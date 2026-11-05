@@ -44,7 +44,7 @@ nav button { display:inline-flex; align-items:center; gap:10px; vertical-align:m
 .hamb[aria-expanded="true"] span:nth-child(1) { transform:translateY(6.5px) rotate(45deg); }
 .hamb[aria-expanded="true"] span:nth-child(2) { opacity:0; }
 .hamb[aria-expanded="true"] span:nth-child(3) { transform:translateY(-6.5px) rotate(-45deg); }
-.cajon { position:fixed; top:65px; left:0; bottom:0; width:var(--ancho-cajon, 300px); max-width:86vw; overflow-y:auto; padding:32px 24px; background:var(--fondo); border-right:1px solid var(--linea); transform:translateX(-100%); visibility:hidden; transition:transform .2s ease, visibility .2s; z-index:20; }
+.cajon { position:fixed; top:65px; left:0; bottom:0; width:max(var(--ancho-cajon, 340px), 340px); max-width:86vw; overflow-y:auto; padding:32px 24px; background:var(--fondo); border-right:1px solid var(--linea); transform:translateX(-100%); visibility:hidden; transition:transform .2s ease, visibility .2s; z-index:20; }
 .cajon.abierto { transform:none; visibility:visible; }
 .velo { position:fixed; inset:65px 0 0 0; background:rgba(0,0,0,.35); z-index:10; }
 header { position:sticky; top:0; z-index:30; background:var(--fondo); }
