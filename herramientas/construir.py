@@ -53,6 +53,7 @@ TEMARIO = [
          "slug": "mini-yolo-digitos-en-la-calle",
          "fuente": "Semana_03/02_Clase_viernes_6_nov/1_Mini_YOLO_digitos_en_la_calle/Animacion_B1_Mini_YOLO_por_dentro.html",
          "miniatura": "mini-yolo.jpg", "fotos": True,
+         "congelada": True,  # la B1 se está cambiando en el curso: se publica la última versión estable (notas/congeladas/)
          "alt": "El NMS del Mini-YOLO borra las cajas que se solapan",
          "desc": "Una red pequeña al estilo YOLO aprende a encontrar dígitos sobre fotos reales de la calle, desde la red recién nacida hasta las cajas finales.",
          "datos": "194 pasos entrenar · 66 predecir · 30 épocas", "pasos": 194 + 66, "minutos": 60,
