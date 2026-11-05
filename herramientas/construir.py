@@ -211,7 +211,6 @@ def construir_inicio():
 <div class="mono">Temario · actualizado el {ACTUALIZADO}</div>
 <h1>Machine learning desde cero, con cada operación a la vista.</h1>
 <p>Un recorrido ordenado: de la regresión lineal a la detección de objetos. Cada lección es una animación paso a paso hecha con los datos reales del entrenamiento.</p>
-<div class="cifras"><div><b>{len(TEMARIO)}</b>temas</div><div><b>{len(pubs)}</b>lecciones publicadas</div><div><b>{pasos}</b>pasos animados</div></div>
 </section>
 {"".join(temas)}
 </main>
