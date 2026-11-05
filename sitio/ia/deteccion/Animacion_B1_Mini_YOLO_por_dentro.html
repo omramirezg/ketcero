@@ -1,11 +1,10 @@
 <!doctype html>
-<html data-kc-fotos lang="es">
+<html data-kc-leccion="mini-yolo-digitos-en-la-calle" data-kc-fotos lang="es">
 <head>
-<script>var KC_ALTO = 65;try{if(localStorage.getItem("tema")!=="claro")document.documentElement.classList.add("kc-oscuro")}catch(e){document.documentElement.classList.add("kc-oscuro")}</script>
-
+<script src="/kc/temprano.js"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>B1 · El Mini-YOLO por dentro</title>
+<title>Mini-YOLO por dentro: dígitos en la calle · Ket Cero</title>
 <style>
   /* El motor de las animaciones del curso: el mismo de la A4 de la semana 2 (estilo de libro, un solo acento rojo). */
   :root{ --tinta:#1A1A1A; --gris:#6B6B6B; --gris2:#B5B5B5; --rojo:#B0302A; --azul:#2F5D8A; --papel:#FFFFFF; --marino:#1F3A5F; --gris3:#6B7A8C; }
@@ -104,64 +103,18 @@
   #cctl .t{color:var(--tinta)}
   #dibujo [data-mazo]{cursor:pointer}
 </style>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono&display=swap" rel="stylesheet">
-<style>
-/* --- cabecera del sitio --- */
-#kc-cab { --f:#FFFFFF; --t:#161616; --g:#6B6B6B; --l:#E2E2E2; --cero:#C8502A;
-  position:fixed; top:0; left:0; right:0; height:65px; box-sizing:border-box; z-index:50; display:flex; align-items:center; justify-content:space-between;
-  padding:0 24px; background:var(--f); border-bottom:1px solid var(--l); font:14px "IBM Plex Sans", system-ui, sans-serif; color:var(--t); }
-html.kc-oscuro #kc-cab { --f:#FFFFFF; --t:#000000; --g:#616161; --l:#E3E3E3; --cero:#FF8255; }   /* tras invertir: #121212, #EDEDED, #9A9A9A, #2A2A2A, coral */
-#kc-cab a { color:inherit; text-decoration:none; }
-#kc-cab .kc-marca { display:flex; align-items:center; gap:10px; font-weight:600; font-size:18px; color:var(--t); }
-#kc-cab .kc-marca small { font-weight:400; color:var(--g); font-size:14px; margin-left:8px; padding-left:12px; border-left:1px solid var(--l); }
-#kc-cab nav { display:flex; align-items:center; gap:28px; }
-#kc-cab nav a, #kc-cab nav button { color:var(--g); font:14px "IBM Plex Sans", system-ui, sans-serif; }
-#kc-cab nav a:hover, #kc-cab nav button:hover { color:var(--t); }
-#kc-cab .kc-aviso { font:12px "IBM Plex Mono", monospace; color:var(--g); }
-#kc-cab .kc-volver { color:var(--t) !important; }
-#kc-tema { display:inline-flex; align-items:center; gap:10px; background:none; border:0; padding:0; cursor:pointer; }
-.kc-pista { position:relative; width:34px; height:18px; box-sizing:border-box; border:1px solid var(--g); border-radius:9px; }
-.kc-perilla { position:absolute; top:2px; left:2px; width:12px; height:12px; border-radius:50%; background:var(--g); transition:transform .15s; }
-#kc-tema[aria-checked="true"] .kc-pista { background:var(--t); border-color:var(--t); }
-#kc-tema[aria-checked="true"] .kc-perilla { transform:translateX(16px); background:var(--f); }
-/* --- la animación debajo de la cabecera --- */
-#codigo { top:65px !important; }
-#codbtn { top:75px !important; }
-/* --- estilo del sitio en la interfaz de la animación --- */
-* { font-style:normal !important; }
-#modos button, #cabeza, #cabeza button, #texto, #inicio, #inicio h1, #inicio h2, #inicio p, #estado, #barra, #pie, #codcab, #codbtn, #velS, #vctl, #pestBanda {
-  font-family:"IBM Plex Sans", system-ui, sans-serif !important; }
-#cont, #inicio .sub, #inicio .op .n, #inicio .pie, #estado .txt { font-family:"IBM Plex Mono", monospace !important; }
-#modos button { background:transparent !important; color:#6B6B6B !important; border-color:#D6D6D6 !important; font-size:15px !important; }
-#modos button.on { color:#161616 !important; border-color:#161616 !important; font-weight:500; }
-#modos button:not(.on):hover { color:#161616 !important; background:transparent !important; }
-#cabeza .sec { color:#6B6B6B !important; font-weight:400 !important; }
-#cabeza .sec.hecho { color:#3A3A3A !important; }
-#cabeza .sec.act { color:#161616 !important; font-weight:500 !important; border-color:#161616 !important; border-bottom-color:#161616 !important; }
-#cabeza .sec:hover { color:#161616 !important; }
-#regla { border-top:1px solid #161616 !important; }
-#regla2 { border-top:1px solid #D6D6D6 !important; }
-#inicio h1 { text-align:left !important; left:200px !important; font-weight:600 !important; font-size:34px !important; letter-spacing:-.5px; }
-#inicio .sub { text-align:left !important; left:200px !important; font-size:14px !important; color:#6B6B6B !important; }
-#inicio .op { border:1px solid #E2E2E2 !important; box-shadow:none !important; background:transparent !important; }
-#inicio .op:hover { border-color:#161616 !important; }
-#inicio .op h2 { text-align:left !important; margin:34px 36px 0 !important; font-weight:600 !important; font-size:28px !important; }
-#inicio .op p { text-align:left !important; margin:16px 36px 0 !important; font-size:18px !important; line-height:1.55 !important; color:#3A3A3A; }
-#inicio .op .n { text-align:left !important; left:36px !important; right:36px !important; font-size:13px !important; color:#6B6B6B !important; }
-#inicio .pie { text-align:left !important; left:200px !important; font-size:13px !important; }
-#estado { background:transparent !important; border-color:#E2E2E2 !important; }
-#codbtn { font-size:14px !important; }
-#codbtn:not(.on) { border-color:#D6D6D6 !important; }
-#codbtn.on { background:transparent !important; border-color:#161616 !important; color:#161616 !important; }
-/* --- modo oscuro --- */
-html.kc-oscuro { filter:invert(.93) hue-rotate(180deg); }
-/* en las lecciones con fotos reales (data-kc-fotos) las imágenes se vuelven a invertir para conservar sus colores;
-   en las demás (dígitos y mapas) las imágenes se oscurecen igual que los dibujos */
-html.kc-oscuro[data-kc-fotos] img, html.kc-oscuro[data-kc-fotos] image, html.kc-oscuro video { filter:hue-rotate(180deg) invert(1) contrast(1.163); }
-html.kc-oscuro #kc-cab .kc-cero { stroke:#FF8255; }
-</style>
+<meta name="description" content="Una red pequeña al estilo YOLO aprende a encontrar dígitos sobre fotos reales de la calle, desde la red recién nacida hasta las cajas finales.">
+<link rel="canonical" href="https://ketcero.com/ia/deteccion/Animacion_B1_Mini_YOLO_por_dentro">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Ket Cero">
+<meta property="og:title" content="Mini-YOLO por dentro: dígitos en la calle · Ket Cero">
+<meta property="og:description" content="Una red pequeña al estilo YOLO aprende a encontrar dígitos sobre fotos reales de la calle, desde la red recién nacida hasta las cajas finales.">
+<meta property="og:url" content="https://ketcero.com/ia/deteccion/Animacion_B1_Mini_YOLO_por_dentro">
+<meta property="og:image" content="https://ketcero.com/img/compartir.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/kc/fuentes.css">
+<link rel="stylesheet" href="/kc/capa.css">
 </head>
 <body>
 <aside id="codigo"><div id="codasa" title="Arrastre para cambiar el ancho del código · doble clic: el ancho de siempre"></div><div id="codcab"><span class="autor">Animación hecha por Omar Ramírez González para el curso de Deep Learning</span><b>Código del cuaderno</b> · Ejercicio_Mini_YOLO_digitos_en_la_calle.ipynb<span id="codnota"></span></div><div id="codcuerpo"></div></aside>
@@ -855,143 +808,6 @@ if (FIJO && modo){ T = Q.has("t") ? parseFloat(Q.get("t")) : parseFloat(Q.get("f
 else if (Q.has("reproducir")) setAuto(true);
 requestAnimationFrame(cuadro);
 </script>
-<header id="kc-cab"><a class="kc-marca" href="/"><svg width="34" height="24" viewBox="0 0 44 30" aria-hidden="true"><line x1="5" y1="3" x2="5" y2="27" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><ellipse class="kc-cero" cx="19" cy="15" rx="6" ry="11" fill="none" stroke="#C8502A" stroke-width="3"/><polyline points="31,3 39,15 31,27" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>Ket Cero<small>Machine learning desde cero</small></a>
-<nav><span class="kc-aviso">Versión preliminar: en revisión, puede tener errores</span><a class="kc-volver" href="/cursos/deep-learning/#deteccion">← Volver al curso</a><a href="/cursos/">Cursos</a><a href="/omar/">Quién soy</a>
-<button id="kc-tema" type="button" role="switch" aria-checked="true">Modo oscuro<span class="kc-pista"><span class="kc-perilla"></span></span></button></nav></header>
-<script>
-(function () {
-  var r = document.documentElement, b = document.getElementById("kc-tema");
-  function poner() { b.setAttribute("aria-checked", r.classList.contains("kc-oscuro") ? "true" : "false"); }
-  b.addEventListener("click", function () {
-    r.classList.toggle("kc-oscuro");
-    try { localStorage.setItem("tema", r.classList.contains("kc-oscuro") ? "oscuro" : "claro"); } catch (e) {}
-    poner();
-  });
-  poner();
-})();
-</script>
-<div id="kc-zoom" role="toolbar" aria-label="Zoom del dibujo"><button type="button" data-z="menos" title="Alejar">−</button><span class="kc-nivel">1×</span><button type="button" data-z="mas" title="Acercar (también Ctrl + rueda del mouse o pellizcar)">+</button><button type="button" data-z="cero" title="Vista completa">⟲</button><button type="button" data-z="ampliar" title="Ver solo el dibujo en pantalla completa (Esc para salir)">Ampliar</button></div>
-<style>
-#kc-zoom { position:fixed; z-index:45; display:none; align-items:center; background:#FFFFFF; border:1px solid #D6D6D6; font:13px "IBM Plex Sans", system-ui, sans-serif; color:#3A3A3A; user-select:none; }
-#kc-zoom button { background:none; border:0; border-left:1px solid #E2E2E2; padding:5px 11px; color:#3A3A3A; font:inherit; cursor:pointer; line-height:1.2; }
-#kc-zoom button:first-child { border-left:0; }
-#kc-zoom button:hover { color:#161616; }
-#kc-zoom .kc-nivel { min-width:34px; padding:0 4px; text-align:center; font:12px "IBM Plex Mono", monospace; color:#6B6B6B; border-left:1px solid #E2E2E2; }
-html.kc-zoom-activo #dibujo { cursor:grab; overflow:hidden !important; }
-html.kc-arrastrando #dibujo { cursor:grabbing; }
-#dibujo { touch-action:pan-x pan-y; }
-html.kc-zoom-activo #dibujo { touch-action:none; }
-html.kc-ampliado #kc-cab, html.kc-ampliado #codigo, html.kc-ampliado #codbtn, html.kc-ampliado #marco > :not(#dibujo) { visibility:hidden !important; }
-html.kc-ampliado #marco { transform:none !important; left:0 !important; top:0 !important; width:100vw !important; height:100vh !important; }
-html.kc-ampliado #dibujo { visibility:visible !important; position:fixed !important; left:24px !important; top:20px !important; width:calc(100vw - 48px) !important; height:calc(100vh - 76px) !important; }
-html.kc-ampliado body { background:#FFFFFF; }
-</style>
-<script>
-(function () {
-  var svg = document.getElementById("dibujo"), caja = document.getElementById("kc-zoom"), r = document.documentElement;
-  if (!svg || !caja) return;
-  var nivel = caja.querySelector(".kc-nivel"), botonAmpliar = caja.querySelector('[data-z="ampliar"]');
-  var z = 1, base = null, propio = null, hash = location.hash, MAX = 6;
-  function leer() { var v = (svg.getAttribute("viewBox") || "").trim().split(/[\s,]+/).map(Number); return v.length === 4 && v.every(isFinite) ? v : null; }
-  function texto(v) { return v.map(function (n) { return +n.toFixed(3); }).join(" "); }
-  // pone el zoom nz manteniendo fijo el punto (px, py) del dibujo; sin punto, acerca hacia el centro de lo que se ve
-  function poner(nz, px, py) {
-    if (!base) { base = leer(); if (!base) return; }
-    nz = Math.max(1, Math.min(MAX, nz));
-    var c = leer() || base, w = base[2] / nz, h = base[3] / nz, x, y;
-    if (px == null) { x = c[0] + c[2] / 2 - w / 2; y = c[1] + c[3] / 2 - h / 2; }
-    else { x = px - (px - c[0]) * (w / c[2]); y = py - (py - c[1]) * (h / c[3]); }
-    x = Math.max(base[0], Math.min(base[0] + base[2] - w, x));
-    y = Math.max(base[1], Math.min(base[1] + base[3] - h, y));
-    z = nz;
-    if (z <= 1.001) { z = 1; propio = null; svg.setAttribute("viewBox", texto(base)); }
-    else { propio = texto([x, y, w, h]); svg.setAttribute("viewBox", propio); }
-    r.classList.toggle("kc-zoom-activo", z > 1);
-    nivel.textContent = (Math.round(z * 10) / 10).toString().replace(".", ",") + "×";
-  }
-  function reiniciar() { if (z > 1 && base) poner(1); base = null; z = 1; propio = null; r.classList.remove("kc-zoom-activo"); nivel.textContent = "1×"; }
-  // si el motor cambia el viewBox (un paso nuevo, un paso ancho), esa pasa a ser la vista completa
-  new MutationObserver(function () {
-    var v = svg.getAttribute("viewBox");
-    if (v === propio || (z === 1 && base && v === texto(base))) return;
-    base = null; z = 1; propio = null; r.classList.remove("kc-zoom-activo"); nivel.textContent = "1×";
-  }).observe(svg, { attributes: true, attributeFilter: ["viewBox"] });
-  setInterval(function () { if (location.hash !== hash) { hash = location.hash; reiniciar(); } ubicar(); }, 250);
-  function punto(ev) { var p = svg.createSVGPoint(); p.x = ev.clientX; p.y = ev.clientY; return p.matrixTransform(svg.getScreenCTM().inverse()); }
-  caja.addEventListener("click", function (ev) {
-    var b = ev.target.closest("button"); if (!b) return;
-    var q = b.getAttribute("data-z");
-    if (q === "mas") poner(z * 1.5); else if (q === "menos") poner(z / 1.5); else if (q === "cero") poner(1); else if (q === "ampliar") ampliar(!r.classList.contains("kc-ampliado"));
-  });
-  // Ctrl + rueda: acerca alrededor del puntero (la rueda sola sigue siendo de la página)
-  svg.addEventListener("wheel", function (ev) {
-    if (!ev.ctrlKey) return;
-    ev.preventDefault(); ev.stopPropagation();
-    var p = punto(ev); poner(z * Math.exp(-Math.max(-120, Math.min(120, ev.deltaY)) * 0.0015), p.x, p.y);
-  }, { passive: false, capture: true });
-  // arrastrar para moverse (solo con zoom) y pellizcar con dos dedos
-  var dedos = {}, arrastre = null, pellizco = null, movido = false;
-  svg.addEventListener("pointerdown", function (ev) {
-    dedos[ev.pointerId] = { x: ev.clientX, y: ev.clientY };
-    var ids = Object.keys(dedos);
-    if (ids.length === 2) {
-      var a = dedos[ids[0]], b = dedos[ids[1]];
-      pellizco = { d: Math.hypot(a.x - b.x, a.y - b.y), z: z }; arrastre = null; return;
-    }
-    if (z > 1 && ev.button === 0) { arrastre = { x: ev.clientX, y: ev.clientY, v: leer() }; movido = false; svg.setPointerCapture(ev.pointerId); }
-  });
-  svg.addEventListener("pointermove", function (ev) {
-    if (!dedos[ev.pointerId]) return;
-    dedos[ev.pointerId] = { x: ev.clientX, y: ev.clientY };
-    var ids = Object.keys(dedos);
-    if (pellizco && ids.length === 2) {
-      var a = dedos[ids[0]], b = dedos[ids[1]], m = punto({ clientX: (a.x + b.x) / 2, clientY: (a.y + b.y) / 2 });
-      poner(pellizco.z * Math.hypot(a.x - b.x, a.y - b.y) / pellizco.d, m.x, m.y); ev.preventDefault(); return;
-    }
-    if (!arrastre || !base) return;
-    var dx = ev.clientX - arrastre.x, dy = ev.clientY - arrastre.y;
-    if (Math.abs(dx) + Math.abs(dy) > 3) { movido = true; r.classList.add("kc-arrastrando"); }
-    var k = svg.getScreenCTM().a, v = arrastre.v;
-    var x = Math.max(base[0], Math.min(base[0] + base[2] - v[2], v[0] - dx / k));
-    var y = Math.max(base[1], Math.min(base[1] + base[3] - v[3], v[1] - dy / k));
-    propio = texto([x, y, v[2], v[3]]); svg.setAttribute("viewBox", propio);
-  });
-  function soltar(ev) {
-    delete dedos[ev.pointerId];
-    if (Object.keys(dedos).length < 2) pellizco = null;
-    arrastre = null; r.classList.remove("kc-arrastrando");
-  }
-  svg.addEventListener("pointerup", soltar); svg.addEventListener("pointercancel", soltar);
-  // un arrastre no cuenta como clic sobre el dibujo
-  svg.addEventListener("click", function (ev) { if (movido) { ev.stopPropagation(); ev.preventDefault(); movido = false; } }, true);
-  function ampliar(si) {
-    r.classList.toggle("kc-ampliado", si);
-    botonAmpliar.textContent = si ? "Cerrar" : "Ampliar";
-    try {
-      if (si && r.requestFullscreen && !document.fullscreenElement) r.requestFullscreen().catch(function () {});
-      if (!si && document.fullscreenElement) document.exitFullscreen().catch(function () {});
-    } catch (e) {}
-    ubicar();
-  }
-  document.addEventListener("fullscreenchange", function () { if (!document.fullscreenElement && r.classList.contains("kc-ampliado")) ampliar(false); });
-  document.addEventListener("keydown", function (ev) { if (ev.key === "Escape" && r.classList.contains("kc-ampliado")) ampliar(false); });
-  // los controles van en la esquina inferior derecha del cuadro del dibujo, solo cuando hay dibujo a la vista
-  function ubicar() {
-    if (r.classList.contains("kc-ampliado")) {
-      caja.style.display = "flex"; caja.style.left = "auto"; caja.style.top = "auto"; caja.style.right = "24px"; caja.style.bottom = "14px"; return;
-    }
-    var b = svg.getBoundingClientRect(), inicio = document.getElementById("inicio");
-    var hay = b.width > 120 && b.height > 80 && getComputedStyle(svg).display !== "none" && getComputedStyle(svg).visibility !== "hidden"
-      && svg.childElementCount > 1 && !(inicio && inicio.offsetParent !== null && getComputedStyle(inicio).display !== "none");
-    caja.style.display = hay ? "flex" : "none";
-    if (!hay) return;
-    caja.style.right = "auto"; caja.style.bottom = "auto";
-    caja.style.left = Math.max(8, b.right - caja.offsetWidth - 8) + "px";
-    caja.style.top = Math.max(8, b.bottom - caja.offsetHeight - 8) + "px";
-  }
-  addEventListener("resize", ubicar);
-  ubicar();
-})();
-</script>
+<script src="/kc/capa.js"></script>
 </body>
 </html>

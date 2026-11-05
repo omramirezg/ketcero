@@ -2,9 +2,12 @@
 
 Uso:  python herramientas/construir.py
 Vuelve a correrlo cada vez que cambie una animación o se agregue una lección al TEMARIO.
+Para probarlo como en Cloudflare (encabezados, direcciones sin «.html»): python herramientas/servidor_local.py
 """
-import html, io, json, os, re, shutil
+import hashlib, html, io, json, os, re, shutil
 from datetime import date
+
+from PIL import Image
 
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITIO = os.path.join(RAIZ, "sitio")
@@ -15,10 +18,12 @@ AUTOR = "Omar Ramírez González"
 LIMITE_MB = 25  # Cloudflare no acepta archivos más grandes
 PARTE_MB = 15  # tamaño de cada pedazo de datos cuando una animación pasa del límite
 ACTUALIZADO = "5 de noviembre de 2026"
+# Cloudflare Web Analytics: pega aquí el token que da el panel (ver notas/PASOS_GOOGLE_Y_ANALITICA.md); vacío = sin analítica
+ANALITICA = ""
 
 # Temario de machine learning. Cada tema: (carpeta en /ia/, título, descripción, lecciones).
-# Lección publicada: dict con fuente (ruta en el curso), miniatura, descripción y datos.
-# Lección pendiente: solo el título.
+# Lección publicada: dict con fuente (ruta en el curso), slug de su página, miniatura, descripción, datos,
+# qué se aprende, requisitos y minutos aproximados. Lección pendiente: solo el título.
 TEMARIO = [
     ("redes-profundas", "Redes neuronales profundas", "Qué es una red, cuándo le gana al machine learning clásico y cómo aprende con descenso de gradiente.", [
         {"titulo": "¿Machine learning o deep learning? Depende de cuántos datos hay"},
@@ -26,21 +31,39 @@ TEMARIO = [
     ]),
     ("cnn", "Redes convolucionales", "Cómo una red lee una imagen.", [
         {"titulo": "La CNN completa, por dentro",
+         "slug": "la-cnn-completa",
          "fuente": "Semana_02/02_Clase_viernes_30_oct/1_Densa_vs_CNN_MNIST/Animacion_A4_la_CNN_completa.html",
          "miniatura": "cnn-completa.jpg",
          "alt": "La pérdida de cada imagen del lote en la CNN completa",
          "desc": "Una LeNet-5 aprende a leer dígitos de MNIST: lotes reales, la pérdida de cada imagen, el backward capa por capa y el paso de AdamW.",
-         "datos": "86 pasos entrenar · 43 predecir · 5 épocas", "pasos": 86 + 43},
+         "datos": "86 pasos entrenar · 43 predecir · 5 épocas", "pasos": 86 + 43, "minutos": 30,
+         "aprender": [
+             "Cómo se reparten las imágenes de MNIST: 55.000 para entrenar, 5.000 para validar y 10.000 de prueba, en lotes de 128.",
+             "Cómo nace la LeNet-5 con pesos al azar y cuáles de sus capas aprenden: 44.426 parámetros.",
+             "La ida de un lote real, capa por capa: convoluciones, ReLU, pooling, aplanar y capas densas.",
+             "La pérdida de cada imagen y del lote, y la vuelta (backward) capa por capa hasta el paso de AdamW.",
+             "Cómo se valida cada época y cómo la red ya entrenada reconoce un 3 que nunca vio.",
+         ],
+         "requisitos": "Saber qué es una neurona y una capa densa ayuda, pero no es indispensable: cada operación se muestra con sus números."},
         {"titulo": "Transfer learning: hojas de café sanas o enfermas"},
         {"titulo": "Clasificar sin entrenar: CLIP contra una CNN"},
     ]),
     ("deteccion", "Detección de objetos", "Encontrar y encerrar objetos: cajas, puntajes, IoU y NMS.", [
         {"titulo": "Mini-YOLO por dentro: dígitos en la calle",
+         "slug": "mini-yolo-digitos-en-la-calle",
          "fuente": "Semana_03/02_Clase_viernes_6_nov/1_Mini_YOLO_digitos_en_la_calle/Animacion_B1_Mini_YOLO_por_dentro.html",
          "miniatura": "mini-yolo.jpg", "fotos": True,
          "alt": "El NMS del Mini-YOLO borra las cajas que se solapan",
          "desc": "Una red pequeña al estilo YOLO aprende a encontrar dígitos sobre fotos reales de la calle, desde la red recién nacida hasta las cajas finales.",
-         "datos": "186 pasos entrenar · 66 predecir · 30 épocas", "pasos": 186 + 66},
+         "datos": "186 pasos entrenar · 66 predecir · 30 épocas", "pasos": 186 + 66, "minutos": 60,
+         "aprender": [
+             "Cómo se arman las escenas: dígitos de MNIST pegados sobre fotos reales de la calle.",
+             "La red al nacer: nueve convoluciones con su BatchNorm, cinco pool y dos capas densas que terminan en una rejilla de 7 × 7.",
+             "La ida de un lote real y la pérdida de YOLO, término por término.",
+             "La vuelta con la regla de la cadena y el paso de AdamW, lote tras lote y época tras época.",
+             "Al predecir: decodificar las 98 cajas, el puntaje, el umbral, el IoU y el NMS hasta las cajas finales.",
+         ],
+         "requisitos": "Haber visto «La CNN completa, por dentro»: aquí se usan las mismas piezas (convoluciones, pooling, capas densas)."},
         {"titulo": "YOLO11 encuentra huecos en la calle"},
     ]),
     ("segmentacion", "Segmentación de imágenes", "Etiquetar cada píxel de una imagen, no solo encerrar el objeto en una caja.", [
@@ -63,10 +86,26 @@ CURSOS = [
      "Redes neuronales profundas en el orden de las sesiones del curso: de las redes densas a los transformers. Cada lección es una animación paso a paso con los datos reales del entrenamiento.",
      TEMARIO),
 ]
+CURSO_DL = "/cursos/deep-learning/"
 
 LOGO = ('<svg width="34" height="24" viewBox="0 0 44 30" aria-hidden="true"><line x1="5" y1="3" x2="5" y2="27" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>'
         '<ellipse cx="19" cy="15" rx="6" ry="11" fill="none" stroke="#C8502A" stroke-width="3"/>'
         '<polyline points="31,3 39,15 31,27" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>')
+
+
+def version(ruta_publica):
+    """Dirección con ?v=<huella del archivo>: así el navegador puede guardarlo un año y aun así ve los cambios."""
+    contenido = open(os.path.join(SITIO, ruta_publica.lstrip("/")), "rb").read()
+    return f"{ruta_publica}?v={hashlib.sha1(contenido).hexdigest()[:10]}"
+
+
+def beacon():
+    if not ANALITICA:
+        return ""
+    return ('<script defer src="https://static.cloudflareinsights.com/beacon.min.js" '
+            f'data-cf-beacon=\'{{"token": "{ANALITICA}"}}\'></script>\n')
+
+
 # Aplica el tema guardado antes de pintar (sin parpadeo) y maneja el botón Oscuro / Claro.
 TEMA_JS = '<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.dataset.tema=t}catch(e){}</script>\n'
 BOTON_JS = """<script>
@@ -108,10 +147,36 @@ BOTON_JS = """<script>
   document.addEventListener("click", function (e) { if (!l.hidden && !l.contains(e.target)) poner(false); });
   document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !l.hidden) { poner(false); b.focus(); } });
 })();
+(function () {
+  // lecciones ya abiertas (las marca la capa de las animaciones) y «seguir donde quedaste»
+  var vistas = [];
+  try { vistas = JSON.parse(localStorage.getItem("kc-vistas") || "[]"); } catch (e) {}
+  [].forEach.call(document.querySelectorAll("[data-leccion]"), function (el) {
+    if (vistas.indexOf(el.getAttribute("data-leccion")) < 0 || el.id === "seguir") return;
+    var s = document.createElement("span"); s.className = "vista"; s.textContent = "vista";
+    (el.querySelector(".d") || el).appendChild(s);
+  });
+  var seguir = document.getElementById("seguir");
+  if (seguir) try {
+    var h = localStorage.getItem("kc-paso-" + seguir.getAttribute("data-leccion"));
+    if (h && /^#[a-z_0-9]+\\/\\d+$/.test(h)) {
+      var p = h.slice(1).split("/");
+      seguir.href = seguir.getAttribute("data-animacion") + h;
+      seguir.textContent = "Seguir donde quedaste: " + p[0] + ", paso " + p[1] + " →";
+      seguir.hidden = false;
+    }
+  } catch (e) {}
+})();
+(function () {
+  // «Cargando la animación…» mientras el navegador trae una animación pesada
+  var c = document.getElementById("cargando");
+  document.addEventListener("click", function (e) {
+    var a = e.target.closest && e.target.closest("a[data-abre-animacion]");
+    if (a && c && e.button === 0 && !e.ctrlKey && !e.metaKey && !e.shiftKey) c.hidden = false;
+  });
+  addEventListener("pageshow", function () { if (c) c.hidden = true; });
+})();
 </script>"""
-FUENTES = ('<link rel="preconnect" href="https://fonts.googleapis.com">\n'
-           '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
-           '<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono&display=swap" rel="stylesheet">\n')
 
 
 def pagina(titulo, descripcion, ruta, cuerpo, actual="", extra_head=""):
@@ -127,6 +192,7 @@ def pagina(titulo, descripcion, ruta, cuerpo, actual="", extra_head=""):
                     + "".join(f'<li><a href="/cursos/{c}/#{clave}"><em>{t}</em>{titulo}<span>{sum("fuente" in l for l in lecciones)}</span></a></li>'
                               for t, (clave, titulo, _, lecciones) in enumerate(tem, 1)) + '</ol>'
                     for c, nombre, _, tem in CURSOS)
+    cuerpo = cuerpo.replace("<main", '<main id="contenido"', 1)
     return f"""<!doctype html>
 <html lang="es">
 <head>
@@ -143,25 +209,38 @@ def pagina(titulo, descripcion, ruta, cuerpo, actual="", extra_head=""):
 <meta property="og:title" content="{html.escape(titulo)}">
 <meta property="og:description" content="{html.escape(descripcion)}">
 <meta property="og:url" content="{DOMINIO}{ruta}">
+<meta property="og:image" content="{DOMINIO}/img/compartir.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Ket Cero: un 0 escrito a mano y lo que ve un filtro de la red">
 <meta property="og:locale" content="es_CO">
-{FUENTES}<link rel="stylesheet" href="/estilo.css">
-{extra_head}</head>
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preload" href="/fuentes/IBMPlexSans-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="{version('/kc/fuentes.css')}">
+<link rel="stylesheet" href="{version('/estilo.css')}">
+{beacon()}{extra_head}</head>
 <body>
+<a class="saltar" href="#contenido">Saltar al contenido</a>
 <header><div class="in">
 <div class="izq"><button id="menu" class="hamb" type="button" aria-expanded="false" aria-controls="cajon" aria-label="Abrir los cursos"><span></span><span></span><span></span></button>
-<a class="marca" href="/">{LOGO}Ket Cero<small>Machine learning desde cero</small></a></div>
-<nav>{enlaces}<button id="tema" type="button" role="switch" aria-checked="true"><span>Modo oscuro</span><span class="pista"><span class="perilla"></span></span></button></nav>
+<a class="marca" href="/" aria-label="Ket Cero, inicio">{LOGO}Ket Cero<small>Machine learning desde cero</small></a></div>
+<nav aria-label="Principal">{enlaces}<button id="tema" type="button" role="switch" aria-checked="true"><span>Modo oscuro</span><span class="pista"><span class="perilla"></span></span></button></nav>
 </div></header>
 <div id="velo" class="velo" hidden></div>
 <aside id="cajon" class="cajon" aria-label="Cursos">
 {cajon}
 </aside>
 {cuerpo}
+<div id="cargando" class="cargando" role="status" hidden><div>{LOGO}<p>Cargando la animación…</p><small>Trae los datos reales de cada paso: la primera vez tarda unos segundos.</small></div></div>
 <footer><div class="in"><span>Ket Cero · un proyecto de <a href="/omar/">{AUTOR}</a></span><span>ketcero.com</span></div></footer>
 {BOTON_JS}
 </body>
 </html>
 """
+
+
+def ld(objeto):
+    return '<script type="application/ld+json">\n' + json.dumps(objeto, ensure_ascii=False, indent=1) + "\n</script>\n"
 
 
 def mb(ruta):
@@ -207,247 +286,74 @@ def partir(origen, destino):
         raise SystemExit(f"{os.path.basename(destino)}: un pedazo quedó de {max(pesos):.1f} MB; baja PARTE_MB")
 
 
-# Capa que el sitio agrega a cada animación publicada (los originales del curso no se tocan):
-# - la misma cabecera del sitio (marca, Cursos, Quién soy, interruptor de modo oscuro) y el aviso de versión preliminar;
-# - la animación se escala en el alto que queda debajo de la cabecera (se ajusta su función escalar());
-# - la interfaz con la letra y el estilo sobrio del sitio, sin cursivas;
-# - modo oscuro por inversión de colores (invert .93 deja el blanco en #121212, como el fondo del sitio); la cabecera
-#   y las fotos llevan colores «pre-invertidos» para verse igual que en el resto del sitio.
+# ------------------------------------------------------------------------------------------------------------
+# Capa del sitio sobre cada animación publicada (los originales del curso no se tocan).
+# Los archivos grandes solo llevan unas pocas líneas FIJAS (agregar_capa); todo lo que la capa hace vive en
+# archivos pequeños de /kc/ (temprano.js, capa.css, capa.js). Así, mejorar la capa no cambia los archivos grandes
+# y el repositorio no crece cada vez.
+# ------------------------------------------------------------------------------------------------------------
 KC_ALTO = 65
-CAPA_TEMPRANA = """<script>var KC_ALTO = %d;try{if(localStorage.getItem("tema")!=="claro")document.documentElement.classList.add("kc-oscuro")}catch(e){document.documentElement.classList.add("kc-oscuro")}</script>
-""" % KC_ALTO
-CAPA_HEAD = """<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono&display=swap" rel="stylesheet">
-<style>
-/* --- cabecera del sitio --- */
-#kc-cab { --f:#FFFFFF; --t:#161616; --g:#6B6B6B; --l:#E2E2E2; --cero:#C8502A;
-  position:fixed; top:0; left:0; right:0; height:%(alto)dpx; box-sizing:border-box; z-index:50; display:flex; align-items:center; justify-content:space-between;
-  padding:0 24px; background:var(--f); border-bottom:1px solid var(--l); font:14px "IBM Plex Sans", system-ui, sans-serif; color:var(--t); }
-html.kc-oscuro #kc-cab { --f:#FFFFFF; --t:#000000; --g:#616161; --l:#E3E3E3; --cero:#FF8255; }   /* tras invertir: #121212, #EDEDED, #9A9A9A, #2A2A2A, coral */
-#kc-cab a { color:inherit; text-decoration:none; }
-#kc-cab .kc-marca { display:flex; align-items:center; gap:10px; font-weight:600; font-size:18px; color:var(--t); }
-#kc-cab .kc-marca small { font-weight:400; color:var(--g); font-size:14px; margin-left:8px; padding-left:12px; border-left:1px solid var(--l); }
-#kc-cab nav { display:flex; align-items:center; gap:28px; }
-#kc-cab nav a, #kc-cab nav button { color:var(--g); font:14px "IBM Plex Sans", system-ui, sans-serif; }
-#kc-cab nav a:hover, #kc-cab nav button:hover { color:var(--t); }
-#kc-cab .kc-aviso { font:12px "IBM Plex Mono", monospace; color:var(--g); }
-#kc-cab .kc-volver { color:var(--t) !important; }
-#kc-tema { display:inline-flex; align-items:center; gap:10px; background:none; border:0; padding:0; cursor:pointer; }
-.kc-pista { position:relative; width:34px; height:18px; box-sizing:border-box; border:1px solid var(--g); border-radius:9px; }
-.kc-perilla { position:absolute; top:2px; left:2px; width:12px; height:12px; border-radius:50%%; background:var(--g); transition:transform .15s; }
-#kc-tema[aria-checked="true"] .kc-pista { background:var(--t); border-color:var(--t); }
-#kc-tema[aria-checked="true"] .kc-perilla { transform:translateX(16px); background:var(--f); }
-/* --- la animación debajo de la cabecera --- */
-#codigo { top:%(alto)dpx !important; }
-#codbtn { top:%(boton)dpx !important; }
-/* --- estilo del sitio en la interfaz de la animación --- */
-* { font-style:normal !important; }
-#modos button, #cabeza, #cabeza button, #texto, #inicio, #inicio h1, #inicio h2, #inicio p, #estado, #barra, #pie, #codcab, #codbtn, #velS, #vctl, #pestBanda {
-  font-family:"IBM Plex Sans", system-ui, sans-serif !important; }
-#cont, #inicio .sub, #inicio .op .n, #inicio .pie, #estado .txt { font-family:"IBM Plex Mono", monospace !important; }
-#modos button { background:transparent !important; color:#6B6B6B !important; border-color:#D6D6D6 !important; font-size:15px !important; }
-#modos button.on { color:#161616 !important; border-color:#161616 !important; font-weight:500; }
-#modos button:not(.on):hover { color:#161616 !important; background:transparent !important; }
-#cabeza .sec { color:#6B6B6B !important; font-weight:400 !important; }
-#cabeza .sec.hecho { color:#3A3A3A !important; }
-#cabeza .sec.act { color:#161616 !important; font-weight:500 !important; border-color:#161616 !important; border-bottom-color:#161616 !important; }
-#cabeza .sec:hover { color:#161616 !important; }
-#regla { border-top:1px solid #161616 !important; }
-#regla2 { border-top:1px solid #D6D6D6 !important; }
-#inicio h1 { text-align:left !important; left:200px !important; font-weight:600 !important; font-size:34px !important; letter-spacing:-.5px; }
-#inicio .sub { text-align:left !important; left:200px !important; font-size:14px !important; color:#6B6B6B !important; }
-#inicio .op { border:1px solid #E2E2E2 !important; box-shadow:none !important; background:transparent !important; }
-#inicio .op:hover { border-color:#161616 !important; }
-#inicio .op h2 { text-align:left !important; margin:34px 36px 0 !important; font-weight:600 !important; font-size:28px !important; }
-#inicio .op p { text-align:left !important; margin:16px 36px 0 !important; font-size:18px !important; line-height:1.55 !important; color:#3A3A3A; }
-#inicio .op .n { text-align:left !important; left:36px !important; right:36px !important; font-size:13px !important; color:#6B6B6B !important; }
-#inicio .pie { text-align:left !important; left:200px !important; font-size:13px !important; }
-#estado { background:transparent !important; border-color:#E2E2E2 !important; }
-#codbtn { font-size:14px !important; }
-#codbtn:not(.on) { border-color:#D6D6D6 !important; }
-#codbtn.on { background:transparent !important; border-color:#161616 !important; color:#161616 !important; }
-/* --- modo oscuro --- */
-html.kc-oscuro { filter:invert(.93) hue-rotate(180deg); }
-/* en las lecciones con fotos reales (data-kc-fotos) las imágenes se vuelven a invertir para conservar sus colores;
-   en las demás (dígitos y mapas) las imágenes se oscurecen igual que los dibujos */
-html.kc-oscuro[data-kc-fotos] img, html.kc-oscuro[data-kc-fotos] image, html.kc-oscuro video { filter:hue-rotate(180deg) invert(1) contrast(1.163); }
-html.kc-oscuro #kc-cab .kc-cero { stroke:#FF8255; }
-</style>
-""" % {"alto": KC_ALTO, "boton": KC_ALTO + 10}
-LOGO_KC = ('<svg width="34" height="24" viewBox="0 0 44 30" aria-hidden="true"><line x1="5" y1="3" x2="5" y2="27" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>'
-           '<ellipse class="kc-cero" cx="19" cy="15" rx="6" ry="11" fill="none" stroke="#C8502A" stroke-width="3"/>'
-           '<polyline points="31,3 39,15 31,27" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>')
-CAPA_BODY = """<header id="kc-cab"><a class="kc-marca" href="/">""" + LOGO_KC + """Ket Cero<small>Machine learning desde cero</small></a>
-<nav><span class="kc-aviso">Versión preliminar: en revisión, puede tener errores</span><a class="kc-volver" href="{curso}">← Volver al curso</a><a href="/cursos/">Cursos</a><a href="/omar/">Quién soy</a>
-<button id="kc-tema" type="button" role="switch" aria-checked="true">Modo oscuro<span class="kc-pista"><span class="kc-perilla"></span></span></button></nav></header>
-<script>
-(function () {
-  var r = document.documentElement, b = document.getElementById("kc-tema");
-  function poner() { b.setAttribute("aria-checked", r.classList.contains("kc-oscuro") ? "true" : "false"); }
-  b.addEventListener("click", function () {
-    r.classList.toggle("kc-oscuro");
-    try { localStorage.setItem("tema", r.classList.contains("kc-oscuro") ? "oscuro" : "claro"); } catch (e) {}
-    poner();
-  });
-  poner();
-})();
-</script>
-"""
+CAPA_DIR = os.path.join(RAIZ, "herramientas", "capa")  # temprano.js, capa.css y capa.js: la capa de las animaciones
 
 
-# Zoom del dibujo (svg#dibujo): se acerca cambiando su viewBox, así solo se mueve lo de adentro del cuadro
-# (el SVG recorta lo que sale de su caja) y el texto vectorial queda nítido. «Ampliar» deja solo el dibujo en pantalla completa.
-# Al cambiar de paso (cambia el #hash) o si el motor pone otro viewBox, vuelve a la vista completa.
-CAPA_ZOOM = """<div id="kc-zoom" role="toolbar" aria-label="Zoom del dibujo"><button type="button" data-z="menos" title="Alejar">−</button><span class="kc-nivel">1×</span><button type="button" data-z="mas" title="Acercar (también Ctrl + rueda del mouse o pellizcar)">+</button><button type="button" data-z="cero" title="Vista completa">⟲</button><button type="button" data-z="ampliar" title="Ver solo el dibujo en pantalla completa (Esc para salir)">Ampliar</button></div>
-<style>
-#kc-zoom { position:fixed; z-index:45; display:none; align-items:center; background:#FFFFFF; border:1px solid #D6D6D6; font:13px "IBM Plex Sans", system-ui, sans-serif; color:#3A3A3A; user-select:none; }
-#kc-zoom button { background:none; border:0; border-left:1px solid #E2E2E2; padding:5px 11px; color:#3A3A3A; font:inherit; cursor:pointer; line-height:1.2; }
-#kc-zoom button:first-child { border-left:0; }
-#kc-zoom button:hover { color:#161616; }
-#kc-zoom .kc-nivel { min-width:34px; padding:0 4px; text-align:center; font:12px "IBM Plex Mono", monospace; color:#6B6B6B; border-left:1px solid #E2E2E2; }
-html.kc-zoom-activo #dibujo { cursor:grab; overflow:hidden !important; }
-html.kc-arrastrando #dibujo { cursor:grabbing; }
-#dibujo { touch-action:pan-x pan-y; }
-html.kc-zoom-activo #dibujo { touch-action:none; }
-html.kc-ampliado #kc-cab, html.kc-ampliado #codigo, html.kc-ampliado #codbtn, html.kc-ampliado #marco > :not(#dibujo) { visibility:hidden !important; }
-html.kc-ampliado #marco { transform:none !important; left:0 !important; top:0 !important; width:100vw !important; height:100vh !important; }
-html.kc-ampliado #dibujo { visibility:visible !important; position:fixed !important; left:24px !important; top:20px !important; width:calc(100vw - 48px) !important; height:calc(100vh - 76px) !important; }
-html.kc-ampliado body { background:#FFFFFF; }
-</style>
-<script>
-(function () {
-  var svg = document.getElementById("dibujo"), caja = document.getElementById("kc-zoom"), r = document.documentElement;
-  if (!svg || !caja) return;
-  var nivel = caja.querySelector(".kc-nivel"), botonAmpliar = caja.querySelector('[data-z="ampliar"]');
-  var z = 1, base = null, propio = null, hash = location.hash, MAX = 6;
-  function leer() { var v = (svg.getAttribute("viewBox") || "").trim().split(/[\\s,]+/).map(Number); return v.length === 4 && v.every(isFinite) ? v : null; }
-  function texto(v) { return v.map(function (n) { return +n.toFixed(3); }).join(" "); }
-  // pone el zoom nz manteniendo fijo el punto (px, py) del dibujo; sin punto, acerca hacia el centro de lo que se ve
-  function poner(nz, px, py) {
-    if (!base) { base = leer(); if (!base) return; }
-    nz = Math.max(1, Math.min(MAX, nz));
-    var c = leer() || base, w = base[2] / nz, h = base[3] / nz, x, y;
-    if (px == null) { x = c[0] + c[2] / 2 - w / 2; y = c[1] + c[3] / 2 - h / 2; }
-    else { x = px - (px - c[0]) * (w / c[2]); y = py - (py - c[1]) * (h / c[3]); }
-    x = Math.max(base[0], Math.min(base[0] + base[2] - w, x));
-    y = Math.max(base[1], Math.min(base[1] + base[3] - h, y));
-    z = nz;
-    if (z <= 1.001) { z = 1; propio = null; svg.setAttribute("viewBox", texto(base)); }
-    else { propio = texto([x, y, w, h]); svg.setAttribute("viewBox", propio); }
-    r.classList.toggle("kc-zoom-activo", z > 1);
-    nivel.textContent = (Math.round(z * 10) / 10).toString().replace(".", ",") + "×";
-  }
-  function reiniciar() { if (z > 1 && base) poner(1); base = null; z = 1; propio = null; r.classList.remove("kc-zoom-activo"); nivel.textContent = "1×"; }
-  // si el motor cambia el viewBox (un paso nuevo, un paso ancho), esa pasa a ser la vista completa
-  new MutationObserver(function () {
-    var v = svg.getAttribute("viewBox");
-    if (v === propio || (z === 1 && base && v === texto(base))) return;
-    base = null; z = 1; propio = null; r.classList.remove("kc-zoom-activo"); nivel.textContent = "1×";
-  }).observe(svg, { attributes: true, attributeFilter: ["viewBox"] });
-  setInterval(function () { if (location.hash !== hash) { hash = location.hash; reiniciar(); } ubicar(); }, 250);
-  function punto(ev) { var p = svg.createSVGPoint(); p.x = ev.clientX; p.y = ev.clientY; return p.matrixTransform(svg.getScreenCTM().inverse()); }
-  caja.addEventListener("click", function (ev) {
-    var b = ev.target.closest("button"); if (!b) return;
-    var q = b.getAttribute("data-z");
-    if (q === "mas") poner(z * 1.5); else if (q === "menos") poner(z / 1.5); else if (q === "cero") poner(1); else if (q === "ampliar") ampliar(!r.classList.contains("kc-ampliado"));
-  });
-  // Ctrl + rueda: acerca alrededor del puntero (la rueda sola sigue siendo de la página)
-  svg.addEventListener("wheel", function (ev) {
-    if (!ev.ctrlKey) return;
-    ev.preventDefault(); ev.stopPropagation();
-    var p = punto(ev); poner(z * Math.exp(-Math.max(-120, Math.min(120, ev.deltaY)) * 0.0015), p.x, p.y);
-  }, { passive: false, capture: true });
-  // arrastrar para moverse (solo con zoom) y pellizcar con dos dedos
-  var dedos = {}, arrastre = null, pellizco = null, movido = false;
-  svg.addEventListener("pointerdown", function (ev) {
-    dedos[ev.pointerId] = { x: ev.clientX, y: ev.clientY };
-    var ids = Object.keys(dedos);
-    if (ids.length === 2) {
-      var a = dedos[ids[0]], b = dedos[ids[1]];
-      pellizco = { d: Math.hypot(a.x - b.x, a.y - b.y), z: z }; arrastre = null; return;
-    }
-    if (z > 1 && ev.button === 0) { arrastre = { x: ev.clientX, y: ev.clientY, v: leer() }; movido = false; svg.setPointerCapture(ev.pointerId); }
-  });
-  svg.addEventListener("pointermove", function (ev) {
-    if (!dedos[ev.pointerId]) return;
-    dedos[ev.pointerId] = { x: ev.clientX, y: ev.clientY };
-    var ids = Object.keys(dedos);
-    if (pellizco && ids.length === 2) {
-      var a = dedos[ids[0]], b = dedos[ids[1]], m = punto({ clientX: (a.x + b.x) / 2, clientY: (a.y + b.y) / 2 });
-      poner(pellizco.z * Math.hypot(a.x - b.x, a.y - b.y) / pellizco.d, m.x, m.y); ev.preventDefault(); return;
-    }
-    if (!arrastre || !base) return;
-    var dx = ev.clientX - arrastre.x, dy = ev.clientY - arrastre.y;
-    if (Math.abs(dx) + Math.abs(dy) > 3) { movido = true; r.classList.add("kc-arrastrando"); }
-    var k = svg.getScreenCTM().a, v = arrastre.v;
-    var x = Math.max(base[0], Math.min(base[0] + base[2] - v[2], v[0] - dx / k));
-    var y = Math.max(base[1], Math.min(base[1] + base[3] - v[3], v[1] - dy / k));
-    propio = texto([x, y, v[2], v[3]]); svg.setAttribute("viewBox", propio);
-  });
-  function soltar(ev) {
-    delete dedos[ev.pointerId];
-    if (Object.keys(dedos).length < 2) pellizco = null;
-    arrastre = null; r.classList.remove("kc-arrastrando");
-  }
-  svg.addEventListener("pointerup", soltar); svg.addEventListener("pointercancel", soltar);
-  // un arrastre no cuenta como clic sobre el dibujo
-  svg.addEventListener("click", function (ev) { if (movido) { ev.stopPropagation(); ev.preventDefault(); movido = false; } }, true);
-  function ampliar(si) {
-    r.classList.toggle("kc-ampliado", si);
-    botonAmpliar.textContent = si ? "Cerrar" : "Ampliar";
-    try {
-      if (si && r.requestFullscreen && !document.fullscreenElement) r.requestFullscreen().catch(function () {});
-      if (!si && document.fullscreenElement) document.exitFullscreen().catch(function () {});
-    } catch (e) {}
-    ubicar();
-  }
-  document.addEventListener("fullscreenchange", function () { if (!document.fullscreenElement && r.classList.contains("kc-ampliado")) ampliar(false); });
-  document.addEventListener("keydown", function (ev) { if (ev.key === "Escape" && r.classList.contains("kc-ampliado")) ampliar(false); });
-  // los controles van en la esquina inferior derecha del cuadro del dibujo, solo cuando hay dibujo a la vista
-  function ubicar() {
-    if (r.classList.contains("kc-ampliado")) {
-      caja.style.display = "flex"; caja.style.left = "auto"; caja.style.top = "auto"; caja.style.right = "24px"; caja.style.bottom = "14px"; return;
-    }
-    var b = svg.getBoundingClientRect(), inicio = document.getElementById("inicio");
-    var hay = b.width > 120 && b.height > 80 && getComputedStyle(svg).display !== "none" && getComputedStyle(svg).visibility !== "hidden"
-      && svg.childElementCount > 1 && !(inicio && inicio.offsetParent !== null && getComputedStyle(inicio).display !== "none");
-    caja.style.display = hay ? "flex" : "none";
-    if (!hay) return;
-    caja.style.right = "auto"; caja.style.bottom = "auto";
-    caja.style.left = Math.max(8, b.right - caja.offsetWidth - 8) + "px";
-    caja.style.top = Math.max(8, b.bottom - caja.offsetHeight - 8) + "px";
-  }
-  addEventListener("resize", ubicar);
-  ubicar();
-})();
-</script>
-"""
-
-
-def agregar_capa(ruta, curso, fotos=False):
+def agregar_capa(ruta, lec):
+    """Las líneas fijas que se agregan a una animación grande. No deben cambiar cuando se mejora la capa."""
     s = io.open(ruta, encoding="utf-8").read()
-    if fotos:
-        s = s.replace("<html", "<html data-kc-fotos", 1)
+    atributos = f' data-kc-leccion="{lec["slug"]}"' + (" data-kc-fotos" if lec.get("fotos") else "")
+    s = s.replace("<html", "<html" + atributos, 1)
     # la animación se escala en el alto que deja la cabecera y se baja esa misma altura
     assert s.count("innerHeight") == 3 and "m.style.top = ((innerHeight" in s, ruta
     s = s.replace("m.style.top = ((innerHeight", "m.style.top = KC_ALTO + ((innerHeight")
     s = s.replace("innerHeight", "(innerHeight - KC_ALTO)")
+    titulo = html.escape(lec["titulo"]) + " · Ket Cero"
+    s = re.sub(r"<title>.*?</title>", lambda m: f"<title>{titulo}</title>", s, count=1, flags=re.S)
     i = s.index("<head>") + len("<head>")
-    s = s[:i] + "\n" + CAPA_TEMPRANA + s[i:]
+    s = s[:i] + '\n<script src="/kc/temprano.js"></script>' + s[i:]
+    url = DOMINIO + lec["url"]
+    cabeza = (f'<meta name="description" content="{html.escape(lec["desc"])}">\n'
+              f'<link rel="canonical" href="{url}">\n'
+              f'<meta property="og:type" content="article">\n<meta property="og:site_name" content="Ket Cero">\n'
+              f'<meta property="og:title" content="{titulo}">\n<meta property="og:description" content="{html.escape(lec["desc"])}">\n'
+              f'<meta property="og:url" content="{url}">\n<meta property="og:image" content="{DOMINIO}/img/compartir.png">\n'
+              '<meta name="twitter:card" content="summary_large_image">\n'
+              '<link rel="icon" href="/favicon.svg" type="image/svg+xml">\n'
+              '<link rel="stylesheet" href="/kc/fuentes.css">\n<link rel="stylesheet" href="/kc/capa.css">\n')
     j = s.index("</head>")
-    s = s[:j] + CAPA_HEAD + s[j:]
+    s = s[:j] + cabeza + s[j:]
     k = s.rindex("</body>")
-    s = s[:k] + CAPA_BODY.replace("{curso}", curso) + CAPA_ZOOM + s[k:]
-    io.open(ruta, "w", encoding="utf-8").write(s)
+    s = s[:k] + '<script src="/kc/capa.js"></script>\n' + s[k:]
+    io.open(ruta, "w", encoding="utf-8", newline="").write(s)
+
+
+def escribir_capa(publicadas_orden):
+    """Copia la capa a /kc/ con los datos de las lecciones (título, página, anterior, siguiente) y la analítica."""
+    os.makedirs(os.path.join(SITIO, "kc"), exist_ok=True)
+    lecciones = {}
+    for n, (clave, num, lec) in enumerate(publicadas_orden):
+        def ref(otra):
+            return {"titulo": otra[2]["titulo"], "pagina": otra[2]["pagina"]} if otra else None
+        lecciones[lec["slug"]] = {"titulo": lec["titulo"], "numero": num, "pagina": lec["pagina"], "animacion": lec["url"],
+                                  "anterior": ref(publicadas_orden[n - 1] if n > 0 else None),
+                                  "siguiente": ref(publicadas_orden[n + 1] if n + 1 < len(publicadas_orden) else None)}
+    datos = ("var KC_LECCIONES = " + json.dumps(lecciones, ensure_ascii=False) + ";\n"
+             + "var KC_ANALITICA = " + json.dumps(ANALITICA) + ";\n")
+    for archivo in ("temprano.js", "capa.css"):
+        shutil.copy2(os.path.join(CAPA_DIR, archivo), os.path.join(SITIO, "kc", archivo))
+    capa = io.open(os.path.join(CAPA_DIR, "capa.js"), encoding="utf-8").read()
+    io.open(os.path.join(SITIO, "kc", "capa.js"), "w", encoding="utf-8", newline="\n").write(datos + capa)
+    shutil.copy2(os.path.join(CAPA_DIR, "fuentes.css"), os.path.join(SITIO, "kc", "fuentes.css"))
 
 
 def publicadas():
-    """Las lecciones con animación, con su tema y su número (3.1, 4.1…)."""
+    """Las lecciones con animación, con su tema y su número (2.1, 3.1…)."""
     for t, (clave, _, _, lecciones) in enumerate(TEMARIO, 1):
         for l, lec in enumerate(lecciones, 1):
             if "fuente" in lec:
                 yield clave, f"{t}.{l}", lec
+
+
+def webp(nombre_jpg):
+    return os.path.splitext(nombre_jpg)[0] + ".webp"
 
 
 def copiar_animaciones():
@@ -458,8 +364,9 @@ def copiar_animaciones():
     os.makedirs(os.path.join(SITIO, "js"), exist_ok=True)
     for archivo in ("cero.js", "cero_datos.js"):  # animación de portada «El cero que aprende»
         shutil.copy2(os.path.join(RAIZ, "herramientas", "animacion_cero", archivo), os.path.join(SITIO, "js", archivo))
+    shutil.copy2(os.path.join(MINIATURAS, "compartir.png"), os.path.join(SITIO, "img", "compartir.png"))
     filas = []
-    for clave, _, lec in publicadas():
+    for clave, num, lec in publicadas():
         destino = os.path.join(SITIO, "ia", clave)
         os.makedirs(destino, exist_ok=True)
         origen = os.path.join(CURSO, lec["fuente"])
@@ -469,10 +376,12 @@ def copiar_animaciones():
             partir(origen, os.path.join(destino, nombre))
         else:
             shutil.copy2(origen, os.path.join(destino, nombre))
-        shutil.copy2(os.path.join(MINIATURAS, lec["miniatura"]), os.path.join(SITIO, "img", lec["miniatura"]))
-        agregar_capa(os.path.join(destino, nombre), f"/cursos/deep-learning/#{clave}", lec.get("fotos", False))
+        Image.open(os.path.join(MINIATURAS, lec["miniatura"])).save(os.path.join(SITIO, "img", webp(lec["miniatura"])), "WEBP", quality=82, method=6)
         lec["url"] = f"/ia/{clave}/{nombre[:-5]}"  # sin «.html»: Cloudflare sirve la página directo, sin la redirección 307
+        lec["pagina"] = f"{CURSO_DL}{lec['slug']}/"
+        agregar_capa(os.path.join(destino, nombre), lec)
         filas.append((lec["url"], peso))
+    escribir_capa(list(publicadas()))
     return filas
 
 
@@ -486,6 +395,11 @@ def filas_cursos():
                    for k, (c, nombre, desc, tem) in enumerate(CURSOS, 1))
 
 
+def miniatura(lec, clase="", carga="lazy"):
+    ruta = version("/img/" + webp(lec["miniatura"]))
+    return f'<img{clase} src="{ruta}" alt="{html.escape(lec["alt"])}" width="940" height="587" loading="{carga}">'
+
+
 def construir_curso(clave_curso, nombre, desc_curso, temario):
     temas = []
     for t, (clave, titulo, desc, lecciones) in enumerate(temario, 1):
@@ -493,9 +407,9 @@ def construir_curso(clave_curso, nombre, desc_curso, temario):
         for l, lec in enumerate(lecciones, 1):
             num = f"{t}.{l}"
             if "fuente" in lec:
-                filas.append(f'<a class="fila pub" href="{lec["url"]}"><div class="n">{num}</div><div><b>{html.escape(lec["titulo"])}</b>'
+                filas.append(f'<a class="fila pub" data-leccion="{lec["slug"]}" href="{lec["pagina"]}"><div class="n">{num}</div><div><b>{html.escape(lec["titulo"])}</b>'
                              f'<p>{html.escape(lec["desc"])}</p><div class="d">{lec["datos"]} · versión preliminar</div></div>'
-                             f'<img src="/img/{lec["miniatura"]}" alt="{html.escape(lec["alt"])}" loading="lazy"></a>')
+                             f'{miniatura(lec)}</a>')
             else:
                 filas.append(f'<div class="fila pend"><div class="n">{num}</div><div><b>{html.escape(lec["titulo"])}</b></div><div class="d">en preparación</div></div>')
         temas.append(f'<section class="tema" id="{clave}"><h2>{titulo} <span>Tema {t}</span></h2><p>{html.escape(desc)}</p>{"".join(filas)}</section>')
@@ -510,8 +424,55 @@ def construir_curso(clave_curso, nombre, desc_curso, temario):
 {"".join(temas)}
 </main>
 </div>"""
+    curso_ld = {"@context": "https://schema.org", "@type": "Course", "name": nombre, "description": desc_curso,
+                "url": f"{DOMINIO}/cursos/{clave_curso}/", "inLanguage": "es",
+                "provider": {"@type": "Organization", "name": "Ket Cero", "url": DOMINIO},
+                "author": {"@type": "Person", "name": AUTOR, "url": f"{DOMINIO}/omar/"},
+                "hasPart": [{"@type": "LearningResource", "name": lec["titulo"], "url": DOMINIO + lec["pagina"],
+                             "description": lec["desc"]} for _, _, lec in publicadas()]}
     return pagina(f"{nombre} · Ket Cero", f"Curso de {nombre} desde cero, en español. {desc_curso}",
-                  f"/cursos/{clave_curso}/", cuerpo, f"/cursos/{clave_curso}/")
+                  f"/cursos/{clave_curso}/", cuerpo, f"/cursos/{clave_curso}/", ld(curso_ld))
+
+
+def construir_leccion(n, orden):
+    """La página de una lección: qué vas a aprender, requisitos, cuánto dura y el botón para abrir la animación."""
+    clave, num, lec = orden[n]
+    tema = next(titulo for c, titulo, _, _ in TEMARIO if c == clave)
+    ant = orden[n - 1][2] if n > 0 else None
+    sig = orden[n + 1][2] if n + 1 < len(orden) else None
+    vecinas = (f'<nav class="vecinas" aria-label="Lecciones">'
+               + (f'<a href="{ant["pagina"]}">← {html.escape(ant["titulo"])}</a>' if ant else "<span></span>")
+               + (f'<a href="{sig["pagina"]}">{html.escape(sig["titulo"])} →</a>' if sig else "<span></span>") + "</nav>")
+    puntos = "".join(f"<li>{html.escape(p)}</li>" for p in lec["aprender"])
+    cuerpo = f"""<div class="cuerpo solo leccion">
+<main>
+<section class="cabeza">
+<div class="mono"><a href="/cursos/">Cursos</a> / <a href="{CURSO_DL}">Deep Learning</a> / <a href="{CURSO_DL}#{clave}">{html.escape(tema)}</a> · lección {num}</div>
+<h1>{html.escape(lec["titulo"])}</h1>
+<p>{html.escape(lec["desc"])}</p>
+<div class="acciones"><a class="boton" href="{lec["url"]}" data-abre-animacion>Abrir la animación →</a>
+<a id="seguir" class="ir" hidden data-leccion="{lec["slug"]}" data-animacion="{lec["url"]}" data-abre-animacion href="{lec["url"]}"></a></div>
+<p class="aviso">Versión preliminar: todavía está en revisión y puede tener errores.</p>
+</section>
+<a class="figura" href="{lec["url"]}" data-abre-animacion>{miniatura(lec, carga="eager")}</a>
+<section class="ficha">
+<h2>Qué vas a aprender</h2>
+<ul>{puntos}</ul>
+<h2>Antes de empezar</h2>
+<p>{html.escape(lec["requisitos"])}</p>
+<h2>Cuánto dura</h2>
+<p>{lec["datos"]}. A tu ritmo, unos {lec["minutos"]} minutos. Avanza con las flechas del teclado o con los botones de abajo; Ctrl + rueda del mouse acerca el dibujo.</p>
+</section>
+{vecinas}
+</main>
+</div>"""
+    recurso = {"@context": "https://schema.org", "@type": "LearningResource", "name": lec["titulo"], "description": lec["desc"],
+               "url": DOMINIO + lec["pagina"], "inLanguage": "es", "learningResourceType": "Animación interactiva",
+               "educationalLevel": "Universitario", "timeRequired": f"PT{lec['minutos']}M",
+               "teaches": lec["aprender"], "image": f"{DOMINIO}/img/{webp(lec['miniatura'])}",
+               "author": {"@type": "Person", "name": AUTOR, "url": f"{DOMINIO}/omar/"},
+               "isPartOf": {"@type": "Course", "name": "Deep Learning", "url": DOMINIO + CURSO_DL}}
+    return pagina(f"{lec['titulo']} · Ket Cero", lec["desc"], lec["pagina"], cuerpo, lec["pagina"], ld(recurso))
 
 
 def construir_cursos():
@@ -536,7 +497,7 @@ def franja_portada():
     proxima = next((lec for _, lec in orden[k + 1:] if "fuente" not in lec), None)
     derecha = f'<span>Próxima: {html.escape(proxima["titulo"].split(":")[0])}</span>' if proxima else "<span></span>"
     corto = lambda titulo: titulo.split(":")[0]
-    return (f'<div class="franja"><a href="{ultima["url"]}">Última lección: {html.escape(corto(ultima["titulo"]))} →</a>'
+    return (f'<div class="franja"><a href="{ultima["pagina"]}">Última lección: {html.escape(corto(ultima["titulo"]))} →</a>'
             f'<a class="bajar" href="#lista-de-cursos">Cursos ↓</a>{derecha}</div>')
 
 
@@ -560,22 +521,24 @@ def construir_inicio():
 <section class="tema" id="lista-de-cursos"><h2>Cursos</h2><p>Empieza por aquí.</p>{filas_cursos()}</section>
 </main>
 </div>
-<script src="/js/cero_datos.js"></script>
-<script src="/js/cero.js"></script>
+<script src="{version('/js/cero_datos.js')}"></script>
+<script src="{version('/js/cero.js')}"></script>
 <script>montarCero(document.getElementById("cero"), window.DATOS_CERO, {{ codigo: document.getElementById("codigo") }});</script>"""
+    sitio_ld = [{"@context": "https://schema.org", "@type": "WebSite", "name": "Ket Cero", "url": DOMINIO + "/", "inLanguage": "es",
+                 "description": "Machine learning desde cero, en español: lecciones animadas paso a paso con los datos reales del entrenamiento."},
+                {"@context": "https://schema.org", "@type": "Organization", "name": "Ket Cero", "url": DOMINIO + "/",
+                 "logo": DOMINIO + "/favicon.svg", "founder": {"@type": "Person", "name": AUTOR, "url": f"{DOMINIO}/omar/"},
+                 "sameAs": ["https://github.com/omramirezg/ketcero"]}]
     return pagina("Ket Cero · Machine learning desde cero",
                   "Machine learning desde cero, en español: cursos con lecciones animadas paso a paso hechas con los datos reales del entrenamiento.",
-                  "/", cuerpo, "/")
+                  "/", cuerpo, "/", "".join(ld(o) for o in sitio_ld))
 
 
 def construir_omar():
-    persona = f"""<script type="application/ld+json">
-{{"@context": "https://schema.org", "@type": "Person", "name": "{AUTOR}",
- "url": "{DOMINIO}/omar/", "jobTitle": "Monitor de Deep Learning",
- "sameAs": ["https://github.com/omramirezg"],
- "worksFor": {{"@type": "Organization", "name": "Ket Cero", "url": "{DOMINIO}"}}}}
-</script>
-"""
+    persona = ld({"@context": "https://schema.org", "@type": "Person", "name": AUTOR,
+                  "url": f"{DOMINIO}/omar/", "jobTitle": "Monitor de Deep Learning",
+                  "sameAs": ["https://github.com/omramirezg"],
+                  "worksFor": {"@type": "Organization", "name": "Ket Cero", "url": DOMINIO}})
     cuerpo = f"""<div class="cuerpo solo">
 <main class="texto">
 <section class="cabeza">
@@ -596,6 +559,36 @@ def construir_404():
     return pagina("Página no encontrada · Ket Cero", "La página que buscas no existe.", "/404", cuerpo)
 
 
+# Encabezados que Cloudflare agrega a cada respuesta. Caché larga solo para archivos con ?v=huella o que nunca cambian;
+# las páginas y la capa de /kc/ se revalidan en cada visita (respuesta 304, casi gratis).
+CSP = ("default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com; "
+       "style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; "
+       "connect-src 'self' https://cloudflareinsights.com; object-src 'none'; base-uri 'self'; form-action 'self'; "
+       "frame-ancestors 'self'; upgrade-insecure-requests")
+LARGA = "public, max-age=31536000, immutable"
+HEADERS = f"""/*
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
+  X-Frame-Options: SAMEORIGIN
+  Cross-Origin-Opener-Policy: same-origin
+  Content-Security-Policy: {CSP}
+
+/fuentes/*
+  Cache-Control: {LARGA}
+
+/js/*
+  Cache-Control: {LARGA}
+
+/img/*
+  Cache-Control: public, max-age=86400
+
+/estilo.css
+  Cache-Control: {LARGA}
+"""
+
+
 def escribir(ruta, texto):
     ruta = os.path.join(SITIO, ruta)
     os.makedirs(os.path.dirname(ruta), exist_ok=True)
@@ -604,13 +597,18 @@ def escribir(ruta, texto):
 
 def main():
     filas = copiar_animaciones()
+    orden = list(publicadas())
     escribir("index.html", construir_inicio())
     escribir("cursos/index.html", construir_cursos())
     for c in CURSOS:
         escribir(f"cursos/{c[0]}/index.html", construir_curso(*c))
+    for n, (_, _, lec) in enumerate(orden):
+        escribir(lec["pagina"].strip("/") + "/index.html", construir_leccion(n, orden))
     escribir("omar/index.html", construir_omar())
     escribir("404.html", construir_404())
-    urls = ["/", "/cursos/"] + [f"/cursos/{c[0]}/" for c in CURSOS] + ["/omar/"] + [u for u, _ in filas]
+    escribir("_headers", HEADERS)
+    urls = (["/", "/cursos/"] + [f"/cursos/{c[0]}/" for c in CURSOS] + [lec["pagina"] for _, _, lec in orden]
+            + ["/omar/"] + [u for u, _ in filas])
     hoy = date.today().isoformat()
     escribir("sitemap.xml", '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
              + "".join(f"<url><loc>{DOMINIO}{u}</loc><lastmod>{hoy}</lastmod></url>\n" for u in urls) + "</urlset>\n")
