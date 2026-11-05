@@ -53,6 +53,7 @@ TEMARIO = [
          "slug": "mini-yolo-digitos-en-la-calle",
          "fuente": "Semana_03/02_Clase_viernes_6_nov/1_Mini_YOLO_digitos_en_la_calle/Animacion_B1_Mini_YOLO_por_dentro.html",
          "miniatura": "mini-yolo.jpg", "fotos": True,
+         "congelada": True,  # la B1 se está cambiando en el curso: se publica la última versión estable (notas/congeladas/)
          "alt": "El NMS del Mini-YOLO borra las cajas que se solapan",
          "desc": "Una red pequeña al estilo YOLO aprende a encontrar dígitos sobre fotos reales de la calle, desde la red recién nacida hasta las cajas finales.",
          "datos": "186 pasos entrenar · 66 predecir · 30 épocas", "pasos": 186 + 66, "minutos": 60,
@@ -388,7 +389,11 @@ def copiar_animaciones():
         origen = os.path.join(CURSO, lec["fuente"])
         nombre = os.path.basename(lec["fuente"])
         peso = mb(origen)
-        if peso > LIMITE_MB:
+        congelada = os.path.join(RAIZ, "notas", "congeladas", clave)
+        if lec.get("congelada") and os.path.isdir(congelada):
+            # mientras su animación se edita en el curso, se publica la copia estable ya armada (con su capa)
+            shutil.rmtree(destino); shutil.copytree(congelada, destino)
+        elif peso > LIMITE_MB:
             partir(origen, os.path.join(destino, nombre))
         else:
             shutil.copy2(origen, os.path.join(destino, nombre))
@@ -399,7 +404,8 @@ def copiar_animaciones():
                 shutil.copy2(os.path.join(MINIATURAS, clip), os.path.join(SITIO, "img", clip))
         lec["url"] = f"/ia/{clave}/{nombre[:-5]}"  # sin «.html»: Cloudflare sirve la página directo, sin la redirección 307
         lec["pagina"] = f"{CURSO_DL}{lec['slug']}/"
-        agregar_capa(os.path.join(destino, nombre), lec)
+        if not (lec.get("congelada") and os.path.isdir(congelada)):
+            agregar_capa(os.path.join(destino, nombre), lec)
         filas.append((lec["url"], peso))
     escribir_capa(list(publicadas()))
     return filas
