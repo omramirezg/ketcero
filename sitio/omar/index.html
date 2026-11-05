@@ -50,7 +50,7 @@
 <script>
 (function () {
   var b = document.getElementById("tema"), r = document.documentElement;
-  function oscuro() { return r.dataset.tema ? r.dataset.tema === "oscuro" : matchMedia("(prefers-color-scheme: dark)").matches; }
+  function oscuro() { return r.dataset.tema !== "claro"; }  // oscuro por defecto
   function rotulo() { b.setAttribute("aria-checked", oscuro() ? "true" : "false"); }
   b.addEventListener("click", function () {
     r.dataset.tema = oscuro() ? "claro" : "oscuro";
