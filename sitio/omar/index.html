@@ -15,30 +15,46 @@
 <meta property="og:title" content="Omar Ramírez González · Ket Cero">
 <meta property="og:description" content="Omar Ramírez González, creador de Ket Cero: machine learning desde cero, con animaciones paso a paso.">
 <meta property="og:url" content="https://ketcero.com/omar/">
+<meta property="og:image" content="https://ketcero.com/img/compartir.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Ket Cero: un 0 escrito a mano y lo que ve un filtro de la red">
 <meta property="og:locale" content="es_CO">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/estilo.css">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preload" href="/fuentes/IBMPlexSans-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/kc/fuentes.css?v=63f628749e">
+<link rel="stylesheet" href="/estilo.css?v=64801c891d">
 <script type="application/ld+json">
-{"@context": "https://schema.org", "@type": "Person", "name": "Omar Ramírez González",
- "url": "https://ketcero.com/omar/", "jobTitle": "Monitor de Deep Learning",
- "sameAs": ["https://github.com/omramirezg"],
- "worksFor": {"@type": "Organization", "name": "Ket Cero", "url": "https://ketcero.com"}}
+{
+ "@context": "https://schema.org",
+ "@type": "Person",
+ "name": "Omar Ramírez González",
+ "url": "https://ketcero.com/omar/",
+ "jobTitle": "Monitor de Deep Learning",
+ "sameAs": [
+  "https://github.com/omramirezg"
+ ],
+ "worksFor": {
+  "@type": "Organization",
+  "name": "Ket Cero",
+  "url": "https://ketcero.com"
+ }
+}
 </script>
 </head>
 <body>
+<a class="saltar" href="#contenido">Saltar al contenido</a>
 <header><div class="in">
 <div class="izq"><button id="menu" class="hamb" type="button" aria-expanded="false" aria-controls="cajon" aria-label="Abrir los cursos"><span></span><span></span><span></span></button>
-<a class="marca" href="/"><svg width="34" height="24" viewBox="0 0 44 30" aria-hidden="true"><line x1="5" y1="3" x2="5" y2="27" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><ellipse cx="19" cy="15" rx="6" ry="11" fill="none" stroke="#C8502A" stroke-width="3"/><polyline points="31,3 39,15 31,27" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>Ket Cero<small>Machine learning desde cero</small></a></div>
-<nav><div class="desplegable"><button id="cursos" type="button" aria-expanded="false" aria-controls="lista-cursos">Cursos</button><div id="lista-cursos" class="lista" hidden><a href="/cursos/deep-learning/">Deep Learning<small>6 temas · 2 lecciones</small></a></div></div><a href="/omar/" aria-current="page">Quién soy</a><button id="tema" type="button" role="switch" aria-checked="true"><span>Modo oscuro</span><span class="pista"><span class="perilla"></span></span></button></nav>
+<a class="marca" href="/" aria-label="Ket Cero, inicio"><svg width="34" height="24" viewBox="0 0 44 30" aria-hidden="true"><line x1="5" y1="3" x2="5" y2="27" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><ellipse cx="19" cy="15" rx="6" ry="11" fill="none" stroke="#C8502A" stroke-width="3"/><polyline points="31,3 39,15 31,27" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>Ket Cero<small>Machine learning desde cero</small></a></div>
+<nav aria-label="Principal"><div class="desplegable"><button id="cursos" type="button" aria-expanded="false" aria-controls="lista-cursos">Cursos</button><div id="lista-cursos" class="lista" hidden><a href="/cursos/deep-learning/">Deep Learning<small>6 temas · 2 lecciones</small></a></div></div><a href="/omar/" aria-current="page">Quién soy</a><button id="tema" type="button" role="switch" aria-checked="true"><span>Modo oscuro</span><span class="pista"><span class="perilla"></span></span></button></nav>
 </div></header>
 <div id="velo" class="velo" hidden></div>
 <aside id="cajon" class="cajon" aria-label="Cursos">
 <p class="t">Deep Learning</p><ol><li><a href="/cursos/deep-learning/#redes-profundas"><em>1</em>Redes neuronales profundas<span>0</span></a></li><li><a href="/cursos/deep-learning/#cnn"><em>2</em>Redes convolucionales<span>1</span></a></li><li><a href="/cursos/deep-learning/#deteccion"><em>3</em>Detección de objetos<span>1</span></a></li><li><a href="/cursos/deep-learning/#segmentacion"><em>4</em>Segmentación de imágenes<span>0</span></a></li><li><a href="/cursos/deep-learning/#generativos-secuencias"><em>5</em>Modelos generativos y secuencias<span>0</span></a></li><li><a href="/cursos/deep-learning/#transformers-grafos"><em>6</em>Transformers y redes de grafos<span>0</span></a></li></ol>
 </aside>
 <div class="cuerpo solo">
-<main class="texto">
+<main id="contenido" class="texto">
 <section class="cabeza">
 <div class="mono">Quién soy</div>
 <h1>Omar Ramírez González</h1>
@@ -46,6 +62,7 @@
 </section>
 </main>
 </div>
+<div id="cargando" class="cargando" role="status" hidden><div><svg width="34" height="24" viewBox="0 0 44 30" aria-hidden="true"><line x1="5" y1="3" x2="5" y2="27" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><ellipse cx="19" cy="15" rx="6" ry="11" fill="none" stroke="#C8502A" stroke-width="3"/><polyline points="31,3 39,15 31,27" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><p>Cargando la animación…</p><small>Trae los datos reales de cada paso: la primera vez tarda unos segundos.</small></div></div>
 <footer><div class="in"><span>Ket Cero · un proyecto de <a href="/omar/">Omar Ramírez González</a></span><span>ketcero.com</span></div></footer>
 <script>
 (function () {
@@ -85,6 +102,35 @@
   b.addEventListener("click", function (e) { e.stopPropagation(); poner(l.hidden); });
   document.addEventListener("click", function (e) { if (!l.hidden && !l.contains(e.target)) poner(false); });
   document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !l.hidden) { poner(false); b.focus(); } });
+})();
+(function () {
+  // lecciones ya abiertas (las marca la capa de las animaciones) y «seguir donde quedaste»
+  var vistas = [];
+  try { vistas = JSON.parse(localStorage.getItem("kc-vistas") || "[]"); } catch (e) {}
+  [].forEach.call(document.querySelectorAll("[data-leccion]"), function (el) {
+    if (vistas.indexOf(el.getAttribute("data-leccion")) < 0 || el.id === "seguir") return;
+    var s = document.createElement("span"); s.className = "vista"; s.textContent = "vista";
+    (el.querySelector(".d") || el).appendChild(s);
+  });
+  var seguir = document.getElementById("seguir");
+  if (seguir) try {
+    var h = localStorage.getItem("kc-paso-" + seguir.getAttribute("data-leccion"));
+    if (h && /^#[a-z_0-9]+\/\d+$/.test(h)) {
+      var p = h.slice(1).split("/");
+      seguir.href = seguir.getAttribute("data-animacion") + h;
+      seguir.textContent = "Seguir donde quedaste: " + p[0] + ", paso " + p[1] + " →";
+      seguir.hidden = false;
+    }
+  } catch (e) {}
+})();
+(function () {
+  // «Cargando la animación…» mientras el navegador trae una animación pesada
+  var c = document.getElementById("cargando");
+  document.addEventListener("click", function (e) {
+    var a = e.target.closest && e.target.closest("a[data-abre-animacion]");
+    if (a && c && e.button === 0 && !e.ctrlKey && !e.metaKey && !e.shiftKey) c.hidden = false;
+  });
+  addEventListener("pageshow", function () { if (c) c.hidden = true; });
 })();
 </script>
 </body>
