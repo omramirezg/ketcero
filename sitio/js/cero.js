@@ -34,12 +34,12 @@
       const modo = ancho >= 860 ? "ancha" : ancho >= 500 ? "media" : "angosta", angosta = modo === "angosta";
       caja.innerHTML = "";
       // geometría: en pantalla ancha, entrada | filtro | mapa en una fila; en angosta, entrada y mapa apilados
-      const c = modo === "ancha" ? 12 : modo === "media" ? 10 : 11, cf = modo === "ancha" ? 36 : 0;
+      const c = modo === "ancha" ? 12 : modo === "media" ? 10 : Math.max(5, Math.floor((ancho - 16) / 52)), cf = modo === "ancha" ? 36 : 0;
       const xE = 0, yE = 22, anchoE = 28 * c;
       const xF = modo === "ancha" ? anchoE + 36 : 0, yF = 22;
-      const xM = modo === "ancha" ? xF + 5 * cf + 36 : modo === "media" ? anchoE + 32 : 0, yM = angosta ? yE + anchoE + 34 : 22 + 2 * c;
-      const anchoTotal = angosta ? anchoE : xM + 24 * c;
-      const yTexto = (angosta ? yM + 24 * c : yE + anchoE) + 30;
+      const xM = modo === "ancha" ? xF + 5 * cf + 36 : anchoE + (angosta ? 16 : 32), yM = yE;  // entrada y mapa alineados arriba
+      const anchoTotal = xM + 24 * c;
+      const yTexto = yE + anchoE + 30;
       const yMini = yTexto + 34, lado = modo === "ancha" ? 72 : modo === "media" ? 58 : 44, sep = angosta ? 8 : 14;
       const alto = yMini + lado + 30;
       svg = el(caja, "svg", { viewBox: `0 0 ${Math.max(anchoTotal, 6 * lado + 5 * sep)} ${alto}`, width: "100%", role: "img",
@@ -53,7 +53,7 @@
         el(svg, "rect", { x: xE + j * c, y: yE + i * c, width: c - 1, height: c - 1, fill: "var(--linea)", "fill-opacity": 0.35 });
         if (X[i][j] > 0) el(svg, "rect", { x: xE + j * c, y: yE + i * c, width: c - 1, height: c - 1, fill: "var(--tinta)", "fill-opacity": (X[i][j] * 0.9).toFixed(3) });
       }
-      ventana = el(svg, "rect", { width: 5 * c - 1, height: 5 * c - 1, fill: "none", stroke: "var(--tinta)", "stroke-width": 1.6 });
+      ventana = el(svg, "rect", { width: 5 * c - 1, height: 5 * c - 1, fill: "none", stroke: "var(--tinta)", "stroke-width": 1.6, opacity: 0 });
 
       if (modo === "ancha") {
         rot(xF, yF - 8, "un filtro de la red");
@@ -69,7 +69,7 @@
       celdasMapa = [];
       for (let i = 0; i < 24; i++) for (let j = 0; j < 24; j++)
         celdasMapa.push(el(svg, "rect", { x: xM + j * c, y: yM + i * c, width: c - 1, height: c - 1, fill: "transparent", stroke: "var(--linea)", "stroke-width": 0.5 }));
-      marca = el(svg, "rect", { width: c - 1, height: c - 1, fill: "none", stroke: "var(--tinta)", "stroke-width": 1.4 });
+      marca = el(svg, "rect", { width: c - 1, height: c - 1, fill: "none", stroke: "var(--tinta)", "stroke-width": 1.4, opacity: 0 });
       dibujar.c = c; dibujar.xE = xE; dibujar.yE = yE; dibujar.xM = xM; dibujar.yM = yM;
 
       linea1 = el(svg, "text", { x: 0, y: yTexto, "font-size": angosta ? 12 : 14, fill: "var(--tinta)" }, "");

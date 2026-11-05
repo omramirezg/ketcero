@@ -150,7 +150,7 @@ def pagina(titulo, descripcion, ruta, cuerpo, actual="", extra_head=""):
 <header><div class="in">
 <div class="izq"><button id="menu" class="hamb" type="button" aria-expanded="false" aria-controls="cajon" aria-label="Abrir los cursos"><span></span><span></span><span></span></button>
 <a class="marca" href="/">{LOGO}Ket Cero<small>Machine learning desde cero</small></a></div>
-<nav>{enlaces}<button id="tema" type="button" role="switch" aria-checked="false"><span>Modo oscuro</span><span class="pista"><span class="perilla"></span></span></button></nav>
+<nav>{enlaces}<button id="tema" type="button" role="switch" aria-checked="true"><span>Modo oscuro</span><span class="pista"><span class="perilla"></span></span></button></nav>
 </div></header>
 <div id="velo" class="velo" hidden></div>
 <aside id="cajon" class="cajon" aria-label="Cursos">
@@ -266,7 +266,7 @@ def construir_curso(clave_curso, nombre, desc_curso, temario):
     cuerpo = f"""<div class="cuerpo">
 <main>
 <section class="cabeza">
-<div class="mono">Curso · actualizado el {ACTUALIZADO}</div>
+<div class="mono"><a href="/cursos/">Cursos</a> / {nombre} · actualizado el {ACTUALIZADO}</div>
 <h1>{nombre}</h1>
 <p>{html.escape(desc_curso)}</p>
 </section>
@@ -281,7 +281,7 @@ def construir_cursos():
     cuerpo = f"""<div class="cuerpo">
 <main>
 <section class="cabeza">
-<div class="mono">Cursos</div>
+<div class="mono">{len(CURSOS)} {"curso" if len(CURSOS) == 1 else "cursos"}</div>
 <h1>Cursos</h1>
 <p>Cada curso es un temario completo, con sus lecciones animadas paso a paso.</p>
 </section>
@@ -296,9 +296,10 @@ def construir_inicio():
 <main>
 <section class="cabeza portada">
 <div>
-<div class="mono">Ket Cero · actualizado el {ACTUALIZADO}</div>
+<div class="mono">Actualizado el {ACTUALIZADO}</div>
 <h1>Machine learning desde cero, con cada operación a la vista.</h1>
 <p>Cursos con lecciones animadas paso a paso, hechas con los datos reales del entrenamiento: qué entra a la red, qué se multiplica, qué se suma y por qué al final acierta.</p>
+<a class="ir" href="/cursos/deep-learning/">Empezar el curso de Deep Learning →</a>
 </div>
 <div id="cero" class="cero"></div>
 </section>
