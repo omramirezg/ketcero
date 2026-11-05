@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Los tres competidores</title>
+<style>
+  :root{ --tinta:#1A1A1A; --gris:#6B6B6B; --gris2:#B5B5B5; --marino:#1F3A5F; --gris3:#6B7A8C; --coral:#D85A30; --coral-claro:#FAECE7; --frio:#EEF1F5; --frio-borde:#9AA7B6; --papel:#FFFFFF; }
+  html,body{margin:0;background:var(--papel);color:var(--tinta);font-family:Cambria,Georgia,"Times New Roman",serif}
+  #marco{max-width:1560px;margin:0 auto;padding:14px 32px 18px}
+  #cab{display:flex;align-items:flex-end;gap:22px;border-bottom:1.5px solid var(--marino);padding-bottom:0}
+  #cab .nombre{font-size:17px;color:var(--marino);font-weight:bold;padding-bottom:9px}
+  #cab .sec{font-size:15px;color:var(--gris3);padding:6px 4px 8px;border-bottom:2.5px solid transparent;cursor:pointer;white-space:nowrap}
+  #cab .sec.hecho{color:var(--tinta)}
+  #cab .sec.act{color:var(--marino);font-weight:bold;border-bottom-color:var(--marino)}
+  #credito{font-size:13px;color:var(--gris);margin:6px 0 0;text-align:right}
+  #titulo{font-size:26px;margin:14px 0 6px}
+  svg{display:block;width:100%;height:calc(100vh - 250px);min-height:420px}
+  svg text{font-family:Cambria,Georgia,"Times New Roman",serif}
+  #texto{font-size:17px;line-height:1.4;min-height:50px;border-top:1.5px solid var(--tinta);padding-top:8px;margin-top:4px}
+  #estado{margin-top:10px;height:34px;box-sizing:border-box;display:flex;align-items:center;gap:2px;padding:0 10px;background:#F6F6F6;border:1px solid #DCDCDC;border-radius:4px;font-size:14px}
+  #estado button{font-family:inherit;font-size:13px;min-width:30px;height:24px;padding:0 8px;border:none;border-radius:4px;background:none;color:var(--tinta);cursor:pointer}
+  #estado button:hover:not(:disabled){background:#E4E4E4}
+  #estado button:disabled{color:#BDBDBD;cursor:default}
+  #prog{flex:1;height:4px;margin:0 16px;background:#E2E2E2;border-radius:2px;position:relative}
+  #progv{position:absolute;left:0;top:0;bottom:0;background:#555;border-radius:2px;width:0}
+  #cont{font-size:14px;color:var(--gris);font-variant-numeric:tabular-nums}
+</style>
+</head>
+<body>
+<div id="marco">
+  <div id="cab"><span class="nombre">Transfer learning · Los tres competidores</span><span id="secs" style="display:flex;gap:14px"></span></div>
+  <div id="credito">Animación hecha por Omar Ramírez González para el curso de Deep Learning</div>
+  <div id="titulo"></div>
+  <svg id="dib" viewBox="0 0 1500 650" xmlns="http://www.w3.org/2000/svg"></svg>
+  <div id="texto"></div>
+  <div id="estado">
+    <button id="ant" title="Paso anterior (←)">⏮&#xFE0E;</button>
+    <button id="rep" title="Repetir el movimiento (R)">↻&#xFE0E;</button>
+    <button id="sig" title="Paso siguiente (→)">⏭&#xFE0E;</button>
+    <div id="prog"><div id="progv"></div></div>
+    <span id="cont"></span>
+  </div>
+</div>
+<script>
+const NS = "http://www.w3.org/2000/svg";
+const f = n => n.toLocaleString("es-CO").replace(/,/g, ".");
+// las tres redes, con los números reales del cuaderno (entrada de 320 × 180)
+const REDES = [
+  { nombre: "Desde cero", que: "CNN pequeña, pesos al azar", total: 389890, aprende: 389890, pct: "100 %",
+    tasas: "Todo con tasa 0,001", exact: ["50,3 %", "58,3 %", "66,3 %"],
+    bloques: [
+      { n: "Bloque 1", c: [["Convolución", "3 × 3"], ["BatchNorm", "+ ReLU"], ["Max pool", "2 × 2"]], s: "32 × 160 × 90", p: 960, o: "azar", a: true },
+      { n: "Bloque 2", c: [["Convolución", "3 × 3"], ["BatchNorm", "+ ReLU"], ["Max pool", "2 × 2"]], s: "64 × 80 × 45", p: 18624, o: "azar", a: true },
+      { n: "Bloque 3", c: [["Convolución", "3 × 3"], ["BatchNorm", "+ ReLU"], ["Max pool", "2 × 2"]], s: "128 × 40 × 22", p: 74112, o: "azar", a: true },
+      { n: "Bloque 4", c: [["Convolución", "3 × 3"], ["BatchNorm", "+ ReLU"], ["Max pool", "2 × 2"]], s: "256 × 20 × 11", p: 295680, o: "azar", a: true },
+      { n: "Promedio", c: [["Pooling global", ""], ["", "promedio de"], ["", "cada mapa"]], s: "256 × 20 × 11 → 256", p: 0, o: null, a: null },
+      { n: "Cabeza", c: [["Dropout", "30 %"], ["Capa densa", ""], ["", "(Linear)"]], s: "256 → 2", p: 514, o: "azar", a: true, cab: true } ] },
+  { nombre: "Congelada", que: "ResNet18 de ImageNet", total: 11177538, aprende: 1026, pct: "0,01 %",
+    tasas: "Solo la cabeza, tasa 0,001", exact: ["66,0 %", "80,0 %", "81,3 %"],
+    bloques: [
+      { n: "conv1", c: [["Convolución", "7 × 7, paso 2"], ["BatchNorm", "+ ReLU"], ["Max pool", "3 × 3"]], s: "64 × 80 × 45", p: 9536, o: "img", a: false },
+      { n: "layer1", c: [["2 bloques residuales:", ""], ["Convolución", "3 × 3 (×4)"], ["BatchNorm", "+ ReLU"], ["Atajo", "(suma)"]], s: "64 × 80 × 45", p: 147968, o: "img", a: false },
+      { n: "layer2", c: [["2 bloques residuales:", ""], ["Convolución", "3 × 3 (×4)"], ["BatchNorm", "+ ReLU"], ["Atajo", "(suma)"]], s: "128 × 40 × 23", p: 525568, o: "img", a: false },
+      { n: "layer3", c: [["2 bloques residuales:", ""], ["Convolución", "3 × 3 (×4)"], ["BatchNorm", "+ ReLU"], ["Atajo", "(suma)"]], s: "256 × 20 × 12", p: 2099712, o: "img", a: false },
+      { n: "layer4", c: [["2 bloques residuales:", ""], ["Convolución", "3 × 3 (×4)"], ["BatchNorm", "+ ReLU"], ["Atajo", "(suma)"]], s: "512 × 10 × 6", p: 8393728, o: "img", a: false },
+      { n: "Promedio", c: [["Pooling global", ""], ["", "promedio de"], ["", "cada mapa"]], s: "512 × 10 × 6 → 512", p: 0, o: null, a: null },
+      { n: "Cabeza fc", c: [["Capa densa", ""], ["", "(Linear)"]], s: "512 → 2", p: 1026, o: "azar", a: true, cab: true } ] },
+  { nombre: "Ajuste fino", que: "ResNet18 de ImageNet", total: 11177538, aprende: 8394754, pct: "75,1 %",
+    tasas: "Cabeza 0,001 · layer4 0,0001", exact: ["67,7 %", "85,0 %", "91,0 %"],
+    bloques: [
+      { n: "conv1", c: [["Convolución", "7 × 7, paso 2"], ["BatchNorm", "+ ReLU"], ["Max pool", "3 × 3"]], s: "64 × 80 × 45", p: 9536, o: "img", a: false },
+      { n: "layer1", c: [["2 bloques residuales:", ""], ["Convolución", "3 × 3 (×4)"], ["BatchNorm", "+ ReLU"], ["Atajo", "(suma)"]], s: "64 × 80 × 45", p: 147968, o: "img", a: false },
+      { n: "layer2", c: [["2 bloques residuales:", ""], ["Convolución", "3 × 3 (×4)"], ["BatchNorm", "+ ReLU"], ["Atajo", "(suma)"]], s: "128 × 40 × 23", p: 525568, o: "img", a: false },
+      { n: "layer3", c: [["2 bloques residuales:", ""], ["Convolución", "3 × 3 (×4)"], ["BatchNorm", "+ ReLU"], ["Atajo", "(suma)"]], s: "256 × 20 × 12", p: 2099712, o: "img", a: false },
+      { n: "layer4", c: [["2 bloques residuales:", ""], ["Convolución", "3 × 3 (×4)"], ["BatchNorm", "+ ReLU"], ["Atajo", "(suma)"]], s: "512 × 10 × 6", p: 8393728, o: "img", a: true, tasa: "0,0001" },
+      { n: "Promedio", c: [["Pooling global", ""], ["", "promedio de"], ["", "cada mapa"]], s: "512 × 10 × 6 → 512", p: 0, o: null, a: null },
+      { n: "Cabeza fc", c: [["Capa densa", ""], ["", "(Linear)"]], s: "512 → 2", p: 1026, o: "azar", a: true, cab: true, tasa: "0,001" } ] },
+];
+// comprobación: lo que aprende cada red = la suma de sus bloques que aprenden
+REDES.forEach(r => {
+  const s = r.bloques.filter(b => b.a).reduce((t, b) => t + b.p, 0), t = r.bloques.reduce((t, b) => t + b.p, 0);
+  if (s !== r.aprende || t !== r.total) console.error("no cuadra", r.nombre, s, t);
+});
+
+const PASOS = [
+  { sec: 0, t: "Tres redes, la misma tarea: decir si una hoja de café está sana o enferma",
+    cap: "Las tres reciben <b>la misma foto</b> (3 × 320 × 180) y sacan <b>2 números</b>: uno para «sana» y otro para «enferma». En cada caja, en negrilla, el tipo de capa: <b>convolución</b> (filtros que recorren la foto), <b>BatchNorm + ReLU</b>, <b>max pool</b> (achica el mapa), <b>pooling global</b> (cada mapa → un número) y <b>capa densa</b> (la cabeza que decide)." },
+  { sec: 1, t: "¿De dónde salen los pesos? Al azar o aprendidos con ImageNet",
+    cap: "<b>Desde cero</b> nace con <b>todos los pesos al azar</b>. La <b>congelada</b> y el <b>ajuste fino</b> son la misma ResNet18, que ya aprendió a ver con <b>1,28 millones de fotos de ImageNet</b>; lo único al azar es la <b>cabeza nueva</b> (512 → 2), porque la de ImageNet decidía entre 1.000 clases." },
+  { sec: 2, t: "¿Quién aprende? Coral: se mueve con el gradiente. Candado: congelado",
+    cap: "<b>Desde cero</b> aprende <b>todo</b>: 389.890 números. La <b>congelada</b> solo aprende la cabeza: <b>1.026 de 11.177.538 (0,01 %)</b>. El <b>ajuste fino</b> aprende la cabeza y <b>layer4</b>: <b>8.394.754 (75,1 %)</b>. Congelar es poner «requires_grad = False»." },
+  { sec: 3, t: "La ida: la foto atraviesa toda la red, igual en las tres", anim: "ida",
+    cap: "En la ida <b>todas las capas trabajan</b>, también las congeladas: la foto pasa por cada bloque hasta los 2 números. Congelar no apaga una capa; solo impide que sus pesos <b>cambien</b>." },
+  { sec: 4, t: "La vuelta: el gradiente se detiene en el candado", anim: "vuelta",
+    cap: "Desde la pérdida, el <b>gradiente</b> viaja hacia atrás. En <b>desde cero</b> llega hasta el bloque 1. En la <b>congelada</b> se detiene en la cabeza. En el <b>ajuste fino</b> llega hasta <b>layer4</b> y ahí se detiene: más atrás nadie lo necesita, porque esos pesos no se mueven." },
+  { sec: 5, t: "Las tasas: pasos grandes para lo nuevo, pasos pequeños para lo que ya sabe",
+    cap: "La cabeza nace al azar: tasa <b>0,001</b>. <b>layer4</b> ya trae lo de ImageNet: tasa <b>0,0001</b>, 10 veces menor, para <b>ajustarlo sin destrozarlo</b> (olvido catastrófico). Desde cero, todo va con 0,001." },
+  { sec: 6, t: "El resultado: exactitud en las 300 hojas de prueba",
+    cap: "Con <b>10 fotos por clase</b> nadie anda bien, pero desde cero solo adivina (50,3 %). Con <b>50</b>, el ajuste fino saca <b>85,0 %</b> contra 58,3 %. Con <b>300</b>, la congelada se estanca en 81,3 % y el ajuste fino sube a <b>91,0 %</b>: ImageNet no tiene hojas enfermas, y dejar que layer4 se adapte le enseña a mirar las manchas." },
+];
+const SECCS = ["La tarea", "Los pesos", "Quién aprende", "La ida", "La vuelta", "Las tasas", "El resultado"];
+
+// geometría
+const X0 = 210, X1 = 1290, YF = [16, 232, 448], BH = 172;
+const svg = document.getElementById("dib");
+function el(tag, at, padre) { const e = document.createElementNS(NS, tag); for (const k in at) e.setAttribute(k, at[k]); (padre || svg).appendChild(e); return e; }
+function txt(x, y, s, tam, at = {}, padre) { const e = el("text", Object.assign({ x, y, "font-size": tam, fill: "#1A1A1A" }, at), padre); e.textContent = s; return e; }
+function candado(x, y, padre) {
+  const g = el("g", { transform: `translate(${x},${y})` }, padre);
+  el("path", { d: "M3 8 V5 a4 4 0 0 1 8 0 V8", fill: "none", stroke: "#6B7A8C", "stroke-width": 1.6 }, g);
+  el("rect", { x: 1, y: 8, width: 12, height: 9, rx: 1.5, fill: "#6B7A8C" }, g);
+  return g;
+}
+let partes = [];   // por red: {bloques:[{g, caja, x, w, ...}], ...}
+function construir() {
+  svg.innerHTML = "";
+  partes = REDES.map((r, k) => {
+    const y = YF[k];
+    const lado = el("g", {});
+    txt(20, y + 34, r.nombre, 24, { "font-weight": "bold", fill: k === 0 ? "#1A1A1A" : "#1F3A5F" }, lado);
+    txt(20, y + 58, r.que, 14, { fill: "#6B6B6B" }, lado);
+    // la foto
+    el("rect", { x: 20, y: y + 74, width: 26, height: 40, fill: "#E8F0E0", stroke: "#7A9A5A", "stroke-width": 1 }, lado);
+    el("path", { d: `M33 ${y + 78} C26 ${y + 90} 27 ${y + 104} 33 ${y + 110} C39 ${y + 104} 40 ${y + 90} 33 ${y + 78} Z`, fill: "#6C9A3E" }, lado);
+    txt(54, y + 92, "foto", 13, { fill: "#6B6B6B" }, lado);
+    txt(54, y + 108, "3 × 320 × 180", 13, { fill: "#6B6B6B" }, lado);
+    const n = r.bloques.length, gap = 12, w = (X1 - X0 - gap * (n - 1)) / n;
+    const bs = r.bloques.map((b, i) => {
+      const x = X0 + i * (w + gap), g = el("g", {});
+      const caja = el("rect", { x, y, width: w, height: BH, rx: 4, fill: "#FFFFFF", stroke: "#B5B5B5", "stroke-width": 1.2 }, g);
+      txt(x + w / 2, y + 26, b.n, 17, { "text-anchor": "middle", "font-weight": "bold" }, g);
+      b.c.forEach(([tipo, resto], j) => {
+        const e = txt(x + w / 2, y + 46 + 17 * j, "", 12.5, { "text-anchor": "middle" }, g);
+        const a1 = document.createElementNS(NS, "tspan"); a1.setAttribute("font-weight", "bold"); a1.textContent = tipo; e.appendChild(a1);
+        if (resto) { const a2 = document.createElementNS(NS, "tspan"); a2.setAttribute("fill", "#6B6B6B"); a2.textContent = " " + resto; e.appendChild(a2); }
+      });
+      el("path", { d: `M${x + 8} ${y + 110} H${x + w - 8}`, stroke: "#DDDDDD", "stroke-width": 1 }, g);
+      txt(x + w / 2, y + 126, b.s, 13, { "text-anchor": "middle" }, g);
+      const pt = txt(x + w / 2, y + 145, b.p ? f(b.p) + " pesos" : "0 pesos", 13.5, { "text-anchor": "middle" }, g);
+      const ori = txt(x + w / 2, y + 163, b.o === "azar" ? "al azar" : b.o === "img" ? "de ImageNet" : "", 12.5, { "text-anchor": "middle", fill: "#6B6B6B", "font-style": "italic", opacity: 0 }, g);
+      const lock = b.a === false ? candado(x + w - 20, y + 6, g) : null; if (lock) lock.setAttribute("opacity", 0);
+      const tas = b.tasa ? txt(x + w / 2, y + BH + 18, "tasa " + b.tasa, 13.5, { "text-anchor": "middle", fill: "#D85A30", opacity: 0 }, g) : null;
+      if (i > 0) el("path", { d: `M${x - gap + 1} ${y + BH / 2} H${x - 1}`, stroke: "#9A9A9A", "stroke-width": 1.2 }, svg);
+      return { g, caja, x, w, y, b, ori, lock, tas, pt };
+    });
+    el("path", { d: `M150 ${y + 94} H${X0 - 2}`, stroke: "#9A9A9A", "stroke-width": 1.2 });
+    // salida y cuadro de la derecha
+    const xs = X1 + 14;
+    el("path", { d: `M${X1} ${y + BH / 2} H${xs + 6}`, stroke: "#9A9A9A", "stroke-width": 1.2 });
+    const der = el("g", {});
+    txt(xs + 12, y + 22, "2 números: sana, enferma", 14, { fill: "#6B6B6B" }, der);
+    const ap = txt(xs + 12, y + 50, "", 16, {}, der), ap2 = txt(xs + 12, y + 70, "", 14, { fill: "#6B6B6B" }, der);
+    const ta = txt(xs + 12, y + 92, "", 13, { fill: "#D85A30" }, der);
+    const ex = txt(xs + 12, y + 50, "", 15, {}, der), ex2 = txt(xs + 12, y + 72, "", 15, {}, der), ex3 = txt(xs + 12, y + 94, "", 15, {}, der);
+    return { r, bs, y, ap, ap2, ta, ex, ex2, ex3 };
+  });
+  // un punto por red para la ida y la vuelta
+  partes.forEach(p => { p.punto = el("circle", { cx: 0, cy: p.y + BH / 2, r: 9, fill: "#1F3A5F", opacity: 0 }); });
+}
+
+let paso = 0, t0 = 0, anim = null;
+function pintar(t) {
+  const P = PASOS[paso];
+  document.getElementById("titulo").textContent = P.t;
+  document.getElementById("texto").innerHTML = P.cap;
+  document.getElementById("cont").textContent = `${paso + 1}/${PASOS.length}`;
+  document.getElementById("progv").style.width = (100 * (paso + 1) / PASOS.length) + "%";
+  document.getElementById("ant").disabled = paso === 0; document.getElementById("sig").disabled = paso === PASOS.length - 1;
+  document.getElementById("secs").innerHTML = SECCS.map((s, i) => `<span class="sec ${i === P.sec ? "act" : i < P.sec ? "hecho" : ""}" data-i="${i}">${i + 1} · ${s}</span>`).join("");
+  document.querySelectorAll("#secs .sec").forEach(e => e.onclick = () => ir(+e.dataset.i));
+  partes.forEach((p, k) => {
+    p.bs.forEach(o => {
+      const aprende = o.b.a === true, congel = o.b.a === false, color = paso >= 2;
+      o.caja.setAttribute("fill", color ? (aprende ? "#FAECE7" : congel ? "#EEF1F5" : "#FFFFFF") : "#FFFFFF");
+      o.caja.setAttribute("stroke", color ? (aprende ? "#D85A30" : congel ? "#9AA7B6" : "#B5B5B5") : "#B5B5B5");
+      o.caja.setAttribute("stroke-dasharray", o.b.a === null ? "4 3" : "");
+      o.ori.setAttribute("opacity", paso >= 1 ? 1 : 0);
+      if (o.lock) o.lock.setAttribute("opacity", paso >= 2 ? 1 : 0);
+      if (o.tas) o.tas.setAttribute("opacity", paso >= 5 ? 1 : 0);
+    });
+    const r = p.r;
+    if (paso >= 2 && paso < 6) { p.ap.textContent = "Aprende " + f(r.aprende); p.ap2.textContent = "de " + f(r.total) + " · " + r.pct; }
+    else { p.ap.textContent = ""; p.ap2.textContent = ""; }
+    p.ta.textContent = paso === 5 ? r.tasas : "";
+    if (paso === 6) { p.ex.textContent = "10 por clase: " + r.exact[0]; p.ex2.textContent = "50 por clase: " + r.exact[1]; p.ex3.textContent = "300 por clase: " + r.exact[2]; p.ex3.setAttribute("font-weight", k === 2 ? "bold" : "normal"); }
+    else { p.ex.textContent = ""; p.ex2.textContent = ""; p.ex3.textContent = ""; }
+    // el punto
+    const xa = 160, xb = X1 + 20;
+    if (P.anim === "ida") {
+      const u = Math.min(1, t / 3200); p.punto.setAttribute("fill", "#1F3A5F"); p.punto.setAttribute("opacity", u < 1 ? 1 : 0.0);
+      p.punto.setAttribute("cx", xa + (xb - xa) * u);
+      p.bs.forEach(o => { const c = o.x + o.w / 2, pasado = xa + (xb - xa) * u > c; o.pt.setAttribute("fill", "#1A1A1A"); o.caja.setAttribute("stroke-width", pasado && Math.abs(xa + (xb - xa) * u - c) < o.w / 2 + 40 ? 2.4 : 1.2); });
+    } else if (P.anim === "vuelta") {
+      const ult = p.bs.findIndex(o => o.b.a === true);          // hasta dónde llega el gradiente
+      const xfin = p.bs[ult].x + 6, u = Math.min(1, t / 3200), x = xb - (xb - xfin) * u;
+      p.punto.setAttribute("fill", "#D85A30"); p.punto.setAttribute("opacity", 1); p.punto.setAttribute("cx", x);
+      p.bs.forEach((o, i) => o.caja.setAttribute("stroke-width", (i >= ult && x <= o.x + o.w) ? 2.4 : 1.2));
+      if (!p.alto) p.alto = txt(0, p.y - 10, "", 14, { fill: "#D85A30", "text-anchor": "middle" });
+      p.alto.setAttribute("x", p.bs[ult].x + p.bs[ult].w / 2);
+      p.alto.textContent = u >= 1 ? (k === 0 ? "el gradiente llega hasta el bloque 1" : "el gradiente se detiene aquí") : "";
+    } else {
+      p.punto.setAttribute("opacity", 0);
+      p.bs.forEach(o => o.caja.setAttribute("stroke-width", 1.2));
+      if (p.alto) p.alto.textContent = "";
+    }
+  });
+}
+function bucle(ts) { const t = ts - t0; pintar(t); if (PASOS[paso].anim && t < 3400) anim = requestAnimationFrame(bucle); else anim = null; }
+function ir(n) { paso = Math.max(0, Math.min(PASOS.length - 1, n)); if (anim) cancelAnimationFrame(anim); t0 = performance.now(); anim = requestAnimationFrame(bucle); try { history.replaceState(null, "", "#" + (paso + 1)); } catch (e) {} }
+document.getElementById("ant").onclick = () => ir(paso - 1);
+document.getElementById("sig").onclick = () => ir(paso + 1);
+document.getElementById("rep").onclick = () => ir(paso);
+addEventListener("keydown", e => { if (e.key === "ArrowRight") ir(paso + 1); else if (e.key === "ArrowLeft") ir(paso - 1); else if (e.key === "r" || e.key === "R") ir(paso); });
+construir();
+ir((parseInt(location.hash.slice(1)) || 1) - 1);
+</script>
+</body>
+</html>

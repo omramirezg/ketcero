@@ -1,0 +1,4 @@
+__pycache__/
+*.antes*
+.DS_Store
+Thumbs.db

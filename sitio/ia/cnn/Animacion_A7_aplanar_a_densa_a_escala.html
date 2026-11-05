@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>A7 · De aplanar a la densa, a escala</title>
+<style>
+:root{--tinta:#1A1A1A;--gris:#6B6B6B;--rojo:#B0302A;--papel:#FFFFFF}
+html,body{margin:0;height:100%;background:var(--papel);overflow:hidden;font-family:Cambria,Georgia,serif;color:var(--tinta)}
+#marco{position:absolute;left:0;top:0;width:1600px;height:900px;transform-origin:0 0}
+#cab{position:absolute;left:40px;top:12px;right:40px;height:52px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #DDD}
+#cab h1{font-weight:normal;font-size:24px;margin:0;flex:1}
+button{font-family:inherit;font-size:18px;background:#FFF;color:var(--tinta);border:1px solid #9A9A9A;padding:5px 14px;cursor:pointer}
+button.on{border-color:var(--tinta);box-shadow:inset 0 -2px 0 var(--rojo)}
+#dib{position:absolute;left:0;top:70px}
+#ctl{position:absolute;left:40px;right:40px;top:828px;display:flex;align-items:center;gap:10px;font-size:17px;color:var(--gris);border-top:1px solid #DDD;padding-top:14px}
+input[type=range]{accent-color:var(--rojo)}
+</style></head><body><div id="marco">
+<div id="cab"><h1>De aplanar a la densa, a escala: 2 imágenes · 4 números · 3 neuronas · 12 pesos</h1>
+<button id="m1">una cuenta a la vez</button><button id="m2">todo al mismo tiempo (GPU)</button></div>
+<svg id="dib" width="1600" height="750" viewBox="0 0 1600 750" font-family="Cambria, Georgia, serif"><g id="st"></g><g id="dy"></g></svg>
+<div id="ctl"><button id="pp">pausar</button><button id="fb" title="cuadro atrás (coma)">◂</button><button id="ff" title="cuadro adelante (punto)">▸</button>
+<span>velocidad</span><input type="range" id="vel" min="0.1" max="4" step="0.05" value="1" style="width:170px"><span id="velo" style="min-width:52px">1×</span>
+<button class="pre" data-v="0.5">0,5×</button><button class="pre" data-v="1">1×</button><button class="pre" data-v="2">2×</button>
+<input type="range" id="scr" min="0" max="1000" value="0" style="flex:1"><span id="tt" style="min-width:96px;text-align:right"></span></div>
+</div>
+<script>
+const NS = "http://www.w3.org/2000/svg", $ = id => document.getElementById(id);
+const INK = "#1A1A1A", GR = "#6B6B6B", GR2 = "#B5B5B5", CA = "#B0302A", CB = "#2F5D8A", COL = [CA, CB];
+function el(t, a, p){ const e = document.createElementNS(NS, t); for (const k in a) e.setAttribute(k, a[k]); if (p) p.appendChild(e); return e; }
+function T(x, y, s, tam, p, o = {}){ const e = el("text", {x, y, "font-size": tam, fill: o.c || INK, "text-anchor": o.a || "start", "font-style": o.i ? "italic" : "normal"}, p); e.textContent = s; return e; }
+function caja(x, y, w, h, p){ return el("rect", {x, y, width: w, height: h, fill: "none", stroke: GR2, "stroke-width": 1}, p); }
+const f = v => { let s = (Math.round(v * 100) / 100).toFixed(2).replace(/\.?0+$/, ""); if (s === "-0" || s === "") s = "0"; return s.replace("-", "−").replace(".", ","); };
+const fp = v => v < 0 ? "(" + f(v) + ")" : f(v);
+
+// los números del ejemplo
+const X = [[0.5, 0, 1, 0.2], [0, 0.8, 0.3, 1]];
+const W = [[0.4, -0.2, 0.1], [-0.3, 0.5, 0.2], [0.2, 0.1, -0.4], [0.1, 0.3, 0.5]];
+const B = [0.1, -0.1, 0];
+const Z = X.map(x => [0, 1, 2].map(n => x.reduce((s, v, i) => s + v * W[i][n], 0) + B[n]));
+const H = Z.map(r => r.map(v => Math.max(0, v)));
+const SUB = ["₁", "₂", "₃", "₄"], NOM = ["imagen 1 · un 2", "imagen 2 · un 5"];
+
+// geometría
+const EY = [80, 170, 260, 350], NX = 862, NY = [95, 225, 355], NR = 40, WX = 742;
+const PY = (n, i) => NY[n] - 30 + 20 * i;
+const CW = 54, CH = 40, MX = {X: 60, W: 324, b: 538, Z: 756, H: 1060}, MY = {X: 515, W: 475, b: 535, Z: 515, H: 515};
+const st = $("st"), dy = $("dy"), R = {};
+
+// ── red ──
+T(40, 30, "aplanar (2, 4)", 20, st); T(390, 30, "entradas", 20, st);
+T(590, 30, "densa: 3 neuronas · cada cable es un peso", 20, st);
+[0, 1].forEach(r => {
+  const y0 = r ? 197 : 82;
+  T(40, y0 - 12, NOM[r], 18, st, {c: COL[r]});
+  X[r].forEach((v, i) => { el("rect", {x: 40 + i * 62, y: y0, width: 56, height: 44, fill: "none", stroke: COL[r], "stroke-width": 1.2}, st); T(68 + i * 62, y0 + 29, f(v), 20, st, {a: "middle"}); });
+});
+T(40, 290, "cada tira = el vector de una imagen", 16, st, {c: GR, i: true});
+EY.forEach((cy, i) => {
+  caja(390, cy - 26, 104, 52, st); T(380, cy + 7, "x" + SUB[i], 20, st, {a: "end"});
+  R["e" + i] = T(442, cy + 7, "", 20, st, {a: "middle"});
+  R["ea" + i] = T(418, cy + 7, "", 20, st, {a: "middle", c: CA}); R["eb" + i] = T(468, cy + 7, "", 20, st, {a: "middle", c: CB});
+});
+const gc = el("g", {}, st);
+EY.forEach((cy, i) => [0, 1, 2].forEach(n => { R["c" + i + n] = el("line", {x1: 494, y1: cy, x2: WX, y2: PY(n, i)}, gc); }));
+[0, 1, 2].forEach(n => {
+  [0, 1, 2, 3].forEach(i => {
+    const py = PY(n, i);
+    R["wb" + i + n] = el("rect", {x: WX, y: py - 9, width: 50, height: 18, fill: "#FFF"}, st);
+    T(WX + 25, py + 5, f(W[i][n]), 14, st, {a: "middle"});
+    const dx = Math.sqrt(NR * NR - (py - NY[n]) ** 2);
+    el("line", {x1: WX + 50, y1: py, x2: NX - dx, y2: py, stroke: GR2, "stroke-width": 1}, st);
+  });
+  R["bb" + n] = el("rect", {x: WX, y: NY[n] + 44, width: 50, height: 18, fill: "#FFF"}, st);
+  T(WX - 6, NY[n] + 58, "b", 14, st, {a: "end", c: GR, i: true}); T(WX + 25, NY[n] + 58, f(B[n]), 14, st, {a: "middle"});
+  R["n" + n] = el("circle", {cx: NX, cy: NY[n], r: NR, fill: "#FFF"}, st);
+  T(NX + 48, NY[n] - 26, "n" + (n + 1), 18, st);
+  R["nv" + n] = T(NX, NY[n] + 7, "", 20, st, {a: "middle"});
+});
+
+// ── hilos y conteo ──
+T(1010, 30, "hilos de la GPU: uno por casilla (simplificado)", 20, st);
+[0, 1].forEach(r => [0, 1, 2].forEach(c => {
+  const x = 1010 + c * 187, y = 56 + r * 88;
+  R["k" + r + c] = el("rect", {x, y, width: 176, height: 72, fill: "none"}, st);
+  T(x + 88, y + 25, "fila " + (r + 1) + " de X · col " + (c + 1) + " de W", 15, st, {a: "middle", c: COL[r]});
+  R["kv" + r + c] = T(x + 88, y + 58, "", 22, st, {a: "middle"});
+  const hit = el("rect", {x, y, width: 176, height: 72, fill: "#FFF", "fill-opacity": 0, style: "cursor:pointer"}, st);
+  hit.onmouseenter = () => { if (!fijo) foco = [r, c]; };
+  hit.onmouseleave = () => { if (!fijo) foco = null; };
+  hit.onclick = () => { if (fijo && foco && foco[0] === r && foco[1] === c){ fijo = false; foco = null; } else { fijo = true; foco = [r, c]; } };
+}));
+let foco = null, fijo = false;
+T(1010, 240, "mouse o clic en un hilo: se marcan su fila de X y su columna de W", 15, st, {c: GR, i: true});
+T(1010, 260, "en una GPU real (cuBLAS): cada hilo calcula varias casillas, por bloques", 15, st, {c: GR, i: true});
+T(1010, 288, "conteo", 18, st);
+T(1010, 314, "pesos (cables): 12 · sesgos: 3", 17, st, {c: GR});
+R.cm = T(1010, 338, "", 17, st, {c: GR}); R.cr = T(1010, 362, "", 17, st, {c: GR});
+el("rect", {x: 1010, y: 384, width: 14, height: 14, fill: CA}, st); T(1032, 397, "imagen 1 (un 2)", 17, st);
+el("rect", {x: 1200, y: 384, width: 14, height: 14, fill: CB}, st); T(1222, 397, "imagen 2 (un 5)", 17, st);
+
+// ── matrices ──
+T(40, 440, "la misma cuenta, como multiplicación de matrices", 20, st);
+function matriz(nom, filas, cols, val){
+  for (let r = 0; r < filas; r++) for (let c = 0; c < cols; c++){
+    const x = MX[nom] + c * CW, y = MY[nom] + r * CH;
+    R[nom + r + c] = el("rect", {x, y, width: CW, height: CH, fill: "#FFF"}, st);
+    R[nom + "t" + r + c] = T(x + CW / 2, y + 26, val ? f(val(r, c)) : "", 17, st, {a: "middle"});
+  }
+}
+matriz("X", 2, 4, (r, c) => X[r][c]); matriz("W", 4, 3, (r, c) => W[r][c]); matriz("b", 1, 3, (r, c) => B[c]); matriz("Z", 2, 3); matriz("H", 2, 3);
+[0, 1].forEach(r => { T(MX.X - 8, MY.X + r * CH + 26, "img " + (r + 1), 15, st, {a: "end", c: COL[r]}); T(MX.H + 3 * CW + 10, MY.H + r * CH + 26, "imagen " + (r + 1), 15, st, {c: COL[r]}); });
+[0, 1, 2].forEach(c => { ["W", "Z", "H"].forEach(m => T(MX[m] + c * CW + CW / 2, MY[m] - 8, "n" + (c + 1), 15, st, {a: "middle", c: GR})); });
+T(300, 562, "·", 34, st, {a: "middle"}); T(514, 562, "+", 28, st, {a: "middle"}); T(730, 562, "=", 28, st, {a: "middle"});
+T(990, 559, "→ ReLU →", 18, st, {a: "middle"});
+T(MX.X + 2 * CW, 620, "X: las 2 tiras, una fila por imagen", 16, st, {a: "middle", c: GR, i: true});
+T(MX.W + 1.5 * CW, 662, "W: los 12 pesos, una columna por neurona", 16, st, {a: "middle", c: GR, i: true});
+T(MX.b + 1.5 * CW, 600, "b: los 3 sesgos", 16, st, {a: "middle", c: GR, i: true});
+T(MX.Z + 1.5 * CW, 620, "Z = suma + sesgo", 16, st, {a: "middle", c: GR, i: true});
+T(MX.H + 1.5 * CW, 620, "H: pasa a la siguiente capa", 16, st, {a: "middle", c: GR, i: true});
+[["formas:", INK], ["(2 × 4) · (4 × 3) = (2 × 3)", INK], ["", INK], ["en la A4:", INK], ["(128 × 256) · (256 × 120)", INK], ["= (128 × 120)", INK], ["30.720 pesos, los mismos", GR], ["para las 128 imágenes", GR]]
+  .forEach(([s, c], k) => T(1330, 470 + k * 22, s, 17, st, {c}));
+
+R.pk = T(560, 440, "", 17, st, {c: CA, i: true});
+R.fo = T(40, 705, "", 22, st); R.na = T(40, 738, "", 17, st, {c: GR});
+
+// ── la película ──
+function segs(m){
+  const s = [{k: "intro", d: 3}];
+  if (m === 1){ [0, 1].forEach(r => { s.push({k: "load", rs: [r], d: 1.6}); [0, 1, 2].forEach(n => { s.push({k: "comp", pr: [[r, n]], d: 6}); s.push({k: "write", pr: [[r, n]], d: 1.2}); }); }); }
+  else { const all = []; [0, 1].forEach(r => [0, 1, 2].forEach(n => all.push([r, n]))); s.push({k: "load", rs: [0, 1], d: 1.8}); s.push({k: "comp", pr: all, d: 7}); s.push({k: "write", pr: all, d: 1.4}); }
+  s.push({k: "fin", d: 5}); let a = 0; s.forEach(x => { x.a = a; a += x.d; }); return {s, T: a};
+}
+let modo = 1, S = segs(1), t = 0, play = true, vel = 1, last = performance.now();
+const ease = p => p < .5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+const TP = 0.18;   // cada término ocupa 18 % de la cuenta; luego sesgo (0,72) y ReLU (0,86)
+function parcial(r, n, p){ const m = Math.min(4, Math.floor(p / TP)); let s = 0; for (let i = 0; i < m; i++) s += X[r][i] * W[i][n]; const z = s + (p >= .72 ? B[n] : 0); return {m, s, z, h: p >= .86 ? Math.max(0, z) : null}; }
+function borde(e, color, ancho){ e.setAttribute("stroke", color); e.setAttribute("stroke-width", ancho); }
+
+function render(){
+  const s = S.s; let ci = s.findIndex(x => t < x.a + x.d); if (ci < 0) ci = s.length - 1;
+  const sg = s[ci], p = Math.min(1, (t - sg.a) / sg.d);
+  dy.innerHTML = "";
+  const hecho = {}, zhecho = {}; let mult = 0, carg = [];
+  for (let j = 0; j < ci; j++){ const x = s[j];
+    if (x.k === "comp"){ mult += x.pr.length * 4; x.pr.forEach(([r, n]) => zhecho[r + "" + n] = Z[r][n]); }
+    if (x.k === "write") x.pr.forEach(([r, n]) => hecho[r + "" + n] = H[r][n]);
+    if (x.k === "load") carg = x.rs; }
+  const act = sg.k === "comp" ? sg.pr : [], k = Math.floor(p / TP);
+  if (sg.k === "comp") mult += act.length * Math.min(4, k);
+  if (sg.k === "load"){ carg = p > .95 ? sg.rs : [];
+    sg.rs.forEach(r => X[r].forEach((v, i) => { const q = ease(Math.min(1, p / .95)), x0 = 68 + i * 62, y0 = (r ? 197 : 82) + 29, x1 = modo === 1 ? 442 : (r ? 468 : 418), y1 = EY[i] + 7;
+      T(x0 + (x1 - x0) * q, y0 + (y1 - y0) * q, f(v), 20, dy, {a: "middle", c: COL[r]}); })); }
+  const colAct = modo === 1 && act.length ? COL[act[0][0]] : INK;
+  // entradas
+  for (let i = 0; i < 4; i++){ const uno = modo === 1 && carg.length === 1, dos = modo === 2 && carg.length === 2;
+    R["e" + i].textContent = uno ? f(X[carg[0]][i]) : ""; R["e" + i].setAttribute("fill", uno ? COL[carg[0]] : INK);
+    R["ea" + i].textContent = dos ? f(X[0][i]) : ""; R["eb" + i].textContent = dos ? f(X[1][i]) : ""; }
+  // cables, pesos y sesgos
+  const nAct = new Set(act.map(a => a[1]));
+  for (let i = 0; i < 4; i++) for (let n = 0; n < 3; n++){
+    const on = nAct.has(n), cur = on && i === k && k < 4, c = R["c" + i + n];
+    c.setAttribute("stroke", on ? colAct : GR2); c.setAttribute("stroke-width", cur ? 3 : on ? 1.4 : 1); c.setAttribute("opacity", cur ? 1 : on ? .75 : .8);
+    borde(R["wb" + i + n], cur ? colAct : on ? colAct : GR2, cur ? 2.5 : 1); }
+  for (let n = 0; n < 3; n++){
+    borde(R["bb" + n], nAct.has(n) && p >= .72 ? colAct : GR2, nAct.has(n) && p >= .72 ? 2.5 : 1);
+    borde(R["n" + n], nAct.has(n) ? colAct : INK, nAct.has(n) ? 2.4 : 1.3); R["nv" + n].textContent = ""; }
+  act.forEach(([r, n]) => {
+    if (k < 4){ const q = (p - TP * k) / TP, off = modo === 2 ? (r ? 4 : -4) : 0;
+      el("circle", {cx: 494 + (WX - 494) * q, cy: EY[k] + off + (PY(n, k) - EY[k]) * q, r: 5.5, fill: COL[r]}, dy); }
+    if (modo === 1){ const c = parcial(r, n, p); R["nv" + n].textContent = c.h !== null ? f(c.h) : f(p >= .72 ? c.z : c.s); R["nv" + n].setAttribute("fill", COL[r]); }
+  });
+  // hilos
+  for (let r = 0; r < 2; r++) for (let n = 0; n < 3; n++){
+    const key = r + "" + n, on = act.some(a => a[0] === r && a[1] === n), kb = R["k" + key], kv = R["kv" + key];
+    if (on){ const c = parcial(r, n, p); borde(kb, COL[r], 2.4); kb.removeAttribute("stroke-dasharray"); kv.textContent = c.h !== null ? "→ " + f(c.h) : f(p >= .72 ? c.z : c.s); kv.setAttribute("fill", COL[r]); }
+    else if (key in zhecho){ borde(kb, GR2, 1); kb.removeAttribute("stroke-dasharray"); kv.textContent = f(H[r][n]); kv.setAttribute("fill", GR); }
+    else { borde(kb, GR2, 1); kb.setAttribute("stroke-dasharray", "4 4"); kv.textContent = "—"; kv.setAttribute("fill", GR2); }
+  }
+  // matrices
+  // el paso k: en X se marca el número k de cada fila activa y en W el número k de cada columna activa (en GPU, todos a la vez, con su etiqueta)
+  for (let r = 0; r < 2; r++) for (let c = 0; c < 4; c++){ const on = act.some(a => a[0] === r), cur = on && c === k && k < 4; borde(R["X" + r + c], on ? COL[r] : GR2, cur ? 3 : on ? 1.4 : 1); }
+  for (let r = 0; r < 4; r++) for (let c = 0; c < 3; c++){ const on = nAct.has(c), cur = on && r === k && k < 4; borde(R["W" + r + c], on ? colAct : GR2, cur ? 3 : on ? 1.4 : 1); }
+  for (let c = 0; c < 3; c++){ const on = nAct.has(c) && p >= .72; borde(R["b0" + c], on ? colAct : GR2, on ? 3 : 1); }
+  for (let r = 0; r < 2; r++) for (let n = 0; n < 3; n++){
+    const key = r + "" + n, on = act.some(a => a[0] === r && a[1] === n), zt = R["Zt" + key], ht = R["Ht" + key];
+    if (on){ const c = parcial(r, n, p); zt.textContent = c.m ? f(p >= .72 ? c.z : c.s) : ""; zt.setAttribute("fill", COL[r]); borde(R["Z" + key], COL[r], 2.4); }
+    else { zt.textContent = key in zhecho ? f(Z[r][n]) : ""; zt.setAttribute("fill", COL[r]); borde(R["Z" + key], GR2, 1); }
+    ht.textContent = key in hecho ? f(H[r][n]) : ""; ht.setAttribute("fill", COL[r]); borde(R["H" + key], key in hecho ? INK : GR2, 1);
+  }
+  R.pk.textContent = "";
+  if (modo === 2 && sg.k === "comp" && !foco){   // en GPU las matrices muestran UN hilo de ejemplo, el (1, 1): su fila completa por su columna completa
+    const er = 0, en = 0;
+    for (let r = 0; r < 2; r++) for (let c = 0; c < 4; c++) borde(R["X" + r + c], r === er ? COL[er] : GR2, r === er ? (c === k ? 3.5 : 2) : 1);
+    for (let r = 0; r < 4; r++) for (let c = 0; c < 3; c++) borde(R["W" + r + c], c === en ? COL[er] : GR2, c === en ? (r === k ? 3.5 : 2) : 1);
+    for (let c = 0; c < 3; c++) borde(R["b0" + c], c === en && p >= .72 ? COL[er] : GR2, c === en && p >= .72 ? 3 : 1);
+    for (let r = 0; r < 2; r++) for (let n = 0; n < 3; n++) borde(R["Z" + r + n], r === er && n === en ? COL[er] : GR2, r === er && n === en ? 3 : 1);
+    borde(R["k" + er + en], COL[er], 4);
+    R.pk.textContent = k < 4 ? "ejemplo, el hilo (1, 1): fila 1 de X × columna 1 de W · paso " + (k + 1) + " de 4: el " + (k + 1) + ".º de su fila por el " + (k + 1) + ".º de su columna"
+                             : "ejemplo, el hilo (1, 1): fila 1 de X × columna 1 de W, más el sesgo b₁";
+  }
+  if (foco){   // el hilo elegido: su fila de X, su columna de W, su sesgo, su casilla de Z y H, y los cables de su neurona
+    const [fr, fn] = foco, cf = COL[fr];
+    for (let r = 0; r < 2; r++) for (let c = 0; c < 4; c++) borde(R["X" + r + c], r === fr ? cf : GR2, r === fr ? 3 : 1);
+    for (let r = 0; r < 4; r++) for (let c = 0; c < 3; c++) borde(R["W" + r + c], c === fn ? cf : GR2, c === fn ? 3 : 1);
+    for (let c = 0; c < 3; c++) borde(R["b0" + c], c === fn ? cf : GR2, c === fn ? 3 : 1);
+    borde(R["Z" + fr + fn], cf, 3); borde(R["H" + fr + fn], cf, 3); borde(R["k" + fr + fn], cf, 3.5);
+    for (let i = 0; i < 4; i++) for (let n = 0; n < 3; n++){ const c = R["c" + i + n], on = n === fn;
+      c.setAttribute("stroke", on ? cf : GR2); c.setAttribute("stroke-width", on ? 2.2 : 1); c.setAttribute("opacity", on ? 1 : .5); borde(R["wb" + i + n], on ? cf : GR2, on ? 2 : 1); }
+    borde(R["n" + fn], cf, 2.6);
+    R.fo.textContent = "casilla (" + (fr + 1) + ", " + (fn + 1) + ") de Z = fila " + (fr + 1) + " de X · columna " + (fn + 1) + " de W + b" + SUB[fn] + " = "
+      + [0, 1, 2, 3].map(i => f(X[fr][i]) + "×" + fp(W[i][fn])).join(" + ") + " + " + fp(B[fn]) + " = " + f(Z[fr][fn]);
+    R.na.textContent = "En la red: la tira de la imagen " + (fr + 1) + " pasando por los 4 cables de la neurona " + (fn + 1) + ". Es la misma cuenta." + (fijo ? " (clic otra vez para soltar)" : "");
+  }
+  if (sg.k === "write") sg.pr.forEach(([r, n]) => { const q = ease(p), x1 = MX.H + n * CW + CW / 2, y1 = MY.H + r * CH + 26;
+    T(NX + (x1 - NX) * q, NY[n] + 7 + (y1 - NY[n] - 7) * q, f(H[r][n]), 20, dy, {a: "middle", c: COL[r]}); });
+  R.cm.textContent = "multiplicaciones hechas: " + mult; R.cr.textContent = "casillas de resultado llenas: " + Object.keys(hecho).length + " de 6";
+  // textos
+  let fo = "", na = "";
+  if (sg.k === "intro"){ fo = modo === 1 ? "Una cuenta a la vez: así lo explicamos en el tablero." : "La GPU: las mismas cuentas, pero las 6 casillas al mismo tiempo.";
+    na = "Los 12 pesos están en los cables (y en la matriz W). Son los mismos para las 2 imágenes."; }
+  if (sg.k === "load"){ fo = modo === 1 ? "Entra la tira de la imagen " + (sg.rs[0] + 1) + ": sus 4 números ocupan las 4 entradas." : "Entran las 2 tiras juntas: cada entrada lleva 2 números, uno por imagen.";
+    na = modo === 1 ? "En la matriz, la tira es la fila " + (sg.rs[0] + 1) + " de X." : "En la matriz, las 2 tiras son las 2 filas de X."; }
+  if (sg.k === "comp"){
+    if (modo === 1){ const [r, n] = act[0], c = parcial(r, n, p), ts = [0, 1, 2, 3].slice(0, c.m).map(i => f(X[r][i]) + "×" + fp(W[i][n]));
+      fo = "neurona " + (n + 1) + ", imagen " + (r + 1) + ":  " + ts.join(" + ") + (c.m < 4 ? (c.m ? " + …" : "…") : "") + (p >= .72 ? " + " + fp(B[n]) + " = " + f(c.z) : "") + (c.h !== null ? "  → ReLU → " + f(c.h) : "");
+      na = "Es lo mismo que la fila " + (r + 1) + " de X por la columna " + (n + 1) + " de W, más el sesgo b" + SUB[n] + ": la casilla (" + (r + 1) + ", " + (n + 1) + ") de Z."; }
+    else { fo = "Las 6 casillas a la vez: cada hilo multiplica su par " + Math.min(4, k + 1) + " de 4 y suma" + (p >= .72 ? "; después, sesgo y ReLU." : ".");
+      na = "Los otros 5 hilos hacen lo mismo con SU fila y SU columna, al mismo tiempo: por eso se llenan juntas las 6 casillas de Z. Mouse sobre un hilo: el suyo."; } }
+  if (sg.k === "write"){ fo = "Cada resultado va a su casilla de H: fila de su imagen, columna de su neurona."; na = "La neurona no guarda el número: es una regla. Los resultados viven en la tabla H."; }
+  if (sg.k === "fin"){ fo = modo === 1 ? "12 pesos usados 2 veces = 24 multiplicaciones. Los pesos no cambiaron." : "X (2 × 4) · W (4 × 3) + b = Z (2 × 3) → ReLU → H: una sola multiplicación de matrices.";
+    na = modo === 1 ? "La GPU no hace esto en fila: mira el botón «todo al mismo tiempo (GPU)»." : "Las mismas 24 multiplicaciones y los mismos 12 pesos; lo que cambia es que van en paralelo."; }
+  if (!foco){ R.fo.textContent = fo; R.na.textContent = na; }
+  $("scr").value = Math.round(t / S.T * 1000); $("tt").textContent = t.toFixed(1).replace(".", ",") + " / " + Math.round(S.T) + " s";
+  $("pp").textContent = play ? "pausar" : (t >= S.T ? "repetir" : "seguir");
+  $("m1").classList.toggle("on", modo === 1); $("m2").classList.toggle("on", modo === 2);
+}
+function loop(now){ const d = (now - last) / 1000; last = now; if (play){ t = Math.min(S.T, t + d * vel); if (t >= S.T) play = false; } render(); requestAnimationFrame(loop); }
+function setModo(m){ modo = m; S = segs(m); t = 0; play = true; }
+function paso(signo){ play = false; const s = S.s, sg = s.find(x => t < x.a + x.d) || s[s.length - 1]; t = Math.max(0, Math.min(S.T, t + signo * Math.max(0.15, sg.d / 40))); }
+function setVel(v){ vel = v; $("vel").value = v; $("velo").textContent = (Math.round(v * 100) / 100).toString().replace(".", ",") + "×"; }
+$("m1").onclick = () => setModo(1); $("m2").onclick = () => setModo(2);
+$("pp").onclick = () => { if (t >= S.T){ t = 0; play = true; } else play = !play; };
+$("fb").onclick = () => paso(-1); $("ff").onclick = () => paso(1);
+$("vel").oninput = e => setVel(+e.target.value);
+document.querySelectorAll(".pre").forEach(b => b.onclick = () => setVel(+b.dataset.v));
+$("scr").oninput = e => { play = false; t = e.target.value / 1000 * S.T; };
+addEventListener("keydown", e => { if (e.key === " " || e.key === "k"){ e.preventDefault(); $("pp").click(); } if (e.key === ",") paso(-1); if (e.key === ".") paso(1); if (e.key === "1") setModo(1); if (e.key === "2") setModo(2); });
+function ajustar(){ const m = $("marco"), e = Math.min(innerWidth / 1600, innerHeight / 900); m.style.transform = `scale(${e})`; m.style.left = ((innerWidth - 1600 * e) / 2) + "px"; m.style.top = ((innerHeight - 900 * e) / 2) + "px"; }
+addEventListener("resize", ajustar); ajustar();
+const Q = new URLSearchParams(location.search); if (Q.has("modo")) setModo(+Q.get("modo")); if (Q.has("t")){ t = +Q.get("t"); play = false; }
+if (Q.has("foco")){ const v = Q.get("foco").split(",").map(Number); foco = [v[0] - 1, v[1] - 1]; fijo = true; }   // ?foco=1,2
+requestAnimationFrame(loop);
+</script></body></html>
