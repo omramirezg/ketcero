@@ -20,13 +20,9 @@ ACTUALIZADO = "5 de noviembre de 2026"
 # Lección publicada: dict con fuente (ruta en el curso), miniatura, descripción y datos.
 # Lección pendiente: solo el título.
 TEMARIO = [
-    ("fundamentos", "Fundamentos", "Lo que hace falta antes de cualquier red.", [
-        {"titulo": "Regresión lineal: ajustar una recta"},
-        {"titulo": "La pérdida y el descenso de gradiente"},
-    ]),
-    ("redes-neuronales", "Redes neuronales", "De una neurona a una red densa que aprende.", [
-        {"titulo": "Una neurona, número por número"},
-        {"titulo": "El backward con la regla de la cadena"},
+    ("redes-profundas", "Redes neuronales profundas", "Qué es una red, cuándo le gana al machine learning clásico y cómo aprende con descenso de gradiente.", [
+        {"titulo": "¿Machine learning o deep learning? Depende de cuántos datos hay"},
+        {"titulo": "Una red que pinta un mapa de cultivos"},
     ]),
     ("cnn", "Redes convolucionales", "Cómo una red lee una imagen.", [
         {"titulo": "La CNN completa, por dentro",
@@ -35,6 +31,8 @@ TEMARIO = [
          "alt": "La pérdida de cada imagen del lote en la CNN completa",
          "desc": "Una LeNet-5 aprende a leer dígitos de MNIST: lotes reales, la pérdida de cada imagen, el backward capa por capa y el paso de AdamW.",
          "datos": "86 pasos entrenar · 43 predecir · 5 épocas", "pasos": 86 + 43},
+        {"titulo": "Transfer learning: hojas de café sanas o enfermas"},
+        {"titulo": "Clasificar sin entrenar: CLIP contra una CNN"},
     ]),
     ("deteccion", "Detección de objetos", "Encontrar y encerrar objetos: cajas, puntajes, IoU y NMS.", [
         {"titulo": "Mini-YOLO por dentro: dígitos en la calle",
@@ -43,9 +41,19 @@ TEMARIO = [
          "alt": "El NMS del Mini-YOLO borra las cajas que se solapan",
          "desc": "Una red pequeña al estilo YOLO aprende a encontrar dígitos sobre fotos reales de la calle, desde la red recién nacida hasta las cajas finales.",
          "datos": "186 pasos entrenar · 66 predecir · 30 épocas", "pasos": 186 + 66},
+        {"titulo": "YOLO11 encuentra huecos en la calle"},
     ]),
-    ("lenguaje", "Modelos de lenguaje", "Del bigrama a los transformers.", [
-        {"titulo": "El bigrama de letras"},
+    ("segmentacion", "Segmentación de imágenes", "Etiquetar cada píxel de una imagen, no solo encerrar el objeto en una caja.", [
+        {"titulo": "Cómo se etiquetan las imágenes para entrenar"},
+        {"titulo": "Segmentación semántica, píxel por píxel"},
+    ]),
+    ("generativos-secuencias", "Modelos generativos y secuencias", "Redes que inventan imágenes y redes que leen datos en orden.", [
+        {"titulo": "GANs: dos redes que compiten"},
+        {"titulo": "RNNs: una red con memoria"},
+    ]),
+    ("transformers-grafos", "Transformers y redes de grafos", "La atención, base de los modelos de lenguaje, y las redes que aprenden sobre conexiones.", [
+        {"titulo": "Transformers: la atención, número por número"},
+        {"titulo": "Redes neuronales de grafos"},
     ]),
 ]
 
@@ -208,7 +216,7 @@ def construir_inicio():
 <section class="cabeza">
 <div class="mono">Temario · actualizado el {ACTUALIZADO}</div>
 <h1>Machine learning desde cero, con cada operación a la vista.</h1>
-<p>Un recorrido ordenado: de la regresión lineal a la detección de objetos. Cada lección es una animación paso a paso hecha con los datos reales del entrenamiento.</p>
+<p>Un recorrido ordenado, en el mismo orden del curso: de las redes profundas a los transformers. Cada lección es una animación paso a paso hecha con los datos reales del entrenamiento.</p>
 </section>
 {"".join(temas)}
 </main>
