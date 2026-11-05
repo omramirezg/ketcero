@@ -124,7 +124,7 @@ footer .in { max-width:1240px; margin:0 auto; padding:24px 32px 48px; display:fl
 footer .in { max-width:1360px; }
 .portada { grid-template-columns:minmax(0,1fr) 640px; position:relative; }
 .cabeza .explica { margin:0 0 18px; font-size:15px; color:var(--gris); max-width:560px; }
-.lado { position:relative; top:58px; }  /* la animación reserva abajo el sitio de los 6 mapas: se baja la mitad de ese hueco */
+.lado { position:relative; top:var(--bajar-lado, 0px); }  /* la animación reserva abajo el sitio de los 6 mapas: se baja la mitad de ese hueco */
 main .portada { padding-bottom:80px; }
 .franja { position:absolute; left:0; right:0; bottom:0; display:grid; grid-template-columns:1fr auto 1fr; align-items:center;
   border-top:1px solid var(--linea); padding:14px 0; font:13px "IBM Plex Mono", monospace; color:var(--gris); }
@@ -163,7 +163,7 @@ main .portada { padding-bottom:80px; }
 
 /* Bloque bajo el código: la casilla en cámara lenta y, al final, la tabla de probabilidades.
    Su alto está reservado para que la portada no salte entre fases. */
-.bloque-codigo { height:178px; margin-top:12px; max-width:640px; opacity:0; transition:opacity .3s; font:11.5px/1.5 "IBM Plex Mono", monospace; color:var(--gris); }
+.bloque-codigo { position:absolute; left:0; right:0; overflow:hidden; background:var(--fondo); pointer-events:none; z-index:2; opacity:0; transition:opacity .3s; font:11.5px/1.5 "IBM Plex Mono", monospace; color:var(--gris); }
 .bloque-codigo.visible { opacity:1; }
 .bloque-codigo .b-tit { margin-bottom:8px; color:var(--texto); }
 .bloque-codigo .b-mats { display:flex; align-items:center; gap:10px; }

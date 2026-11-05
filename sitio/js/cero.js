@@ -29,7 +29,7 @@
   }
 
   // Panel de código que acompaña la animación: la línea que se ejecuta lleva la flecha ▶, las del bucle se resaltan
-  // y los comentarios muestran los valores reales. Debajo del panel queda un bloque (cámara lenta y tabla final).
+  // y los comentarios muestran los valores reales.
   function montarCodigo(caja, D) {
     const f = D.filtro_principal, n = D.indice_prueba;
     const lineas = [
@@ -57,9 +57,6 @@
       return fila;
     });
     caja.appendChild(pre);
-    const bloque = document.createElement("div");
-    bloque.className = "bloque-codigo";
-    caja.parentNode.insertBefore(bloque, caja.nextSibling);
     const notas = lineas.map(l => l[1]);
     function marcar(activas, valores, actual) {
       filas.forEach((fila, k) => {
@@ -69,13 +66,20 @@
         fila.children[3].textContent = v ? "# " + v : notas[k] ? "# " + notas[k] : "";
       });
     }
-    return { marcar, bloque };
+    return { marcar };
   }
 
   function montarCero(caja, D, opciones) {
     const panel = opciones && opciones.codigo ? montarCodigo(opciones.codigo, D) : null;
     const marcar = panel ? panel.marcar : () => {};
-    const bloque = panel ? panel.bloque : null;
+    // bloque de la cámara lenta y de la tabla final: va sobre la parte baja de la animación (donde salen los 6 mapas),
+    // así no alarga la portada; solo existe cuando hay panel de código (en celular no)
+    let bloque = null;
+    if (panel) {
+      bloque = document.createElement("div");
+      bloque.className = "bloque-codigo";
+      caja.parentNode.appendChild(bloque);
+    }
     const f = D.filtro_principal, K = D.filtros[f], b = D.sesgos[f], X = D.entrada, MAPA = D.mapas[f];
     const topePos = Math.max(...MAPA.flat().filter(v => v > 0), 1e-6);
     const topeNeg = Math.max(...MAPA.flat().filter(v => v < 0).map(v => -v), 1e-6);
@@ -109,7 +113,7 @@
     function mostrar(g, si, animar) {
       if (!g) return;
       g.style.transition = animar ? "opacity .7s ease" : "none";
-      g.style.opacity = si ? 1 : 0;
+      g.style.opacity = si ? 1 : g === gMapa ? 0.35 : 0;
     }
 
     function dibujar() {
@@ -128,6 +132,11 @@
       svg = el(caja, "svg", { viewBox: `0 0 ${Math.max(anchoTotal, 6 * lado + 5 * sep)} ${alto}`, width: "100%", role: "img",
         "aria-label": `Un filtro de la primera capa recorre un cero escrito a mano y llena su mapa; la red responde 0 con probabilidad ${num(D.probabilidades[0], 4)}` });
       svg.style.display = "block";
+      if (bloque) {
+        const esc = caja.clientWidth / Math.max(anchoTotal, 6 * lado + 5 * sep);
+        bloque.style.top = (caja.offsetTop + (yTexto - 16) * esc) + "px";
+        bloque.style.height = ((alto - yTexto + 16) * esc) + "px";
+      }
       svg.style.font = '13px "IBM Plex Mono", monospace';
       const rot = (x, y, txt) => el(svg, "text", { x, y, fill: "var(--gris)", "font-size": 12 }, txt);
 
