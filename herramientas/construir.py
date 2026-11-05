@@ -108,6 +108,18 @@ def beacon():
 
 # Aplica el tema guardado antes de pintar (sin parpadeo) y maneja el botón Oscuro / Claro.
 TEMA_JS = '<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.dataset.tema=t}catch(e){}</script>\n'
+CLIP_JS = """<script>
+(function () {
+  var quieto = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  document.querySelectorAll("video.clip").forEach(function (v) {
+    if (quieto) { v.removeAttribute("autoplay"); v.pause(); return; }
+    if (!v.hasAttribute("data-al-pasar")) return;
+    var fila = v.closest("a") || v;
+    fila.addEventListener("mouseenter", function () { v.play().catch(function () {}); });
+    fila.addEventListener("mouseleave", function () { v.pause(); });
+  });
+})();
+</script>"""
 BOTON_JS = """<script>
 (function () {
   var b = document.getElementById("tema"), r = document.documentElement;
@@ -234,6 +246,7 @@ def pagina(titulo, descripcion, ruta, cuerpo, actual="", extra_head=""):
 <div id="cargando" class="cargando" role="status" hidden><div>{LOGO}<p>Cargando la animación…</p><small>Trae los datos reales de cada paso: la primera vez tarda unos segundos.</small></div></div>
 <footer><div class="in"><span>Ket Cero · un proyecto de <a href="/omar/">{AUTOR}</a></span><span>ketcero.com</span></div></footer>
 {BOTON_JS}
+{CLIP_JS}
 </body>
 </html>
 """
@@ -377,6 +390,10 @@ def copiar_animaciones():
         else:
             shutil.copy2(origen, os.path.join(destino, nombre))
         Image.open(os.path.join(MINIATURAS, lec["miniatura"])).save(os.path.join(SITIO, "img", webp(lec["miniatura"])), "WEBP", quality=82, method=6)
+        for ext in (".webm", ".mp4"):  # clip de la animación corriendo (lo graba herramientas/grabar_clips.py)
+            clip = os.path.splitext(lec["miniatura"])[0] + ext
+            if os.path.exists(os.path.join(MINIATURAS, clip)):
+                shutil.copy2(os.path.join(MINIATURAS, clip), os.path.join(SITIO, "img", clip))
         lec["url"] = f"/ia/{clave}/{nombre[:-5]}"  # sin «.html»: Cloudflare sirve la página directo, sin la redirección 307
         lec["pagina"] = f"{CURSO_DL}{lec['slug']}/"
         agregar_capa(os.path.join(destino, nombre), lec)
@@ -400,6 +417,19 @@ def miniatura(lec, clase="", carga="lazy"):
     return f'<img{clase} src="{ruta}" alt="{html.escape(lec["alt"])}" width="940" height="587" loading="{carga}">'
 
 
+def clip(lec, solo_al_pasar=False):
+    """La animación corriendo, en un video corto sin sonido. En el temario se anima al pasar el mouse;
+    en la página de la lección se reproduce sola en bucle. Si no hay clip, queda la imagen fija."""
+    base = os.path.splitext(lec["miniatura"])[0]
+    if not os.path.exists(os.path.join(SITIO, "img", base + ".webm")):
+        return miniatura(lec)
+    poster = version("/img/" + webp(lec["miniatura"]))
+    fuentes = "".join(f'<source src="{version("/img/" + base + ext)}" type="video/{ext[1:]}">' for ext in (".webm", ".mp4"))
+    modo = 'preload="none" data-al-pasar' if solo_al_pasar else 'autoplay preload="auto"'
+    return (f'<video class="clip" muted loop playsinline {modo} poster="{poster}" aria-label="{html.escape(lec["alt"])}">'
+            f'{fuentes}</video>')
+
+
 def construir_curso(clave_curso, nombre, desc_curso, temario):
     temas = []
     for t, (clave, titulo, desc, lecciones) in enumerate(temario, 1):
@@ -409,7 +439,7 @@ def construir_curso(clave_curso, nombre, desc_curso, temario):
             if "fuente" in lec:
                 filas.append(f'<a class="fila pub" data-leccion="{lec["slug"]}" href="{lec["pagina"]}"><div class="n">{num}</div><div><b>{html.escape(lec["titulo"])}</b>'
                              f'<p>{html.escape(lec["desc"])}</p><div class="d">{lec["datos"]} · versión preliminar</div></div>'
-                             f'{miniatura(lec)}</a>')
+                             f'{clip(lec, solo_al_pasar=True)}</a>')
             else:
                 filas.append(f'<div class="fila pend"><div class="n">{num}</div><div><b>{html.escape(lec["titulo"])}</b></div><div class="d">en preparación</div></div>')
         temas.append(f'<section class="tema" id="{clave}"><h2>{titulo} <span>Tema {t}</span></h2><p>{html.escape(desc)}</p>{"".join(filas)}</section>')
@@ -454,7 +484,7 @@ def construir_leccion(n, orden):
 <a id="seguir" class="ir" hidden data-leccion="{lec["slug"]}" data-animacion="{lec["url"]}" data-abre-animacion href="{lec["url"]}"></a></div>
 <p class="aviso">Versión preliminar: todavía está en revisión y puede tener errores.</p>
 </section>
-<a class="figura" href="{lec["url"]}" data-abre-animacion>{miniatura(lec, carga="eager")}</a>
+<a class="figura" href="{lec["url"]}" data-abre-animacion>{clip(lec)}</a>
 <section class="ficha">
 <h2>Qué vas a aprender</h2>
 <ul>{puntos}</ul>

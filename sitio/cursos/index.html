@@ -23,7 +23,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preload" href="/fuentes/IBMPlexSans-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/kc/fuentes.css?v=63f628749e">
-<link rel="stylesheet" href="/estilo.css?v=64801c891d">
+<link rel="stylesheet" href="/estilo.css?v=80b12cfc18">
 </head>
 <body>
 <a class="saltar" href="#contenido">Saltar al contenido</a>
@@ -115,6 +115,18 @@
     if (a && c && e.button === 0 && !e.ctrlKey && !e.metaKey && !e.shiftKey) c.hidden = false;
   });
   addEventListener("pageshow", function () { if (c) c.hidden = true; });
+})();
+</script>
+<script>
+(function () {
+  var quieto = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  document.querySelectorAll("video.clip").forEach(function (v) {
+    if (quieto) { v.removeAttribute("autoplay"); v.pause(); return; }
+    if (!v.hasAttribute("data-al-pasar")) return;
+    var fila = v.closest("a") || v;
+    fila.addEventListener("mouseenter", function () { v.play().catch(function () {}); });
+    fila.addEventListener("mouseleave", function () { v.pause(); });
+  });
 })();
 </script>
 </body>

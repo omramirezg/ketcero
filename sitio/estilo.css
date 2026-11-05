@@ -211,3 +211,8 @@ a:focus-visible, button:focus-visible { outline:2px solid var(--tinta); outline-
 .ficha p { color:var(--texto); margin:0; }
 .vecinas { display:flex; justify-content:space-between; gap:24px; margin-top:44px; padding-top:18px; border-top:1px solid var(--linea); font-size:15px; }
 .vecinas a { color:var(--gris); } .vecinas a:hover { color:var(--tinta); }
+
+/* clips de las animaciones: la miniatura del temario (16:10) y la figura de la lección (proporción del dibujo) */
+.fila.pub img, .fila.pub video { width:100%; height:auto; aspect-ratio:16/10; object-fit:cover; object-position:center; border:1px solid var(--linea); display:block; background:#111; }
+.figura video { width:100%; height:auto; display:block; border:1px solid var(--linea); background:#111; }
+:root:not([data-tema="claro"]) .fila.pub img, :root:not([data-tema="claro"]) .figura img { filter:none; }

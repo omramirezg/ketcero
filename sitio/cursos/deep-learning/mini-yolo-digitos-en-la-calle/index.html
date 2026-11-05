@@ -23,7 +23,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preload" href="/fuentes/IBMPlexSans-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/kc/fuentes.css?v=63f628749e">
-<link rel="stylesheet" href="/estilo.css?v=64801c891d">
+<link rel="stylesheet" href="/estilo.css?v=80b12cfc18">
 <script type="application/ld+json">
 {
  "@context": "https://schema.org",
@@ -77,7 +77,7 @@
 <a id="seguir" class="ir" hidden data-leccion="mini-yolo-digitos-en-la-calle" data-animacion="/ia/deteccion/Animacion_B1_Mini_YOLO_por_dentro" data-abre-animacion href="/ia/deteccion/Animacion_B1_Mini_YOLO_por_dentro"></a></div>
 <p class="aviso">Versión preliminar: todavía está en revisión y puede tener errores.</p>
 </section>
-<a class="figura" href="/ia/deteccion/Animacion_B1_Mini_YOLO_por_dentro" data-abre-animacion><img src="/img/mini-yolo.webp?v=4e1d6da581" alt="El NMS del Mini-YOLO borra las cajas que se solapan" width="940" height="587" loading="eager"></a>
+<a class="figura" href="/ia/deteccion/Animacion_B1_Mini_YOLO_por_dentro" data-abre-animacion><video class="clip" muted loop playsinline autoplay preload="auto" poster="/img/mini-yolo.webp?v=edbf1ed92a" aria-label="El NMS del Mini-YOLO borra las cajas que se solapan"><source src="/img/mini-yolo.webm?v=59388e309d" type="video/webm"><source src="/img/mini-yolo.mp4?v=f58b963d4e" type="video/mp4"></video></a>
 <section class="ficha">
 <h2>Qué vas a aprender</h2>
 <ul><li>Cómo se arman las escenas: dígitos de MNIST pegados sobre fotos reales de la calle.</li><li>La red al nacer: nueve convoluciones con su BatchNorm, cinco pool y dos capas densas que terminan en una rejilla de 7 × 7.</li><li>La ida de un lote real y la pérdida de YOLO, término por término.</li><li>La vuelta con la regla de la cadena y el paso de AdamW, lote tras lote y época tras época.</li><li>Al predecir: decodificar las 98 cajas, el puntaje, el umbral, el IoU y el NMS hasta las cajas finales.</li></ul>
@@ -158,6 +158,18 @@
     if (a && c && e.button === 0 && !e.ctrlKey && !e.metaKey && !e.shiftKey) c.hidden = false;
   });
   addEventListener("pageshow", function () { if (c) c.hidden = true; });
+})();
+</script>
+<script>
+(function () {
+  var quieto = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  document.querySelectorAll("video.clip").forEach(function (v) {
+    if (quieto) { v.removeAttribute("autoplay"); v.pause(); return; }
+    if (!v.hasAttribute("data-al-pasar")) return;
+    var fila = v.closest("a") || v;
+    fila.addEventListener("mouseenter", function () { v.play().catch(function () {}); });
+    fila.addEventListener("mouseleave", function () { v.pause(); });
+  });
 })();
 </script>
 </body>
