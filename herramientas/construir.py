@@ -74,6 +74,19 @@ BOTON_JS = """<script>
   });
   rotulo();
 })();
+(function () {
+  var m = document.getElementById("menu"), c = document.getElementById("cajon"), v = document.getElementById("velo");
+  function poner(abierto) {
+    m.setAttribute("aria-expanded", abierto ? "true" : "false");
+    c.classList.toggle("abierto", abierto);
+    v.hidden = !abierto;
+    if (abierto) c.querySelector("a").focus();
+  }
+  m.addEventListener("click", function () { poner(m.getAttribute("aria-expanded") !== "true"); });
+  v.addEventListener("click", function () { poner(false); });
+  c.addEventListener("click", function (e) { if (e.target.closest("a")) poner(false); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !v.hidden) { poner(false); m.focus(); } });
+})();
 </script>"""
 FUENTES = ('<link rel="preconnect" href="https://fonts.googleapis.com">\n'
            '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
@@ -85,6 +98,8 @@ def pagina(titulo, descripcion, ruta, cuerpo, actual="", extra_head=""):
     menu = [("/", "Temario"), ("/omar/", "Quién soy")]
     marca = ' aria-current="page"'
     enlaces = "".join(f'<a href="{u}"{marca if u == actual else ""}>{t}</a>' for u, t in menu)
+    temas = "".join(f'<li><a href="/#{clave}">{t} · {titulo} <span>{sum("fuente" in l for l in lecciones)}</span></a></li>'
+                    for t, (clave, titulo, _, lecciones) in enumerate(TEMARIO, 1))
     return f"""<!doctype html>
 <html lang="es">
 <head>
@@ -106,9 +121,17 @@ def pagina(titulo, descripcion, ruta, cuerpo, actual="", extra_head=""):
 {extra_head}</head>
 <body>
 <header><div class="in">
-<a class="marca" href="/">{LOGO}Ket Cero<small>Machine learning desde cero</small></a>
+<div class="izq"><button id="menu" class="hamb" type="button" aria-expanded="false" aria-controls="cajon" aria-label="Abrir el temario"><span></span><span></span><span></span></button>
+<a class="marca" href="/">{LOGO}Ket Cero<small>Machine learning desde cero</small></a></div>
 <nav>{enlaces}<button id="tema" type="button" role="switch" aria-checked="false"><span>Modo oscuro</span><span class="pista"><span class="perilla"></span></span></button></nav>
 </div></header>
+<div id="velo" class="velo" hidden></div>
+<aside id="cajon" class="cajon" aria-label="Temario">
+<p class="t">Temario</p>
+<ol>{temas}</ol>
+<p class="t">Autor</p>
+<p><a href="/omar/">{AUTOR}</a></p>
+</aside>
 {cuerpo}
 <footer><div class="in"><span>Ket Cero · un proyecto de <a href="/omar/">{AUTOR}</a></span><span>ketcero.com</span></div></footer>
 {BOTON_JS}
@@ -173,6 +196,9 @@ def copiar_animaciones():
     shutil.rmtree(os.path.join(SITIO, "ia"), ignore_errors=True)
     shutil.rmtree(os.path.join(SITIO, "img"), ignore_errors=True)
     os.makedirs(os.path.join(SITIO, "img"))
+    os.makedirs(os.path.join(SITIO, "js"), exist_ok=True)
+    for archivo in ("cero.js", "cero_datos.js"):  # animación de portada «El cero que aprende»
+        shutil.copy2(os.path.join(RAIZ, "herramientas", "animacion_cero", archivo), os.path.join(SITIO, "js", archivo))
     filas = []
     for clave, _, lec in publicadas():
         destino = os.path.join(SITIO, "ia", clave)
@@ -191,10 +217,8 @@ def copiar_animaciones():
 
 
 def construir_inicio():
-    lados, temas = [], []
+    temas = []
     for t, (clave, titulo, desc, lecciones) in enumerate(TEMARIO, 1):
-        n_pub = sum("fuente" in l for l in lecciones)
-        lados.append(f'<li><a href="#{clave}">{t} · {titulo} <span>{n_pub}</span></a></li>')
         filas = []
         for l, lec in enumerate(lecciones, 1):
             num = f"{t}.{l}"
@@ -206,21 +230,21 @@ def construir_inicio():
                 filas.append(f'<div class="fila pend"><div class="n">{num}</div><div><b>{html.escape(lec["titulo"])}</b></div><div class="d">en preparación</div></div>')
         temas.append(f'<section class="tema" id="{clave}"><h2>{titulo} <span>Tema {t}</span></h2><p>{html.escape(desc)}</p>{"".join(filas)}</section>')
     cuerpo = f"""<div class="cuerpo">
-<aside>
-<p class="t">Temario</p>
-<ol>{"".join(lados)}</ol>
-<p class="t">Autor</p>
-<p><a href="/omar/">{AUTOR}</a></p>
-</aside>
 <main>
-<section class="cabeza">
+<section class="cabeza portada">
+<div>
 <div class="mono">Temario · actualizado el {ACTUALIZADO}</div>
 <h1>Machine learning desde cero, con cada operación a la vista.</h1>
 <p>Un recorrido ordenado, en el mismo orden del curso: de las redes profundas a los transformers. Cada lección es una animación paso a paso hecha con los datos reales del entrenamiento.</p>
+</div>
+<div id="cero" class="cero"></div>
 </section>
 {"".join(temas)}
 </main>
-</div>"""
+</div>
+<script src="/js/cero_datos.js"></script>
+<script src="/js/cero.js"></script>
+<script>montarCero(document.getElementById("cero"), window.DATOS_CERO);</script>"""
     return pagina("Ket Cero · Machine learning desde cero",
                   "Machine learning desde cero, en español: lecciones animadas paso a paso con los datos reales del entrenamiento. Redes convolucionales, detección de objetos y más.",
                   "/", cuerpo, "/")

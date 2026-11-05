@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ket Cero · prueba de la animación de portada</title>
+<script>try { const t = localStorage.getItem("tema"); if (t) document.documentElement.setAttribute("data-tema", t); } catch (e) {}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../sitio/estilo.css">
+<style>
+#cero { margin-top:32px; }
+</style>
+</head>
+<body>
+<header><div class="in">
+  <a class="marca" href="#"><svg width="34" height="24" viewBox="0 0 44 30" aria-hidden="true"><line x1="5" y1="3" x2="5" y2="27" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><ellipse cx="19" cy="15" rx="6" ry="11" fill="none" stroke="#C8502A" stroke-width="3"/><polyline points="31,3 39,15 31,27" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>Ket Cero<small>Machine learning desde cero</small></a>
+  <nav><a aria-current="page" href="#">Temario</a><a href="#">Quién soy</a><button id="tema" type="button">Oscuro</button></nav>
+</div></header>
+
+<div class="cuerpo">
+  <aside>
+    <p class="t">Temario</p>
+    <ol>
+      <li><a href="#">1 · Fundamentos <span>0</span></a></li>
+      <li><a href="#">2 · Redes neuronales <span>0</span></a></li>
+      <li><a href="#">3 · Redes convolucionales <span>1</span></a></li>
+      <li><a href="#">4 · Detección de objetos <span>1</span></a></li>
+      <li><a href="#">5 · Modelos de lenguaje <span>0</span></a></li>
+    </ol>
+    <p class="t">Autor</p>
+    <p>Omar Ramírez González</p>
+  </aside>
+  <main>
+    <section class="cabeza">
+      <div class="mono">Temario · actualizado el 5 de noviembre de 2026</div>
+      <h1>Machine learning desde cero, con cada operación a la vista.</h1>
+      <p>Un recorrido ordenado: de la regresión lineal a la detección de objetos. Cada lección es una animación paso a paso hecha con los datos reales del entrenamiento.</p>
+      <div id="cero"></div>
+    </section>
+  </main>
+</div>
+<script src="cero_datos.js"></script>
+<script src="cero.js"></script>
+<script>
+montarCero(document.getElementById("cero"), window.DATOS_CERO);
+const boton = document.getElementById("tema");
+const oscuro = () => document.documentElement.getAttribute("data-tema") === "oscuro" ||
+  (!document.documentElement.getAttribute("data-tema") && matchMedia("(prefers-color-scheme: dark)").matches);
+const rotular = () => { boton.textContent = oscuro() ? "Claro" : "Oscuro"; };
+rotular();
+boton.addEventListener("click", () => {
+  const nuevo = oscuro() ? "claro" : "oscuro";
+  document.documentElement.setAttribute("data-tema", nuevo);
+  try { localStorage.setItem("tema", nuevo); } catch (e) {}
+  rotular();
+});
+</script>
+</body>
+</html>

@@ -29,9 +29,17 @@
 </head>
 <body>
 <header><div class="in">
-<a class="marca" href="/"><svg width="34" height="24" viewBox="0 0 44 30" aria-hidden="true"><line x1="5" y1="3" x2="5" y2="27" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><ellipse cx="19" cy="15" rx="6" ry="11" fill="none" stroke="#C8502A" stroke-width="3"/><polyline points="31,3 39,15 31,27" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>Ket Cero<small>Machine learning desde cero</small></a>
+<div class="izq"><button id="menu" class="hamb" type="button" aria-expanded="false" aria-controls="cajon" aria-label="Abrir el temario"><span></span><span></span><span></span></button>
+<a class="marca" href="/"><svg width="34" height="24" viewBox="0 0 44 30" aria-hidden="true"><line x1="5" y1="3" x2="5" y2="27" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><ellipse cx="19" cy="15" rx="6" ry="11" fill="none" stroke="#C8502A" stroke-width="3"/><polyline points="31,3 39,15 31,27" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>Ket Cero<small>Machine learning desde cero</small></a></div>
 <nav><a href="/">Temario</a><a href="/omar/" aria-current="page">Quién soy</a><button id="tema" type="button" role="switch" aria-checked="false"><span>Modo oscuro</span><span class="pista"><span class="perilla"></span></span></button></nav>
 </div></header>
+<div id="velo" class="velo" hidden></div>
+<aside id="cajon" class="cajon" aria-label="Temario">
+<p class="t">Temario</p>
+<ol><li><a href="/#redes-profundas">1 · Redes neuronales profundas <span>0</span></a></li><li><a href="/#cnn">2 · Redes convolucionales <span>1</span></a></li><li><a href="/#deteccion">3 · Detección de objetos <span>1</span></a></li><li><a href="/#segmentacion">4 · Segmentación de imágenes <span>0</span></a></li><li><a href="/#generativos-secuencias">5 · Modelos generativos y secuencias <span>0</span></a></li><li><a href="/#transformers-grafos">6 · Transformers y redes de grafos <span>0</span></a></li></ol>
+<p class="t">Autor</p>
+<p><a href="/omar/">Omar Ramírez González</a></p>
+</aside>
 <div class="cuerpo solo">
 <main class="texto">
 <section class="cabeza">
@@ -53,6 +61,19 @@
     rotulo();
   });
   rotulo();
+})();
+(function () {
+  var m = document.getElementById("menu"), c = document.getElementById("cajon"), v = document.getElementById("velo");
+  function poner(abierto) {
+    m.setAttribute("aria-expanded", abierto ? "true" : "false");
+    c.classList.toggle("abierto", abierto);
+    v.hidden = !abierto;
+    if (abierto) c.querySelector("a").focus();
+  }
+  m.addEventListener("click", function () { poner(m.getAttribute("aria-expanded") !== "true"); });
+  v.addEventListener("click", function () { poner(false); });
+  c.addEventListener("click", function (e) { if (e.target.closest("a")) poner(false); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !v.hidden) { poner(false); m.focus(); } });
 })();
 </script>
 </body>
