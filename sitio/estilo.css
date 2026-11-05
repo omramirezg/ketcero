@@ -22,7 +22,7 @@ nav button { display:inline-flex; align-items:center; gap:10px; vertical-align:m
 #tema:focus-visible .pista { outline:2px solid var(--tinta); outline-offset:2px; }
 .desplegable { position:relative; display:inline-flex; }
 #cursos[aria-expanded="true"], #cursos[aria-current="page"] { color:var(--tinta); }
-.lista { position:absolute; right:0; top:calc(100% + 21px); min-width:280px; border-top:0; background:var(--fondo); border:1px solid var(--linea); padding:6px 0; z-index:40; }
+.lista { position:absolute; left:0; top:calc(100% + 21px); min-width:280px; border-top:0; background:var(--fondo); border:1px solid var(--linea); padding:6px 0; z-index:40; }
 .lista a { display:block; margin:0; padding:10px 16px; color:var(--tinta); font-size:15px; }
 .lista a small { display:block; font:12px "IBM Plex Mono", monospace; color:var(--gris); margin-top:2px; }
 .lista a:hover { background:var(--marca); }
@@ -134,7 +134,10 @@ main .portada { padding-bottom:80px; }
 .portada > div { min-width:0; }
 .panel-codigo { margin-top:36px; border:1px solid var(--linea); padding:14px 0; max-width:640px; }
 .codigo-cero { margin:0; font:12.5px/1.75 "IBM Plex Mono", monospace; overflow-x:auto; }
-.codigo-cero .linea { display:grid; grid-template-columns:36px max-content 1fr; gap:0 18px; padding:0 16px 0 0; border-left:2px solid transparent; white-space:pre; }
+.codigo-cero .linea { display:grid; grid-template-columns:18px 22px max-content 1fr; gap:0 14px; padding:0 16px 0 0; border-left:2px solid transparent; white-space:pre; transition:background .15s; }
+.codigo-cero .flecha { color:#D85A30; visibility:hidden; text-align:right; font-size:10px; }
+.codigo-cero .actual { background:rgba(216,90,48,.14); border-left-color:#D85A30; }
+.codigo-cero .actual .flecha { visibility:visible; }
 .codigo-cero .num { text-align:right; color:var(--gris); opacity:.6; }
 .codigo-cero .activa { background:var(--marca); border-left-color:var(--tinta); }
 /* colores de VS Code: Dark+ en modo oscuro, Light+ en modo claro (solo el código lleva color) */
@@ -157,3 +160,20 @@ main .portada { padding-bottom:80px; }
 }
 .panel-codigo { max-width:min(640px, 100%); overflow:hidden; }
 @media (max-width: 900px) { .panel-codigo { display:none; } }
+
+/* Bloque bajo el código: la casilla en cámara lenta y, al final, la tabla de probabilidades.
+   Su alto está reservado para que la portada no salte entre fases. */
+.bloque-codigo { height:178px; margin-top:12px; max-width:640px; opacity:0; transition:opacity .3s; font:11.5px/1.5 "IBM Plex Mono", monospace; color:var(--gris); }
+.bloque-codigo.visible { opacity:1; }
+.bloque-codigo .b-tit { margin-bottom:8px; color:var(--texto); }
+.bloque-codigo .b-mats { display:flex; align-items:center; gap:10px; }
+.bloque-codigo .op { color:var(--tinta); font-size:15px; }
+.bloque-codigo .m5 { border-collapse:collapse; }
+.bloque-codigo .m5 td { width:35px; height:19px; padding:0; text-align:center; border:1px solid var(--linea); color:var(--tinta); font-size:10.5px; }
+.bloque-codigo .b-suma { margin-top:9px; color:var(--texto); }
+.bloque-codigo .b-suma b { color:var(--tinta); font-weight:500; }
+.bloque-codigo .prob { border-collapse:collapse; margin-top:6px; }
+.bloque-codigo .prob th { text-align:left; font-weight:400; color:var(--gris); padding:5px 8px 5px 0; }
+.bloque-codigo .prob td { text-align:right; padding:5px 5px; color:var(--texto); border-bottom:1px solid var(--linea); }
+.bloque-codigo .prob td.top { color:var(--tinta); background:var(--marca); font-weight:500; }
+@media (max-width: 900px) { .bloque-codigo { display:none; } }
