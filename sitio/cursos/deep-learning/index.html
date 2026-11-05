@@ -157,6 +157,9 @@
   var quieto = matchMedia("(prefers-reduced-motion: reduce)").matches;
   document.querySelectorAll("video.clip").forEach(function (v) {
     if (quieto) { v.removeAttribute("autoplay"); v.pause(); return; }
+    // más rápido que el clip grabado: cada paso dura ~1,3 s en vez de 2,6 s
+    v.defaultPlaybackRate = 2; v.playbackRate = 2;
+    v.addEventListener("play", function () { v.playbackRate = 2; });
     if (!v.hasAttribute("data-al-pasar")) return;
     var fila = v.closest("a") || v;
     fila.addEventListener("mouseenter", function () { v.play().catch(function () {}); });
