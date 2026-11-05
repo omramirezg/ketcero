@@ -37,7 +37,7 @@
       const c = modo === "ancha" ? 12 : modo === "media" ? 10 : Math.max(5, Math.floor((ancho - 16) / 52)), cf = modo === "ancha" ? 36 : 0;
       const xE = 0, yE = 22, anchoE = 28 * c;
       const xF = modo === "ancha" ? anchoE + 36 : 0, yF = 22;
-      const xM = modo === "ancha" ? xF + 5 * cf + 36 : anchoE + (angosta ? 16 : 32), yM = yE;  // entrada y mapa alineados arriba
+      const xM = modo === "ancha" ? xF + 5 * cf + 36 : anchoE + (angosta ? 16 : 32), yM = yE + 2 * c;  // el mapa (24) centrado frente a la entrada (28)
       const anchoTotal = xM + 24 * c;
       const yTexto = yE + anchoE + 30;
       const yMini = yTexto + 34, lado = modo === "ancha" ? 72 : modo === "media" ? 58 : 44, sep = angosta ? 8 : 14;
@@ -65,7 +65,7 @@
         el(svg, "text", { x: xF, y: yF + 5 * cf + 18, "font-size": 12, fill: "var(--gris)" }, `sesgo b = ${num(b)}`);
       }
 
-      rot(xM, yM - 8, "lo que ve el filtro");
+      rot(xM, yE - 8, "lo que ve el filtro");
       celdasMapa = [];
       for (let i = 0; i < 24; i++) for (let j = 0; j < 24; j++)
         celdasMapa.push(el(svg, "rect", { x: xM + j * c, y: yM + i * c, width: c - 1, height: c - 1, fill: "transparent", stroke: "var(--linea)", "stroke-width": 0.5 }));
