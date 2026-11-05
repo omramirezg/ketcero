@@ -48,7 +48,7 @@
       svg.style.font = '13px "IBM Plex Mono", monospace';
       const rot = (x, y, t) => el(svg, "text", { x, y, fill: "var(--gris)", "font-size": 12 }, t);
 
-      rot(xE, yE - 8, `entrada 28 × 28 · prueba n.º ${D.indice_prueba}`);
+      rot(xE, yE - 8, "un 0 escrito a mano");
       for (let i = 0; i < 28; i++) for (let j = 0; j < 28; j++) {
         el(svg, "rect", { x: xE + j * c, y: yE + i * c, width: c - 1, height: c - 1, fill: "var(--linea)", "fill-opacity": 0.35 });
         if (X[i][j] > 0) el(svg, "rect", { x: xE + j * c, y: yE + i * c, width: c - 1, height: c - 1, fill: "var(--tinta)", "fill-opacity": (X[i][j] * 0.9).toFixed(3) });
@@ -56,7 +56,7 @@
       ventana = el(svg, "rect", { width: 5 * c - 1, height: 5 * c - 1, fill: "none", stroke: "var(--tinta)", "stroke-width": 1.6 });
 
       if (modo === "ancha") {
-        rot(xF, yF - 8, `filtro ${f + 1} de conv1`);
+        rot(xF, yF - 8, "un filtro de la red");
         const tK = Math.max(...K.flat().map(Math.abs));
         for (let i = 0; i < 5; i++) for (let j = 0; j < 5; j++) {
           el(svg, "rect", { x: xF + j * cf, y: yF + i * cf, width: cf - 1, height: cf - 1, fill: colorSigno(K[i][j], tK, tK), stroke: "var(--linea)", "stroke-width": 0.6 });
@@ -65,7 +65,7 @@
         el(svg, "text", { x: xF, y: yF + 5 * cf + 18, "font-size": 12, fill: "var(--gris)" }, `sesgo b = ${num(b)}`);
       }
 
-      rot(xM, yM - 8, `mapa 24 × 24 · antes de ReLU`);
+      rot(xM, yM - 8, "lo que ve el filtro");
       celdasMapa = [];
       for (let i = 0; i < 24; i++) for (let j = 0; j < 24; j++)
         celdasMapa.push(el(svg, "rect", { x: xM + j * c, y: yM + i * c, width: c - 1, height: c - 1, fill: "transparent", stroke: "var(--linea)", "stroke-width": 0.5 }));

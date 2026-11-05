@@ -57,6 +57,13 @@ TEMARIO = [
     ]),
 ]
 
+# Cursos del sitio: (carpeta en /cursos/, nombre, descripción, temario). Por ahora solo Deep Learning.
+CURSOS = [
+    ("deep-learning", "Deep Learning",
+     "Redes neuronales profundas en el orden de las sesiones del curso: de las redes densas a los transformers. Cada lección es una animación paso a paso con los datos reales del entrenamiento.",
+     TEMARIO),
+]
+
 LOGO = ('<svg width="34" height="24" viewBox="0 0 44 30" aria-hidden="true"><line x1="5" y1="3" x2="5" y2="27" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>'
         '<ellipse cx="19" cy="15" rx="6" ry="11" fill="none" stroke="#C8502A" stroke-width="3"/>'
         '<polyline points="31,3 39,15 31,27" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>')
@@ -76,6 +83,13 @@ BOTON_JS = """<script>
 })();
 (function () {
   var m = document.getElementById("menu"), c = document.getElementById("cajon"), v = document.getElementById("velo");
+  function medir() {
+    var raya = document.querySelector(".marca small");
+    var x = raya && raya.offsetParent ? raya.getBoundingClientRect().left : 0;
+    document.documentElement.style.setProperty("--ancho-cajon", x > 200 ? x + "px" : "86vw");
+  }
+  medir();
+  addEventListener("resize", medir);
   function poner(abierto) {
     m.setAttribute("aria-expanded", abierto ? "true" : "false");
     c.classList.toggle("abierto", abierto);
@@ -87,6 +101,13 @@ BOTON_JS = """<script>
   c.addEventListener("click", function (e) { if (e.target.closest("a")) poner(false); });
   document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !v.hidden) { poner(false); m.focus(); } });
 })();
+(function () {
+  var b = document.getElementById("cursos"), l = document.getElementById("lista-cursos");
+  function poner(abierto) { b.setAttribute("aria-expanded", abierto ? "true" : "false"); l.hidden = !abierto; }
+  b.addEventListener("click", function (e) { e.stopPropagation(); poner(l.hidden); });
+  document.addEventListener("click", function (e) { if (!l.hidden && !l.contains(e.target)) poner(false); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !l.hidden) { poner(false); b.focus(); } });
+})();
 </script>"""
 FUENTES = ('<link rel="preconnect" href="https://fonts.googleapis.com">\n'
            '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
@@ -95,11 +116,17 @@ FUENTES = ('<link rel="preconnect" href="https://fonts.googleapis.com">\n'
 
 def pagina(titulo, descripcion, ruta, cuerpo, actual="", extra_head=""):
     """Plantilla común: cabecera con la marca, menú, contenido y pie con la firma."""
-    menu = [("/", "Temario"), ("/omar/", "Quién soy")]
     marca = ' aria-current="page"'
-    enlaces = "".join(f'<a href="{u}"{marca if u == actual else ""}>{t}</a>' for u, t in menu)
-    temas = "".join(f'<li><a href="/#{clave}">{t} · {titulo} <span>{sum("fuente" in l for l in lecciones)}</span></a></li>'
-                    for t, (clave, titulo, _, lecciones) in enumerate(TEMARIO, 1))
+    lista = "".join(f'<a href="/cursos/{c}/">{nombre}<small>{len(tem)} temas · {publicadas_en(tem)} lecciones</small></a>'
+                    for c, nombre, _, tem in CURSOS)
+    enlaces = (f'<div class="desplegable"><button id="cursos" type="button" aria-expanded="false" aria-controls="lista-cursos"'
+               f'{marca if actual.startswith("/cursos/") else ""}>Cursos</button>'
+               f'<div id="lista-cursos" class="lista" hidden>{lista}</div></div>'
+               f'<a href="/omar/"{marca if actual == "/omar/" else ""}>Quién soy</a>')
+    cajon = "".join(f'<p class="t">{nombre}</p><ol>'
+                    + "".join(f'<li><a href="/cursos/{c}/#{clave}"><em>{t}</em>{titulo}<span>{sum("fuente" in l for l in lecciones)}</span></a></li>'
+                              for t, (clave, titulo, _, lecciones) in enumerate(tem, 1)) + '</ol>'
+                    for c, nombre, _, tem in CURSOS)
     return f"""<!doctype html>
 <html lang="es">
 <head>
@@ -121,14 +148,13 @@ def pagina(titulo, descripcion, ruta, cuerpo, actual="", extra_head=""):
 {extra_head}</head>
 <body>
 <header><div class="in">
-<div class="izq"><button id="menu" class="hamb" type="button" aria-expanded="false" aria-controls="cajon" aria-label="Abrir el temario"><span></span><span></span><span></span></button>
+<div class="izq"><button id="menu" class="hamb" type="button" aria-expanded="false" aria-controls="cajon" aria-label="Abrir los cursos"><span></span><span></span><span></span></button>
 <a class="marca" href="/">{LOGO}Ket Cero<small>Machine learning desde cero</small></a></div>
 <nav>{enlaces}<button id="tema" type="button" role="switch" aria-checked="false"><span>Modo oscuro</span><span class="pista"><span class="perilla"></span></span></button></nav>
 </div></header>
 <div id="velo" class="velo" hidden></div>
-<aside id="cajon" class="cajon" aria-label="Temario">
-<p class="t">Temario</p>
-<ol>{temas}</ol>
+<aside id="cajon" class="cajon" aria-label="Cursos">
+{cajon}
 </aside>
 {cuerpo}
 <footer><div class="in"><span>Ket Cero · un proyecto de <a href="/omar/">{AUTOR}</a></span><span>ketcero.com</span></div></footer>
@@ -214,9 +240,19 @@ def copiar_animaciones():
     return filas
 
 
-def construir_inicio():
+def publicadas_en(temario):
+    return sum("fuente" in l for _, _, _, lecciones in temario for l in lecciones)
+
+
+def filas_cursos():
+    return "".join(f'<a class="fila curso" href="/cursos/{c}/"><div class="n">{k:02d}</div><div><b>{nombre}</b><p>{html.escape(desc)}</p>'
+                   f'<div class="d">{len(tem)} temas · {publicadas_en(tem)} lecciones publicadas</div></div></a>'
+                   for k, (c, nombre, desc, tem) in enumerate(CURSOS, 1))
+
+
+def construir_curso(clave_curso, nombre, desc_curso, temario):
     temas = []
-    for t, (clave, titulo, desc, lecciones) in enumerate(TEMARIO, 1):
+    for t, (clave, titulo, desc, lecciones) in enumerate(temario, 1):
         filas = []
         for l, lec in enumerate(lecciones, 1):
             num = f"{t}.{l}"
@@ -229,22 +265,51 @@ def construir_inicio():
         temas.append(f'<section class="tema" id="{clave}"><h2>{titulo} <span>Tema {t}</span></h2><p>{html.escape(desc)}</p>{"".join(filas)}</section>')
     cuerpo = f"""<div class="cuerpo">
 <main>
+<section class="cabeza">
+<div class="mono">Curso · actualizado el {ACTUALIZADO}</div>
+<h1>{nombre}</h1>
+<p>{html.escape(desc_curso)}</p>
+</section>
+{"".join(temas)}
+</main>
+</div>"""
+    return pagina(f"{nombre} · Ket Cero", f"Curso de {nombre} desde cero, en español. {desc_curso}",
+                  f"/cursos/{clave_curso}/", cuerpo, f"/cursos/{clave_curso}/")
+
+
+def construir_cursos():
+    cuerpo = f"""<div class="cuerpo">
+<main>
+<section class="cabeza">
+<div class="mono">Cursos</div>
+<h1>Cursos</h1>
+<p>Cada curso es un temario completo, con sus lecciones animadas paso a paso.</p>
+</section>
+<section class="tema">{filas_cursos()}</section>
+</main>
+</div>"""
+    return pagina("Cursos · Ket Cero", "Cursos de machine learning desde cero, en español, con animaciones paso a paso.", "/cursos/", cuerpo, "/cursos/")
+
+
+def construir_inicio():
+    cuerpo = f"""<div class="cuerpo">
+<main>
 <section class="cabeza portada">
 <div>
-<div class="mono">Temario · actualizado el {ACTUALIZADO}</div>
+<div class="mono">Ket Cero · actualizado el {ACTUALIZADO}</div>
 <h1>Machine learning desde cero, con cada operación a la vista.</h1>
-<p>Un recorrido ordenado, en el mismo orden del curso: de las redes profundas a los transformers. Cada lección es una animación paso a paso hecha con los datos reales del entrenamiento.</p>
+<p>Cursos con lecciones animadas paso a paso, hechas con los datos reales del entrenamiento: qué entra a la red, qué se multiplica, qué se suma y por qué al final acierta.</p>
 </div>
 <div id="cero" class="cero"></div>
 </section>
-{"".join(temas)}
+<section class="tema" id="lista-de-cursos"><h2>Cursos</h2><p>Empieza por aquí.</p>{filas_cursos()}</section>
 </main>
 </div>
 <script src="/js/cero_datos.js"></script>
 <script src="/js/cero.js"></script>
 <script>montarCero(document.getElementById("cero"), window.DATOS_CERO);</script>"""
     return pagina("Ket Cero · Machine learning desde cero",
-                  "Machine learning desde cero, en español: lecciones animadas paso a paso con los datos reales del entrenamiento. Redes convolucionales, detección de objetos y más.",
+                  "Machine learning desde cero, en español: cursos con lecciones animadas paso a paso hechas con los datos reales del entrenamiento.",
                   "/", cuerpo, "/")
 
 
@@ -272,7 +337,7 @@ def construir_omar():
 
 def construir_404():
     cuerpo = ('<div class="cuerpo solo"><main class="texto"><section class="cabeza"><div class="mono">Error 404</div>'
-              '<h1>Esta página no existe</h1><p>Puede que el enlace haya cambiado. <a href="/">Volver al temario</a>.</p></section></main></div>')
+              '<h1>Esta página no existe</h1><p>Puede que el enlace haya cambiado. <a href="/">Volver al inicio</a>.</p></section></main></div>')
     return pagina("Página no encontrada · Ket Cero", "La página que buscas no existe.", "/404", cuerpo)
 
 
@@ -285,9 +350,12 @@ def escribir(ruta, texto):
 def main():
     filas = copiar_animaciones()
     escribir("index.html", construir_inicio())
+    escribir("cursos/index.html", construir_cursos())
+    for c in CURSOS:
+        escribir(f"cursos/{c[0]}/index.html", construir_curso(*c))
     escribir("omar/index.html", construir_omar())
     escribir("404.html", construir_404())
-    urls = ["/", "/omar/"] + [u for u, _ in filas]
+    urls = ["/", "/cursos/"] + [f"/cursos/{c[0]}/" for c in CURSOS] + ["/omar/"] + [u for u, _ in filas]
     hoy = date.today().isoformat()
     escribir("sitemap.xml", '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
              + "".join(f"<url><loc>{DOMINIO}{u}</loc><lastmod>{hoy}</lastmod></url>\n" for u in urls) + "</urlset>\n")
