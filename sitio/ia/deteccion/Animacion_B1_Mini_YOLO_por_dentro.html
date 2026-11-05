@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es">
+<html data-kc-fotos lang="es">
 <head>
 <script>var KC_ALTO = 65;try{if(localStorage.getItem("tema")!=="claro")document.documentElement.classList.add("kc-oscuro")}catch(e){document.documentElement.classList.add("kc-oscuro")}</script>
 
@@ -157,7 +157,9 @@ html.kc-oscuro #kc-cab { --f:#FFFFFF; --t:#000000; --g:#616161; --l:#E3E3E3; --c
 #codbtn.on { background:transparent !important; border-color:#161616 !important; color:#161616 !important; }
 /* --- modo oscuro --- */
 html.kc-oscuro { filter:invert(.93) hue-rotate(180deg); }
-html.kc-oscuro img, html.kc-oscuro image, html.kc-oscuro video, html.kc-oscuro canvas { filter:hue-rotate(180deg) invert(1) contrast(1.163); }
+/* en las lecciones con fotos reales (data-kc-fotos) las imágenes se vuelven a invertir para conservar sus colores;
+   en las demás (dígitos y mapas) las imágenes se oscurecen igual que los dibujos */
+html.kc-oscuro[data-kc-fotos] img, html.kc-oscuro[data-kc-fotos] image, html.kc-oscuro video { filter:hue-rotate(180deg) invert(1) contrast(1.163); }
 html.kc-oscuro #kc-cab .kc-cero { stroke:#FF8255; }
 </style>
 </head>

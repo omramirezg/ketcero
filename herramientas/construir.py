@@ -37,7 +37,7 @@ TEMARIO = [
     ("deteccion", "Detección de objetos", "Encontrar y encerrar objetos: cajas, puntajes, IoU y NMS.", [
         {"titulo": "Mini-YOLO por dentro: dígitos en la calle",
          "fuente": "Semana_03/02_Clase_viernes_6_nov/1_Mini_YOLO_digitos_en_la_calle/Animacion_B1_Mini_YOLO_por_dentro.html",
-         "miniatura": "mini-yolo.jpg",
+         "miniatura": "mini-yolo.jpg", "fotos": True,
          "alt": "El NMS del Mini-YOLO borra las cajas que se solapan",
          "desc": "Una red pequeña al estilo YOLO aprende a encontrar dígitos sobre fotos reales de la calle, desde la red recién nacida hasta las cajas finales.",
          "datos": "186 pasos entrenar · 66 predecir · 30 épocas", "pasos": 186 + 66},
@@ -269,7 +269,9 @@ html.kc-oscuro #kc-cab { --f:#FFFFFF; --t:#000000; --g:#616161; --l:#E3E3E3; --c
 #codbtn.on { background:transparent !important; border-color:#161616 !important; color:#161616 !important; }
 /* --- modo oscuro --- */
 html.kc-oscuro { filter:invert(.93) hue-rotate(180deg); }
-html.kc-oscuro img, html.kc-oscuro image, html.kc-oscuro video, html.kc-oscuro canvas { filter:hue-rotate(180deg) invert(1) contrast(1.163); }
+/* en las lecciones con fotos reales (data-kc-fotos) las imágenes se vuelven a invertir para conservar sus colores;
+   en las demás (dígitos y mapas) las imágenes se oscurecen igual que los dibujos */
+html.kc-oscuro[data-kc-fotos] img, html.kc-oscuro[data-kc-fotos] image, html.kc-oscuro video { filter:hue-rotate(180deg) invert(1) contrast(1.163); }
 html.kc-oscuro #kc-cab .kc-cero { stroke:#FF8255; }
 </style>
 """ % {"alto": KC_ALTO, "boton": KC_ALTO + 10}
@@ -294,8 +296,10 @@ CAPA_BODY = """<header id="kc-cab"><a class="kc-marca" href="/">""" + LOGO_KC + 
 """
 
 
-def agregar_capa(ruta, curso):
+def agregar_capa(ruta, curso, fotos=False):
     s = io.open(ruta, encoding="utf-8").read()
+    if fotos:
+        s = s.replace("<html", "<html data-kc-fotos", 1)
     # la animación se escala en el alto que deja la cabecera y se baja esa misma altura
     assert s.count("innerHeight") == 3 and "m.style.top = ((innerHeight" in s, ruta
     s = s.replace("m.style.top = ((innerHeight", "m.style.top = KC_ALTO + ((innerHeight")
@@ -337,7 +341,7 @@ def copiar_animaciones():
         else:
             shutil.copy2(origen, os.path.join(destino, nombre))
         shutil.copy2(os.path.join(MINIATURAS, lec["miniatura"]), os.path.join(SITIO, "img", lec["miniatura"]))
-        agregar_capa(os.path.join(destino, nombre), f"/cursos/deep-learning/#{clave}")
+        agregar_capa(os.path.join(destino, nombre), f"/cursos/deep-learning/#{clave}", lec.get("fotos", False))
         lec["url"] = f"/ia/{clave}/{nombre}"
         filas.append((lec["url"], peso))
     return filas
