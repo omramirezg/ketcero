@@ -53,10 +53,9 @@ TEMARIO = [
          "slug": "mini-yolo-digitos-en-la-calle",
          "fuente": "Semana_03/02_Clase_viernes_6_nov/1_Mini_YOLO_digitos_en_la_calle/Animacion_B1_Mini_YOLO_por_dentro.html",
          "miniatura": "mini-yolo.jpg", "fotos": True,
-         "congelada": True,  # la B1 se está cambiando en el curso: se publica la última versión estable (notas/congeladas/)
          "alt": "El NMS del Mini-YOLO borra las cajas que se solapan",
          "desc": "Una red pequeña al estilo YOLO aprende a encontrar dígitos sobre fotos reales de la calle, desde la red recién nacida hasta las cajas finales.",
-         "datos": "186 pasos entrenar · 66 predecir · 30 épocas", "pasos": 186 + 66, "minutos": 60,
+         "datos": "194 pasos entrenar · 66 predecir · 30 épocas", "pasos": 194 + 66, "minutos": 60,
          "aprender": [
              "Cómo se arman las escenas: dígitos de MNIST pegados sobre fotos reales de la calle.",
              "La red al nacer: nueve convoluciones con su BatchNorm, cinco pool y dos capas densas que terminan en una rejilla de 7 × 7.",

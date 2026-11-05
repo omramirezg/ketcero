@@ -21,7 +21,7 @@ B1 = "/ia/deteccion/Animacion_B1_Mini_YOLO_por_dentro#"
 # clave de la lección: pasos elegidos (en orden) para su clip
 CLIPS = {
     "cnn-completa": [A4 + "entrenar/12", A4 + "entrenar/7", A4 + "entrenar/14", A4 + "entrenar/15", A4 + "entrenar/30", A4 + "predecir/16"],
-    "mini-yolo": [B1 + "entrenar/11", B1 + "predecir/7", B1 + "entrenar/20", B1 + "predecir/55", B1 + "predecir/61"],
+    "mini-yolo": [B1 + "entrenar/10", B1 + "predecir/7", B1 + "entrenar/21", B1 + "predecir/55", B1 + "predecir/61"],
 }
 OCULTAR = "#kc-zoom, #kc-seguir, #kc-movil, #kc-ayuda { display:none !important; }"
 W, H = 1600, 900          # cuadro del clip (16:9)
