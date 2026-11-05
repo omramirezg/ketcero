@@ -24,7 +24,7 @@
 <body>
 <header><div class="in">
 <a class="marca" href="/"><svg width="34" height="24" viewBox="0 0 44 30" aria-hidden="true"><line x1="5" y1="3" x2="5" y2="27" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><ellipse cx="19" cy="15" rx="6" ry="11" fill="none" stroke="#C8502A" stroke-width="3"/><polyline points="31,3 39,15 31,27" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>Ket Cero<small>Machine learning desde cero</small></a>
-<nav><a href="/" aria-current="page">Temario</a><a href="/omar/">Quién soy</a><button id="tema" type="button">Oscuro</button></nav>
+<nav><a href="/" aria-current="page">Temario</a><a href="/omar/">Quién soy</a><button id="tema" type="button" role="switch" aria-checked="false"><span>Modo oscuro</span><span class="pista"><span class="perilla"></span></span></button></nav>
 </div></header>
 <div class="cuerpo">
 <aside>
@@ -48,7 +48,7 @@
 (function () {
   var b = document.getElementById("tema"), r = document.documentElement;
   function oscuro() { return r.dataset.tema ? r.dataset.tema === "oscuro" : matchMedia("(prefers-color-scheme: dark)").matches; }
-  function rotulo() { b.textContent = oscuro() ? "Claro" : "Oscuro"; }
+  function rotulo() { b.setAttribute("aria-checked", oscuro() ? "true" : "false"); }
   b.addEventListener("click", function () {
     r.dataset.tema = oscuro() ? "claro" : "oscuro";
     try { localStorage.setItem("tema", r.dataset.tema); } catch (e) {}

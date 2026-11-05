@@ -58,7 +58,7 @@ BOTON_JS = """<script>
 (function () {
   var b = document.getElementById("tema"), r = document.documentElement;
   function oscuro() { return r.dataset.tema ? r.dataset.tema === "oscuro" : matchMedia("(prefers-color-scheme: dark)").matches; }
-  function rotulo() { b.textContent = oscuro() ? "Claro" : "Oscuro"; }
+  function rotulo() { b.setAttribute("aria-checked", oscuro() ? "true" : "false"); }
   b.addEventListener("click", function () {
     r.dataset.tema = oscuro() ? "claro" : "oscuro";
     try { localStorage.setItem("tema", r.dataset.tema); } catch (e) {}
@@ -99,7 +99,7 @@ def pagina(titulo, descripcion, ruta, cuerpo, actual="", extra_head=""):
 <body>
 <header><div class="in">
 <a class="marca" href="/">{LOGO}Ket Cero<small>Machine learning desde cero</small></a>
-<nav>{enlaces}<button id="tema" type="button">Oscuro</button></nav>
+<nav>{enlaces}<button id="tema" type="button" role="switch" aria-checked="false"><span>Modo oscuro</span><span class="pista"><span class="perilla"></span></span></button></nav>
 </div></header>
 {cuerpo}
 <footer><div class="in"><span>Ket Cero · un proyecto de <a href="/omar/">{AUTOR}</a></span><span>ketcero.com</span></div></footer>
