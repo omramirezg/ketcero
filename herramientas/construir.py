@@ -258,7 +258,7 @@ def construir_curso(clave_curso, nombre, desc_curso, temario):
             num = f"{t}.{l}"
             if "fuente" in lec:
                 filas.append(f'<a class="fila pub" href="{lec["url"]}"><div class="n">{num}</div><div><b>{html.escape(lec["titulo"])}</b>'
-                             f'<p>{html.escape(lec["desc"])}</p><div class="d">{lec["datos"]}</div></div>'
+                             f'<p>{html.escape(lec["desc"])}</p><div class="d">{lec["datos"]} · versión preliminar</div></div>'
                              f'<img src="/img/{lec["miniatura"]}" alt="{html.escape(lec["alt"])}" loading="lazy"></a>')
             else:
                 filas.append(f'<div class="fila pend"><div class="n">{num}</div><div><b>{html.escape(lec["titulo"])}</b></div><div class="d">en preparación</div></div>')
@@ -269,6 +269,7 @@ def construir_curso(clave_curso, nombre, desc_curso, temario):
 <div class="mono"><a href="/cursos/">Cursos</a> / {nombre} · actualizado el {ACTUALIZADO}</div>
 <h1>{nombre}</h1>
 <p>{html.escape(desc_curso)}</p>
+<p class="aviso">Las animaciones publicadas son versiones preliminares: todavía están en revisión y pueden tener errores.</p>
 </section>
 {"".join(temas)}
 </main>
@@ -298,7 +299,7 @@ def construir_inicio():
 <div>
 <div class="mono">Actualizado el {ACTUALIZADO}</div>
 <h1>Machine learning desde cero, con cada operación a la vista.</h1>
-<p>Cursos con lecciones animadas paso a paso, hechas con los datos reales del entrenamiento: qué entra a la red, qué se multiplica, qué se suma y por qué al final acierta.</p>
+<p>Lecciones animadas paso a paso, hechas con los datos reales del entrenamiento: qué entra a la red, qué se multiplica, qué se suma y por qué al final acierta.</p>
 <a class="ir" href="/cursos/deep-learning/">Empezar el curso de Deep Learning →</a>
 </div>
 <div id="cero" class="cero"></div>
