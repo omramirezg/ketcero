@@ -197,8 +197,6 @@ def construir_inicio():
             else:
                 filas.append(f'<div class="fila pend"><div class="n">{num}</div><div><b>{html.escape(lec["titulo"])}</b></div><div class="d">en preparación</div></div>')
         temas.append(f'<section class="tema" id="{clave}"><h2>{titulo} <span>Tema {t}</span></h2><p>{html.escape(desc)}</p>{"".join(filas)}</section>')
-    pubs = list(publicadas())
-    pasos = sum(lec["pasos"] for _, _, lec in pubs)
     cuerpo = f"""<div class="cuerpo">
 <aside>
 <p class="t">Temario</p>
