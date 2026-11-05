@@ -207,6 +207,48 @@ def partir(origen, destino):
         raise SystemExit(f"{os.path.basename(destino)}: un pedazo quedó de {max(pesos):.1f} MB; baja PARTE_MB")
 
 
+# Capa que el sitio agrega a cada animación publicada (los originales del curso no se tocan):
+# modo oscuro por inversión de colores (las fotos se vuelven a invertir para conservar sus colores reales),
+# la misma preferencia «tema» del resto del sitio, y una barra con la vuelta al curso y el aviso de versión preliminar.
+CAPA_HEAD = """<script>try{if(localStorage.getItem("tema")!=="claro")document.documentElement.classList.add("kc-oscuro")}catch(e){document.documentElement.classList.add("kc-oscuro")}</script>
+<style>
+html.kc-oscuro { background:#fff; filter:invert(1) hue-rotate(180deg); }
+html.kc-oscuro img, html.kc-oscuro image, html.kc-oscuro video, html.kc-oscuro canvas { filter:invert(1) hue-rotate(180deg); }
+.kc-barra { position:fixed; top:8px; left:12px; z-index:9999; display:flex; align-items:center; gap:16px; padding:5px 10px; background:#fff; border:1px solid #E2E2E2; font:12px/1.4 "IBM Plex Mono", Consolas, monospace; color:#6B6B6B; }
+.kc-barra a { color:#161616; text-decoration:none; }
+.kc-barra a:hover { text-decoration:underline; }
+.kc-barra button { display:inline-flex; align-items:center; gap:8px; background:none; border:0; padding:0; font:inherit; color:#161616; cursor:pointer; }
+.kc-pista { position:relative; width:28px; height:15px; border:1px solid #6B6B6B; border-radius:8px; }
+.kc-perilla { position:absolute; top:2px; left:2px; width:9px; height:9px; border-radius:50%; background:#6B6B6B; transition:transform .15s; }
+html:not(.kc-oscuro) .kc-barra button[aria-checked="true"] .kc-pista, .kc-barra button[aria-checked="true"] .kc-pista { background:#161616; border-color:#161616; }
+.kc-barra button[aria-checked="true"] .kc-perilla { transform:translateX(13px); background:#fff; }
+</style>
+"""
+CAPA_BODY = """<div class="kc-barra"><a href="{curso}">← Ket Cero</a><span>Versión preliminar: en revisión, puede tener errores</span><button id="kc-tema" type="button" role="switch" aria-checked="true">Modo oscuro<span class="kc-pista"><span class="kc-perilla"></span></span></button></div>
+<script>
+(function () {
+  var r = document.documentElement, b = document.getElementById("kc-tema");
+  function poner() { b.setAttribute("aria-checked", r.classList.contains("kc-oscuro") ? "true" : "false"); }
+  b.addEventListener("click", function () {
+    r.classList.toggle("kc-oscuro");
+    try { localStorage.setItem("tema", r.classList.contains("kc-oscuro") ? "oscuro" : "claro"); } catch (e) {}
+    poner();
+  });
+  poner();
+})();
+</script>
+"""
+
+
+def agregar_capa(ruta, curso):
+    s = io.open(ruta, encoding="utf-8").read()
+    i = s.index("<head>") + len("<head>")
+    s = s[:i] + "\n" + CAPA_HEAD + s[i:]
+    j = s.rindex("</body>")
+    s = s[:j] + CAPA_BODY.replace("{curso}", curso) + s[j:]
+    io.open(ruta, "w", encoding="utf-8").write(s)
+
+
 def publicadas():
     """Las lecciones con animación, con su tema y su número (3.1, 4.1…)."""
     for t, (clave, _, _, lecciones) in enumerate(TEMARIO, 1):
@@ -235,6 +277,7 @@ def copiar_animaciones():
         else:
             shutil.copy2(origen, os.path.join(destino, nombre))
         shutil.copy2(os.path.join(MINIATURAS, lec["miniatura"]), os.path.join(SITIO, "img", lec["miniatura"]))
+        agregar_capa(os.path.join(destino, nombre), f"/cursos/deep-learning/#{clave}")
         lec["url"] = f"/ia/{clave}/{nombre}"
         filas.append((lec["url"], peso))
     return filas

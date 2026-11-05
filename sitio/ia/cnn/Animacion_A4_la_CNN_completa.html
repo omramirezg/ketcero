@@ -1,6 +1,20 @@
 <!doctype html>
 <html lang="es">
 <head>
+<script>try{if(localStorage.getItem("tema")!=="claro")document.documentElement.classList.add("kc-oscuro")}catch(e){document.documentElement.classList.add("kc-oscuro")}</script>
+<style>
+html.kc-oscuro { background:#fff; filter:invert(1) hue-rotate(180deg); }
+html.kc-oscuro img, html.kc-oscuro image, html.kc-oscuro video, html.kc-oscuro canvas { filter:invert(1) hue-rotate(180deg); }
+.kc-barra { position:fixed; top:8px; left:12px; z-index:9999; display:flex; align-items:center; gap:16px; padding:5px 10px; background:#fff; border:1px solid #E2E2E2; font:12px/1.4 "IBM Plex Mono", Consolas, monospace; color:#6B6B6B; }
+.kc-barra a { color:#161616; text-decoration:none; }
+.kc-barra a:hover { text-decoration:underline; }
+.kc-barra button { display:inline-flex; align-items:center; gap:8px; background:none; border:0; padding:0; font:inherit; color:#161616; cursor:pointer; }
+.kc-pista { position:relative; width:28px; height:15px; border:1px solid #6B6B6B; border-radius:8px; }
+.kc-perilla { position:absolute; top:2px; left:2px; width:9px; height:9px; border-radius:50%; background:#6B6B6B; transition:transform .15s; }
+html:not(.kc-oscuro) .kc-barra button[aria-checked="true"] .kc-pista, .kc-barra button[aria-checked="true"] .kc-pista { background:#161616; border-color:#161616; }
+.kc-barra button[aria-checked="true"] .kc-perilla { transform:translateX(13px); background:#fff; }
+</style>
+
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>A4 · La CNN completa</title>
@@ -1058,6 +1072,19 @@ if (Q.has("hov") && V && V.hg){ const f = /^(?:o(\d+):)?(\d+),(\d+)$/.exec(Q.get
 if (Q.has("carta") && C) cartaSacar(parseInt(Q.get("carta")) - 1);      // para revisar: ?carta=37
 if (Q.has("foco") && C){ const f = /^([nc])(\d+)$/.exec(Q.get("foco")); if (f){ C.foco = {tipo: f[1], i: parseInt(f[2]) - 1}; if (C.sel === null) cartaSacar(0); else detalle(); } }   // ?foco=n1 (neurona) · ?foco=c37 (número)
 requestAnimationFrame(cuadro);
+</script>
+<div class="kc-barra"><a href="/cursos/deep-learning/#cnn">← Ket Cero</a><span>Versión preliminar: en revisión, puede tener errores</span><button id="kc-tema" type="button" role="switch" aria-checked="true">Modo oscuro<span class="kc-pista"><span class="kc-perilla"></span></span></button></div>
+<script>
+(function () {
+  var r = document.documentElement, b = document.getElementById("kc-tema");
+  function poner() { b.setAttribute("aria-checked", r.classList.contains("kc-oscuro") ? "true" : "false"); }
+  b.addEventListener("click", function () {
+    r.classList.toggle("kc-oscuro");
+    try { localStorage.setItem("tema", r.classList.contains("kc-oscuro") ? "oscuro" : "claro"); } catch (e) {}
+    poner();
+  });
+  poner();
+})();
 </script>
 </body>
 </html>
