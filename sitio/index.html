@@ -3,49 +3,59 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Ket Cero · Ciencia desde cero</title>
-<meta name="description" content="Animaciones que muestran la ciencia por dentro: inteligencia artificial, física, matemática e ingeniería explicadas desde cero, en español.">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.dataset.tema=t}catch(e){}</script>
+<title>Ket Cero · Machine learning desde cero</title>
+<meta name="description" content="Machine learning desde cero, en español: lecciones animadas paso a paso con los datos reales del entrenamiento. Redes convolucionales, detección de objetos y más.">
 <meta name="author" content="Omar Ramírez González">
 <link rel="canonical" href="https://ketcero.com/">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="alternate icon" href="/favicon.ico">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Ket Cero">
-<meta property="og:title" content="Ket Cero · Ciencia desde cero">
-<meta property="og:description" content="Animaciones que muestran la ciencia por dentro: inteligencia artificial, física, matemática e ingeniería explicadas desde cero, en español.">
+<meta property="og:title" content="Ket Cero · Machine learning desde cero">
+<meta property="og:description" content="Machine learning desde cero, en español: lecciones animadas paso a paso con los datos reales del entrenamiento. Redes convolucionales, detección de objetos y más.">
 <meta property="og:url" content="https://ketcero.com/">
 <meta property="og:locale" content="es_CO">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/estilo.css">
 </head>
 <body>
-<header class="barra"><div class="ancho">
-<a class="marca" href="/"><svg viewBox="0 0 44 30" aria-hidden="true"><line x1="5" y1="3" x2="5" y2="27" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><ellipse cx="19" cy="15" rx="6" ry="11" fill="none" stroke="#D85A30" stroke-width="3"/><polyline points="31,3 39,15 31,27" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><b>Ket Cero</b></a>
-<nav class="menu"><a href="/" aria-current="page">Inicio</a><a href="/ia/">Inteligencia artificial</a><a href="/omar/">Quién soy</a></nav>
+<header><div class="in">
+<a class="marca" href="/"><svg width="34" height="24" viewBox="0 0 44 30" aria-hidden="true"><line x1="5" y1="3" x2="5" y2="27" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><ellipse cx="19" cy="15" rx="6" ry="11" fill="none" stroke="#C8502A" stroke-width="3"/><polyline points="31,3 39,15 31,27" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>Ket Cero<small>Machine learning desde cero</small></a>
+<nav><a href="/" aria-current="page">Temario</a><a href="/omar/">Quién soy</a><button id="tema" type="button">Oscuro</button></nav>
 </div></header>
+<div class="cuerpo">
+<aside>
+<p class="t">Temario</p>
+<ol><li><a href="#fundamentos">1 · Fundamentos <span>0</span></a></li><li><a href="#redes-neuronales">2 · Redes neuronales <span>0</span></a></li><li><a href="#cnn">3 · Redes convolucionales <span>1</span></a></li><li><a href="#deteccion">4 · Detección de objetos <span>1</span></a></li><li><a href="#lenguaje">5 · Modelos de lenguaje <span>0</span></a></li></ol>
+<p class="t">Autor</p>
+<p><a href="/omar/">Omar Ramírez González</a></p>
+</aside>
 <main>
-<div class="ancho portada">
-<div class="ket" aria-hidden="true">|<span class="cero">0</span>⟩</div>
-<h1>Ket Cero</h1>
-<p class="lema">Ciencia desde cero</p>
-<p>Animaciones que abren la caja negra: cada número, cada multiplicación y cada paso, para entender de verdad cómo funcionan la inteligencia artificial, la física, la matemática y la ingeniería.</p>
-<p class="firma">Por <a href="/omar/">Omar Ramírez González</a></p>
-</div>
-<section><div class="ancho">
-<h2>¿Por qué |0⟩?</h2>
-<p class="intro">En computación cuántica, |0⟩ («ket cero») es el estado del que arranca todo cálculo. Aquí es lo mismo: no se da nada por sabido, todo empieza desde cero.</p>
-</div></section>
-<section><div class="ancho">
-<h2>Inteligencia artificial</h2>
-<p class="intro">Redes neuronales por dentro, con datos reales y cada operación a la vista.</p>
-<div class="rejilla"><a class="tarjeta" href="/ia/#cnn"><span class="etiqueta">1 animación</span><h3>Redes convolucionales</h3><p>Cómo una CNN mira una imagen: filtros que recorren la foto, mapas, pooling y la decisión final, con dígitos de MNIST.</p></a><a class="tarjeta" href="/ia/#deteccion"><span class="etiqueta">1 animación</span><h3>Detección de objetos</h3><p>Encontrar y encerrar objetos en una imagen: cajas, puntajes y cómo aprende la red a ponerlas en el lugar correcto.</p></a></div>
-</div></section>
-<section><div class="ancho">
-<h2>Lo que viene</h2>
-<div class="rejilla"><div class="tarjeta pronto"><span class="etiqueta">Próximamente</span><h3>Física</h3><p>Movimiento, energía, ondas y campos, con las ecuaciones animadas.</p></div><div class="tarjeta pronto"><span class="etiqueta">Próximamente</span><h3>Matemática</h3><p>Cálculo, álgebra lineal y probabilidad: la base de todo lo demás.</p></div><div class="tarjeta pronto"><span class="etiqueta">Próximamente</span><h3>Computación cuántica</h3><p>Qubits, superposición y compuertas, empezando por |0⟩.</p></div><div class="tarjeta pronto"><span class="etiqueta">Próximamente</span><h3>Ingeniería</h3><p>Cómo se aplica todo esto en máquinas, estructuras y sistemas reales.</p></div></div>
-</div></section>
+<section class="cabeza">
+<div class="mono">Temario · actualizado el 5 de noviembre de 2026</div>
+<h1>Machine learning desde cero, con cada operación a la vista.</h1>
+<p>Un recorrido ordenado: de la regresión lineal a la detección de objetos. Cada lección es una animación paso a paso hecha con los datos reales del entrenamiento.</p>
+<div class="cifras"><div><b>5</b>temas</div><div><b>2</b>lecciones publicadas</div><div><b>381</b>pasos animados</div></div>
+</section>
+<section class="tema" id="fundamentos"><h2>Fundamentos <span>Tema 1</span></h2><p>Lo que hace falta antes de cualquier red.</p><div class="fila pend"><div class="n">1.1</div><div><b>Regresión lineal: ajustar una recta</b></div><div class="d">en preparación</div></div><div class="fila pend"><div class="n">1.2</div><div><b>La pérdida y el descenso de gradiente</b></div><div class="d">en preparación</div></div></section><section class="tema" id="redes-neuronales"><h2>Redes neuronales <span>Tema 2</span></h2><p>De una neurona a una red densa que aprende.</p><div class="fila pend"><div class="n">2.1</div><div><b>Una neurona, número por número</b></div><div class="d">en preparación</div></div><div class="fila pend"><div class="n">2.2</div><div><b>El backward con la regla de la cadena</b></div><div class="d">en preparación</div></div></section><section class="tema" id="cnn"><h2>Redes convolucionales <span>Tema 3</span></h2><p>Cómo una red lee una imagen.</p><a class="fila pub" href="/ia/cnn/Animacion_A4_la_CNN_completa.html"><div class="n">3.1</div><div><b>La CNN completa, por dentro</b><p>Una LeNet-5 aprende a leer dígitos de MNIST: lotes reales, la pérdida de cada imagen, el backward capa por capa y el paso de AdamW.</p><div class="d">86 pasos entrenar · 43 predecir · 5 épocas</div></div><img src="/img/cnn-completa.jpg" alt="La pérdida de cada imagen del lote en la CNN completa" loading="lazy"></a></section><section class="tema" id="deteccion"><h2>Detección de objetos <span>Tema 4</span></h2><p>Encontrar y encerrar objetos: cajas, puntajes, IoU y NMS.</p><a class="fila pub" href="/ia/deteccion/Animacion_B1_Mini_YOLO_por_dentro.html"><div class="n">4.1</div><div><b>Mini-YOLO por dentro: dígitos en la calle</b><p>Una red pequeña al estilo YOLO aprende a encontrar dígitos sobre fotos reales de la calle, desde la red recién nacida hasta las cajas finales.</p><div class="d">186 pasos entrenar · 66 predecir · 30 épocas</div></div><img src="/img/mini-yolo.jpg" alt="El NMS del Mini-YOLO borra las cajas que se solapan" loading="lazy"></a></section><section class="tema" id="lenguaje"><h2>Modelos de lenguaje <span>Tema 5</span></h2><p>Del bigrama a los transformers.</p><div class="fila pend"><div class="n">5.1</div><div><b>El bigrama de letras</b></div><div class="d">en preparación</div></div></section>
 </main>
-<footer class="pie"><div class="ancho">
-<span>Ket Cero · Ciencia desde cero · un proyecto de <a href="/omar/">Omar Ramírez González</a></span>
-<span>© 2026</span>
-</div></footer>
+</div>
+<footer><div class="in"><span>Ket Cero · un proyecto de <a href="/omar/">Omar Ramírez González</a></span><span>ketcero.com</span></div></footer>
+<script>
+(function () {
+  var b = document.getElementById("tema"), r = document.documentElement;
+  function oscuro() { return r.dataset.tema ? r.dataset.tema === "oscuro" : matchMedia("(prefers-color-scheme: dark)").matches; }
+  function rotulo() { b.textContent = oscuro() ? "Claro" : "Oscuro"; }
+  b.addEventListener("click", function () {
+    r.dataset.tema = oscuro() ? "claro" : "oscuro";
+    try { localStorage.setItem("tema", r.dataset.tema); } catch (e) {}
+    rotulo();
+  });
+  rotulo();
+})();
+</script>
 </body>
 </html>

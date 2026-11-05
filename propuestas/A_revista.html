@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ket Cero · Propuesta A · Índice editorial</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono&display=swap" rel="stylesheet">
+<style>
+:root { --tinta:#141414; --gris:#666; --linea:#DDDDDD; }
+* { box-sizing:border-box; }
+body { margin:0; background:#fff; color:var(--tinta); font:17px/1.65 "IBM Plex Sans", system-ui, sans-serif; }
+a { color:inherit; text-decoration:none; }
+.ancho { max-width:1120px; margin:0 auto; padding:0 32px; }
+.serif { font-family:"Source Serif 4", Georgia, serif; }
+.meta { font:13px/1.6 "IBM Plex Mono", monospace; color:var(--gris); }
+
+header .ancho { display:flex; justify-content:space-between; align-items:center; height:76px; border-bottom:1px solid var(--tinta); }
+.marca { display:flex; align-items:center; gap:12px; font:600 21px "Source Serif 4", serif; }
+nav a { margin-left:30px; font-size:15px; color:var(--gris); }
+nav a:hover { color:var(--tinta); }
+
+.intro { display:grid; grid-template-columns: 7fr 4fr; gap:64px; padding:72px 0 64px; border-bottom:1px solid var(--linea); }
+h1 { font:400 54px/1.08 "Source Serif 4", serif; letter-spacing:-1px; margin:0 0 24px; }
+.intro p { font-size:19px; color:#333; margin:0 0 16px; max-width:640px; }
+.intro aside { border-left:1px solid var(--linea); padding-left:32px; align-self:end; }
+.intro aside b { display:block; font-weight:500; }
+
+h2 { font:600 15px "IBM Plex Sans", sans-serif; letter-spacing:1px; text-transform:uppercase; margin:0; padding:40px 0 18px; border-bottom:1px solid var(--tinta); }
+
+.leccion { display:grid; grid-template-columns: 520px 1fr; gap:40px; padding:40px 0; border-bottom:1px solid var(--linea); }
+.leccion img { width:100%; aspect-ratio: 16/10; object-fit:cover; object-position:left top; border:1px solid var(--linea); display:block; }
+.leccion h3 { font:400 32px/1.15 "Source Serif 4", serif; margin:6px 0 14px; letter-spacing:-.3px; }
+.leccion a:hover h3 { text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:5px; }
+.leccion p { margin:0 0 18px; color:#333; }
+.datos { display:grid; grid-template-columns: 120px 1fr; font:13px/2 "IBM Plex Mono", monospace; border-top:1px solid var(--linea); padding-top:10px; }
+.datos dt { color:var(--gris); }
+.datos dd { margin:0; }
+
+table { width:100%; border-collapse:collapse; margin-bottom:24px; }
+th, td { text-align:left; padding:16px 12px 16px 0; border-bottom:1px solid var(--linea); vertical-align:top; }
+th { font:13px "IBM Plex Mono", monospace; color:var(--gris); font-weight:400; }
+td:first-child { font:400 22px "Source Serif 4", serif; width:28%; }
+td:last-child { font:13px "IBM Plex Mono", monospace; color:var(--gris); text-align:right; white-space:nowrap; }
+
+footer .ancho { display:flex; justify-content:space-between; padding-top:28px; padding-bottom:56px; border-top:1px solid var(--tinta); margin-top:56px; font-size:14px; color:var(--gris); }
+
+@media (max-width: 900px) {
+  .ancho { padding:0 16px; }
+  .intro, .leccion { grid-template-columns:1fr; gap:24px; }
+  .intro aside { border-left:0; padding-left:0; border-top:1px solid var(--linea); padding-top:16px; }
+  h1 { font-size:38px; }
+  nav a { margin-left:14px; }
+  td:last-child { white-space:normal; }
+}
+</style>
+</head>
+<body>
+<header><div class="ancho">
+  <a class="marca" href="#"><svg width="38" height="26" viewBox="0 0 44 30" aria-hidden="true"><line x1="5" y1="3" x2="5" y2="27" stroke="#141414" stroke-width="3" stroke-linecap="round"/><ellipse cx="19" cy="15" rx="6" ry="11" fill="none" stroke="#C8502A" stroke-width="3"/><polyline points="31,3 39,15 31,27" fill="none" stroke="#141414" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>Ket Cero</a>
+  <nav><a href="#">Lecciones</a><a href="#">Temas</a><a href="#">Quién soy</a></nav>
+</div></header>
+
+<main class="ancho">
+  <section class="intro">
+    <div>
+      <h1>Machine learning desde cero, viendo cada número.</h1>
+      <p>Lecciones animadas que muestran cómo aprende un modelo por dentro: qué entra, qué se multiplica, qué se suma y por qué al final acierta. Todo con los datos reales del entrenamiento.</p>
+    </div>
+    <aside>
+      <b>Omar Ramírez González</b>
+      <span class="meta">Monitor de Deep Learning. Hace estas animaciones para que se entienda lo que normalmente se da por sabido.</span>
+    </aside>
+  </section>
+
+  <h2>Lecciones recientes</h2>
+  <a class="leccion" href="#">
+    <img src="img/b1_pred_rec.jpg" alt="Animación del Mini-YOLO: el NMS borra las cajas que se solapan">
+    <div>
+      <div class="meta">Detección de objetos</div>
+      <h3>Mini-YOLO por dentro: dígitos en la calle</h3>
+      <p>Una red pequeña al estilo YOLO aprende a encontrar dígitos sobre fotos reales de la calle: la red recién nacida, la pérdida, la vuelta con la regla de la cadena y las cajas finales.</p>
+      <dl class="datos"><dt>Pasos</dt><dd>186 entrenar · 66 predecir</dd><dt>Datos</dt><dd>12.000 escenas por época, 30 épocas</dd><dt>Publicada</dt><dd>5 de noviembre de 2026</dd></dl>
+    </div>
+  </a>
+  <a class="leccion" href="#">
+    <img src="img/a4_30_rec.jpg" alt="Animación de la CNN completa: la pérdida de cada imagen del lote">
+    <div>
+      <div class="meta">Redes convolucionales</div>
+      <h3>La CNN completa, por dentro</h3>
+      <p>Una LeNet-5 aprende a leer dígitos de MNIST: los lotes reales, la pérdida de cada imagen, el backward capa por capa y el paso de AdamW.</p>
+      <dl class="datos"><dt>Pasos</dt><dd>86 entrenar · 43 predecir</dd><dt>Datos</dt><dd>55.000 imágenes, 5 épocas</dd><dt>Publicada</dt><dd>5 de noviembre de 2026</dd></dl>
+    </div>
+  </a>
+
+  <h2>Temas</h2>
+  <table>
+    <tr><th>Tema</th><th>Qué se estudia</th><th>Lecciones</th></tr>
+    <tr><td>Fundamentos</td><td>Regresión lineal y logística, la pérdida y el descenso de gradiente.</td><td>en preparación</td></tr>
+    <tr><td>Redes neuronales</td><td>La neurona, las capas densas y el backward con la regla de la cadena.</td><td>en preparación</td></tr>
+    <tr><td>Redes convolucionales</td><td>Filtros, mapas, pooling y cómo una red lee una imagen.</td><td>1</td></tr>
+    <tr><td>Detección de objetos</td><td>Cajas, puntajes, IoU, NMS y la familia YOLO.</td><td>1</td></tr>
+    <tr><td>Modelos de lenguaje</td><td>Del bigrama a los transformers.</td><td>en preparación</td></tr>
+  </table>
+</main>
+
+<footer><div class="ancho"><span>Ket Cero · Machine learning desde cero</span><span>ketcero.com</span></div></footer>
+</body>
+</html>

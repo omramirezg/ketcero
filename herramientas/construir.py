@@ -1,44 +1,80 @@
 """Arma el sitio de Ket Cero en ../sitio: copia las animaciones del curso y genera las páginas.
 
 Uso:  python herramientas/construir.py
-Vuelve a correrlo cada vez que cambie una animación o se agregue una nueva al CATALOGO.
+Vuelve a correrlo cada vez que cambie una animación o se agregue una lección al TEMARIO.
 """
 import html, io, json, os, re, shutil
 from datetime import date
 
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITIO = os.path.join(RAIZ, "sitio")
+MINIATURAS = os.path.join(RAIZ, "herramientas", "miniaturas")
 CURSO = r"C:\Users\USUARIO\Desktop\Maestria\2026-02\Monitoria de Deep Learning\Propuesta_2026"
 DOMINIO = "https://ketcero.com"
 AUTOR = "Omar Ramírez González"
-LIMITE_MB = 25  # Cloudflare Pages no acepta archivos más grandes
-
-# Cada tema: carpeta en /ia/, título, descripción y sus animaciones (ruta en el curso, título, descripción).
-CATALOGO = [
-    ("cnn", "Redes convolucionales", "Cómo una CNN mira una imagen: filtros que recorren la foto, mapas, pooling y la decisión final, con dígitos de MNIST.", [
-        ("Semana_02/02_Clase_viernes_30_oct/1_Densa_vs_CNN_MNIST/Animacion_A4_la_CNN_completa.html", "La CNN completa, por dentro", "La red entera con un lote real: convoluciones, pooling, aplanado, capa densa y la vuelta del entrenamiento."),
-    ]),
-    ("deteccion", "Detección de objetos", "Encontrar y encerrar objetos en una imagen: cajas, puntajes y cómo aprende la red a ponerlas en el lugar correcto.", [
-        ("Semana_03/02_Clase_viernes_6_nov/1_Mini_YOLO_digitos_en_la_calle/Animacion_B1_Mini_YOLO_por_dentro.html", "Mini YOLO por dentro: dígitos en la calle", "Una red pequeña al estilo YOLO aprende a encontrar dígitos sobre fotos de la calle: los datos, la red al nacer, la ida, la vuelta y la predicción."),
-    ]),
-]
+LIMITE_MB = 25  # Cloudflare no acepta archivos más grandes
 PARTE_MB = 15  # tamaño de cada pedazo de datos cuando una animación pasa del límite
+ACTUALIZADO = "5 de noviembre de 2026"
 
-PRONTO = [
-    ("Física", "Movimiento, energía, ondas y campos, con las ecuaciones animadas."),
-    ("Matemática", "Cálculo, álgebra lineal y probabilidad: la base de todo lo demás."),
-    ("Computación cuántica", "Qubits, superposición y compuertas, empezando por |0⟩."),
-    ("Ingeniería", "Cómo se aplica todo esto en máquinas, estructuras y sistemas reales."),
+# Temario de machine learning. Cada tema: (carpeta en /ia/, título, descripción, lecciones).
+# Lección publicada: dict con fuente (ruta en el curso), miniatura, descripción y datos.
+# Lección pendiente: solo el título.
+TEMARIO = [
+    ("fundamentos", "Fundamentos", "Lo que hace falta antes de cualquier red.", [
+        {"titulo": "Regresión lineal: ajustar una recta"},
+        {"titulo": "La pérdida y el descenso de gradiente"},
+    ]),
+    ("redes-neuronales", "Redes neuronales", "De una neurona a una red densa que aprende.", [
+        {"titulo": "Una neurona, número por número"},
+        {"titulo": "El backward con la regla de la cadena"},
+    ]),
+    ("cnn", "Redes convolucionales", "Cómo una red lee una imagen.", [
+        {"titulo": "La CNN completa, por dentro",
+         "fuente": "Semana_02/02_Clase_viernes_30_oct/1_Densa_vs_CNN_MNIST/Animacion_A4_la_CNN_completa.html",
+         "miniatura": "cnn-completa.jpg",
+         "alt": "La pérdida de cada imagen del lote en la CNN completa",
+         "desc": "Una LeNet-5 aprende a leer dígitos de MNIST: lotes reales, la pérdida de cada imagen, el backward capa por capa y el paso de AdamW.",
+         "datos": "86 pasos entrenar · 43 predecir · 5 épocas", "pasos": 86 + 43},
+    ]),
+    ("deteccion", "Detección de objetos", "Encontrar y encerrar objetos: cajas, puntajes, IoU y NMS.", [
+        {"titulo": "Mini-YOLO por dentro: dígitos en la calle",
+         "fuente": "Semana_03/02_Clase_viernes_6_nov/1_Mini_YOLO_digitos_en_la_calle/Animacion_B1_Mini_YOLO_por_dentro.html",
+         "miniatura": "mini-yolo.jpg",
+         "alt": "El NMS del Mini-YOLO borra las cajas que se solapan",
+         "desc": "Una red pequeña al estilo YOLO aprende a encontrar dígitos sobre fotos reales de la calle, desde la red recién nacida hasta las cajas finales.",
+         "datos": "186 pasos entrenar · 66 predecir · 30 épocas", "pasos": 186 + 66},
+    ]),
+    ("lenguaje", "Modelos de lenguaje", "Del bigrama a los transformers.", [
+        {"titulo": "El bigrama de letras"},
+    ]),
 ]
 
-LOGO = ('<svg viewBox="0 0 44 30" aria-hidden="true"><line x1="5" y1="3" x2="5" y2="27" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>'
-        '<ellipse cx="19" cy="15" rx="6" ry="11" fill="none" stroke="#D85A30" stroke-width="3"/>'
+LOGO = ('<svg width="34" height="24" viewBox="0 0 44 30" aria-hidden="true"><line x1="5" y1="3" x2="5" y2="27" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>'
+        '<ellipse cx="19" cy="15" rx="6" ry="11" fill="none" stroke="#C8502A" stroke-width="3"/>'
         '<polyline points="31,3 39,15 31,27" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>')
+# Aplica el tema guardado antes de pintar (sin parpadeo) y maneja el botón Oscuro / Claro.
+TEMA_JS = '<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.dataset.tema=t}catch(e){}</script>\n'
+BOTON_JS = """<script>
+(function () {
+  var b = document.getElementById("tema"), r = document.documentElement;
+  function oscuro() { return r.dataset.tema ? r.dataset.tema === "oscuro" : matchMedia("(prefers-color-scheme: dark)").matches; }
+  function rotulo() { b.textContent = oscuro() ? "Claro" : "Oscuro"; }
+  b.addEventListener("click", function () {
+    r.dataset.tema = oscuro() ? "claro" : "oscuro";
+    try { localStorage.setItem("tema", r.dataset.tema); } catch (e) {}
+    rotulo();
+  });
+  rotulo();
+})();
+</script>"""
+FUENTES = ('<link rel="preconnect" href="https://fonts.googleapis.com">\n'
+           '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
+           '<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono&display=swap" rel="stylesheet">\n')
 
 
 def pagina(titulo, descripcion, ruta, cuerpo, actual="", extra_head=""):
     """Plantilla común: cabecera con la marca, menú, contenido y pie con la firma."""
-    menu = [("/", "Inicio"), ("/ia/", "Inteligencia artificial"), ("/omar/", "Quién soy")]
+    menu = [("/", "Temario"), ("/omar/", "Quién soy")]
     marca = ' aria-current="page"'
     enlaces = "".join(f'<a href="{u}"{marca if u == actual else ""}>{t}</a>' for u, t in menu)
     return f"""<!doctype html>
@@ -46,31 +82,28 @@ def pagina(titulo, descripcion, ruta, cuerpo, actual="", extra_head=""):
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{html.escape(titulo)}</title>
+{TEMA_JS}<title>{html.escape(titulo)}</title>
 <meta name="description" content="{html.escape(descripcion)}">
 <meta name="author" content="{AUTOR}">
 <link rel="canonical" href="{DOMINIO}{ruta}">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="alternate icon" href="/favicon.ico">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Ket Cero">
 <meta property="og:title" content="{html.escape(titulo)}">
 <meta property="og:description" content="{html.escape(descripcion)}">
 <meta property="og:url" content="{DOMINIO}{ruta}">
 <meta property="og:locale" content="es_CO">
-<link rel="stylesheet" href="/estilo.css">
+{FUENTES}<link rel="stylesheet" href="/estilo.css">
 {extra_head}</head>
 <body>
-<header class="barra"><div class="ancho">
-<a class="marca" href="/">{LOGO}<b>Ket Cero</b></a>
-<nav class="menu">{enlaces}</nav>
+<header><div class="in">
+<a class="marca" href="/">{LOGO}Ket Cero<small>Machine learning desde cero</small></a>
+<nav>{enlaces}<button id="tema" type="button">Oscuro</button></nav>
 </div></header>
-<main>
 {cuerpo}
-</main>
-<footer class="pie"><div class="ancho">
-<span>Ket Cero · Ciencia desde cero · un proyecto de <a href="/omar/">{AUTOR}</a></span>
-<span>© {date.today().year}</span>
-</div></footer>
+<footer><div class="in"><span>Ket Cero · un proyecto de <a href="/omar/">{AUTOR}</a></span><span>ketcero.com</span></div></footer>
+{BOTON_JS}
 </body>
 </html>
 """
@@ -119,75 +152,73 @@ def partir(origen, destino):
         raise SystemExit(f"{os.path.basename(destino)}: un pedazo quedó de {max(pesos):.1f} MB; baja PARTE_MB")
 
 
+def publicadas():
+    """Las lecciones con animación, con su tema y su número (3.1, 4.1…)."""
+    for t, (clave, _, _, lecciones) in enumerate(TEMARIO, 1):
+        for l, lec in enumerate(lecciones, 1):
+            if "fuente" in lec:
+                yield clave, f"{t}.{l}", lec
+
+
 def copiar_animaciones():
     """Copia cada animación a /ia/<tema>/ con su nombre original (así siguen funcionando los enlaces entre ellas)."""
     shutil.rmtree(os.path.join(SITIO, "ia"), ignore_errors=True)
+    shutil.rmtree(os.path.join(SITIO, "img"), ignore_errors=True)
+    os.makedirs(os.path.join(SITIO, "img"))
     filas = []
-    for clave, _, _, anims in CATALOGO:
+    for clave, _, lec in publicadas():
         destino = os.path.join(SITIO, "ia", clave)
         os.makedirs(destino, exist_ok=True)
-        for fuente, titulo, desc in anims:
-            origen = os.path.join(CURSO, fuente)
-            nombre = os.path.basename(fuente)
-            peso = mb(origen)
-            if peso > LIMITE_MB:
-                partir(origen, os.path.join(destino, nombre))
-            else:
-                shutil.copy2(origen, os.path.join(destino, nombre))
-            filas.append((clave, nombre, titulo, peso))
+        origen = os.path.join(CURSO, lec["fuente"])
+        nombre = os.path.basename(lec["fuente"])
+        peso = mb(origen)
+        if peso > LIMITE_MB:
+            partir(origen, os.path.join(destino, nombre))
+        else:
+            shutil.copy2(origen, os.path.join(destino, nombre))
+        shutil.copy2(os.path.join(MINIATURAS, lec["miniatura"]), os.path.join(SITIO, "img", lec["miniatura"]))
+        lec["url"] = f"/ia/{clave}/{nombre}"
+        filas.append((lec["url"], peso))
     return filas
 
 
-def tarjeta_animacion(clave, fuente, titulo, desc):
-    nombre = os.path.basename(fuente)
-    peso = mb(os.path.join(CURSO, fuente))
-    aviso = "  ·  conviene abrirla con wifi" if peso > 8 else ""
-    return (f'<li><a class="tarjeta" href="/ia/{clave}/{nombre}"><h3>{html.escape(titulo)}</h3>'
-            f'<p>{html.escape(desc)}</p><span class="dato">Animación · {peso:.1f} MB{aviso}</span></a></li>')
-
-
 def construir_inicio():
-    temas = "".join(
-        f'<a class="tarjeta" href="/ia/#{c}"><span class="etiqueta">{len(a)} {"animaciones" if len(a) > 1 else "animación"}</span>'
-        f'<h3>{t}</h3><p>{html.escape(d)}</p></a>' for c, t, d, a in CATALOGO)
-    pronto = "".join(f'<div class="tarjeta pronto"><span class="etiqueta">Próximamente</span><h3>{t}</h3><p>{d}</p></div>' for t, d in PRONTO)
-    cuerpo = f"""<div class="ancho portada">
-<div class="ket" aria-hidden="true">|<span class="cero">0</span>⟩</div>
-<h1>Ket Cero</h1>
-<p class="lema">Ciencia desde cero</p>
-<p>Animaciones que abren la caja negra: cada número, cada multiplicación y cada paso, para entender de verdad cómo funcionan la inteligencia artificial, la física, la matemática y la ingeniería.</p>
-<p class="firma">Por <a href="/omar/">{AUTOR}</a></p>
-</div>
-<section><div class="ancho">
-<h2>¿Por qué |0⟩?</h2>
-<p class="intro">En computación cuántica, |0⟩ («ket cero») es el estado del que arranca todo cálculo. Aquí es lo mismo: no se da nada por sabido, todo empieza desde cero.</p>
-</div></section>
-<section><div class="ancho">
-<h2>Inteligencia artificial</h2>
-<p class="intro">Redes neuronales por dentro, con datos reales y cada operación a la vista.</p>
-<div class="rejilla">{temas}</div>
-</div></section>
-<section><div class="ancho">
-<h2>Lo que viene</h2>
-<div class="rejilla">{pronto}</div>
-</div></section>"""
-    return pagina("Ket Cero · Ciencia desde cero",
-                  "Animaciones que muestran la ciencia por dentro: inteligencia artificial, física, matemática e ingeniería explicadas desde cero, en español.",
+    lados, temas = [], []
+    for t, (clave, titulo, desc, lecciones) in enumerate(TEMARIO, 1):
+        n_pub = sum("fuente" in l for l in lecciones)
+        lados.append(f'<li><a href="#{clave}">{t} · {titulo} <span>{n_pub}</span></a></li>')
+        filas = []
+        for l, lec in enumerate(lecciones, 1):
+            num = f"{t}.{l}"
+            if "fuente" in lec:
+                filas.append(f'<a class="fila pub" href="{lec["url"]}"><div class="n">{num}</div><div><b>{html.escape(lec["titulo"])}</b>'
+                             f'<p>{html.escape(lec["desc"])}</p><div class="d">{lec["datos"]}</div></div>'
+                             f'<img src="/img/{lec["miniatura"]}" alt="{html.escape(lec["alt"])}" loading="lazy"></a>')
+            else:
+                filas.append(f'<div class="fila pend"><div class="n">{num}</div><div><b>{html.escape(lec["titulo"])}</b></div><div class="d">en preparación</div></div>')
+        temas.append(f'<section class="tema" id="{clave}"><h2>{titulo} <span>Tema {t}</span></h2><p>{html.escape(desc)}</p>{"".join(filas)}</section>')
+    pubs = list(publicadas())
+    pasos = sum(lec["pasos"] for _, _, lec in pubs)
+    cuerpo = f"""<div class="cuerpo">
+<aside>
+<p class="t">Temario</p>
+<ol>{"".join(lados)}</ol>
+<p class="t">Autor</p>
+<p><a href="/omar/">{AUTOR}</a></p>
+</aside>
+<main>
+<section class="cabeza">
+<div class="mono">Temario · actualizado el {ACTUALIZADO}</div>
+<h1>Machine learning desde cero, con cada operación a la vista.</h1>
+<p>Un recorrido ordenado: de la regresión lineal a la detección de objetos. Cada lección es una animación paso a paso hecha con los datos reales del entrenamiento.</p>
+<div class="cifras"><div><b>{len(TEMARIO)}</b>temas</div><div><b>{len(pubs)}</b>lecciones publicadas</div><div><b>{pasos}</b>pasos animados</div></div>
+</section>
+{"".join(temas)}
+</main>
+</div>"""
+    return pagina("Ket Cero · Machine learning desde cero",
+                  "Machine learning desde cero, en español: lecciones animadas paso a paso con los datos reales del entrenamiento. Redes convolucionales, detección de objetos y más.",
                   "/", cuerpo, "/")
-
-
-def construir_ia():
-    bloques = []
-    for clave, titulo, desc, anims in CATALOGO:
-        items = "".join(tarjeta_animacion(clave, *a) for a in anims)
-        bloques.append(f'<section class="tema" id="{clave}"><div class="ancho"><h2>{titulo}</h2>'
-                       f'<p class="intro">{html.escape(desc)}</p><ul class="lista rejilla">{items}</ul></div></section>')
-    cuerpo = ('<div class="ancho portada"><h1>Inteligencia artificial, por dentro</h1>'
-              '<p class="lema">Cada animación avanza paso a paso: usa los botones o las flechas del teclado.</p></div>'
-              + "".join(bloques))
-    return pagina("Inteligencia artificial por dentro · Ket Cero",
-                  "Animaciones de redes neuronales paso a paso: CNN, transfer learning, CLIP, detección de objetos y modelos de lenguaje, en español.",
-                  "/ia/", cuerpo, "/ia/")
 
 
 def construir_omar():
@@ -198,27 +229,30 @@ def construir_omar():
  "worksFor": {{"@type": "Organization", "name": "Ket Cero", "url": "{DOMINIO}"}}}}
 </script>
 """
-    cuerpo = f"""<div class="ancho portada">
-<div class="persona">
-<div class="foto">Tu foto<br>(la misma de LinkedIn)</div>
-<div>
+    cuerpo = f"""<div class="cuerpo solo">
+<main class="texto">
+<section class="cabeza">
+<div class="mono">Quién soy</div>
 <h1>{AUTOR}</h1>
-<p class="lema">Creador de Ket Cero</p>
+<p>Creador de Ket Cero.</p>
+</section>
 <p>Soy monitor del curso de Deep Learning de la maestría <span class="completar">[universidad y programa]</span>. Hago animaciones que muestran las redes neuronales por dentro, con los números reales, porque así es como yo aprendí a entenderlas.</p>
-<p><span class="completar">[Tu formación: pregrado, maestría, experiencia]</span></p>
-<p><span class="completar">[Qué buscas: por ejemplo, roles de ML Engineer]</span></p>
+<h2>Formación</h2>
+<p><span class="completar">[pregrado, maestría, experiencia]</span></p>
+<h2>Qué busco</h2>
+<p><span class="completar">[por ejemplo, roles de ML Engineer]</span></p>
+<h2>Contacto</h2>
 <p><a href="https://github.com/omramirezg">GitHub</a> · <span class="completar">[LinkedIn]</span> · <span class="completar">[correo de contacto]</span></p>
-</div>
-</div>
+</main>
 </div>"""
     return pagina(f"{AUTOR} · Ket Cero",
-                  f"{AUTOR}, creador de Ket Cero: animaciones de inteligencia artificial y ciencia explicadas desde cero.",
+                  f"{AUTOR}, creador de Ket Cero: machine learning desde cero, con animaciones paso a paso.",
                   "/omar/", cuerpo, "/omar/", persona)
 
 
 def construir_404():
-    cuerpo = ('<div class="ancho portada"><div class="ket" aria-hidden="true">|<span class="cero">?</span>⟩</div>'
-              '<h1>Esta página no existe</h1><p>Puede que el enlace haya cambiado. <a href="/">Volver al inicio</a>.</p></div>')
+    cuerpo = ('<div class="cuerpo solo"><main class="texto"><section class="cabeza"><div class="mono">Error 404</div>'
+              '<h1>Esta página no existe</h1><p>Puede que el enlace haya cambiado. <a href="/">Volver al temario</a>.</p></section></main></div>')
     return pagina("Página no encontrada · Ket Cero", "La página que buscas no existe.", "/404", cuerpo)
 
 
@@ -231,18 +265,16 @@ def escribir(ruta, texto):
 def main():
     filas = copiar_animaciones()
     escribir("index.html", construir_inicio())
-    escribir("ia/index.html", construir_ia())
     escribir("omar/index.html", construir_omar())
     escribir("404.html", construir_404())
-    urls = ["/", "/ia/", "/omar/"] + [f"/ia/{c}/{n}" for c, n, _, _ in filas]
+    urls = ["/", "/omar/"] + [u for u, _ in filas]
     hoy = date.today().isoformat()
     escribir("sitemap.xml", '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
              + "".join(f"<url><loc>{DOMINIO}{u}</loc><lastmod>{hoy}</lastmod></url>\n" for u in urls) + "</urlset>\n")
     escribir("robots.txt", f"User-agent: *\nAllow: /\nSitemap: {DOMINIO}/sitemap.xml\n")
-    total = sum(p for *_, p in filas)
-    print(f"{len(filas)} animaciones copiadas ({total:.1f} MB). Sitio listo en {SITIO}")
-    for c, n, _, p in filas:
-        print(f"  {p:6.1f} MB  /ia/{c}/{n}")
+    print(f"{len(filas)} animaciones copiadas ({sum(p for _, p in filas):.1f} MB). Sitio listo en {SITIO}")
+    for u, p in filas:
+        print(f"  {p:6.1f} MB  {u}")
 
 
 if __name__ == "__main__":

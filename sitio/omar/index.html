@@ -3,17 +3,22 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.dataset.tema=t}catch(e){}</script>
 <title>Omar Ramírez González · Ket Cero</title>
-<meta name="description" content="Omar Ramírez González, creador de Ket Cero: animaciones de inteligencia artificial y ciencia explicadas desde cero.">
+<meta name="description" content="Omar Ramírez González, creador de Ket Cero: machine learning desde cero, con animaciones paso a paso.">
 <meta name="author" content="Omar Ramírez González">
 <link rel="canonical" href="https://ketcero.com/omar/">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="alternate icon" href="/favicon.ico">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Ket Cero">
 <meta property="og:title" content="Omar Ramírez González · Ket Cero">
-<meta property="og:description" content="Omar Ramírez González, creador de Ket Cero: animaciones de inteligencia artificial y ciencia explicadas desde cero.">
+<meta property="og:description" content="Omar Ramírez González, creador de Ket Cero: machine learning desde cero, con animaciones paso a paso.">
 <meta property="og:url" content="https://ketcero.com/omar/">
 <meta property="og:locale" content="es_CO">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/estilo.css">
 <script type="application/ld+json">
 {"@context": "https://schema.org", "@type": "Person", "name": "Omar Ramírez González",
@@ -23,28 +28,39 @@
 </script>
 </head>
 <body>
-<header class="barra"><div class="ancho">
-<a class="marca" href="/"><svg viewBox="0 0 44 30" aria-hidden="true"><line x1="5" y1="3" x2="5" y2="27" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><ellipse cx="19" cy="15" rx="6" ry="11" fill="none" stroke="#D85A30" stroke-width="3"/><polyline points="31,3 39,15 31,27" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><b>Ket Cero</b></a>
-<nav class="menu"><a href="/">Inicio</a><a href="/ia/">Inteligencia artificial</a><a href="/omar/" aria-current="page">Quién soy</a></nav>
+<header><div class="in">
+<a class="marca" href="/"><svg width="34" height="24" viewBox="0 0 44 30" aria-hidden="true"><line x1="5" y1="3" x2="5" y2="27" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><ellipse cx="19" cy="15" rx="6" ry="11" fill="none" stroke="#C8502A" stroke-width="3"/><polyline points="31,3 39,15 31,27" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>Ket Cero<small>Machine learning desde cero</small></a>
+<nav><a href="/">Temario</a><a href="/omar/" aria-current="page">Quién soy</a><button id="tema" type="button">Oscuro</button></nav>
 </div></header>
-<main>
-<div class="ancho portada">
-<div class="persona">
-<div class="foto">Tu foto<br>(la misma de LinkedIn)</div>
-<div>
+<div class="cuerpo solo">
+<main class="texto">
+<section class="cabeza">
+<div class="mono">Quién soy</div>
 <h1>Omar Ramírez González</h1>
-<p class="lema">Creador de Ket Cero</p>
+<p>Creador de Ket Cero.</p>
+</section>
 <p>Soy monitor del curso de Deep Learning de la maestría <span class="completar">[universidad y programa]</span>. Hago animaciones que muestran las redes neuronales por dentro, con los números reales, porque así es como yo aprendí a entenderlas.</p>
-<p><span class="completar">[Tu formación: pregrado, maestría, experiencia]</span></p>
-<p><span class="completar">[Qué buscas: por ejemplo, roles de ML Engineer]</span></p>
+<h2>Formación</h2>
+<p><span class="completar">[pregrado, maestría, experiencia]</span></p>
+<h2>Qué busco</h2>
+<p><span class="completar">[por ejemplo, roles de ML Engineer]</span></p>
+<h2>Contacto</h2>
 <p><a href="https://github.com/omramirezg">GitHub</a> · <span class="completar">[LinkedIn]</span> · <span class="completar">[correo de contacto]</span></p>
-</div>
-</div>
-</div>
 </main>
-<footer class="pie"><div class="ancho">
-<span>Ket Cero · Ciencia desde cero · un proyecto de <a href="/omar/">Omar Ramírez González</a></span>
-<span>© 2026</span>
-</div></footer>
+</div>
+<footer><div class="in"><span>Ket Cero · un proyecto de <a href="/omar/">Omar Ramírez González</a></span><span>ketcero.com</span></div></footer>
+<script>
+(function () {
+  var b = document.getElementById("tema"), r = document.documentElement;
+  function oscuro() { return r.dataset.tema ? r.dataset.tema === "oscuro" : matchMedia("(prefers-color-scheme: dark)").matches; }
+  function rotulo() { b.textContent = oscuro() ? "Claro" : "Oscuro"; }
+  b.addEventListener("click", function () {
+    r.dataset.tema = oscuro() ? "claro" : "oscuro";
+    try { localStorage.setItem("tema", r.dataset.tema); } catch (e) {}
+    rotulo();
+  });
+  rotulo();
+})();
+</script>
 </body>
 </html>
