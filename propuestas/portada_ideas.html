@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.dataset.tema=t}catch(e){}</script>
+<title>Prototipo · Ket Cero · Machine learning desde cero</title>
+<meta name="description" content="Machine learning desde cero, en español: cursos con lecciones animadas paso a paso hechas con los datos reales del entrenamiento.">
+<meta name="author" content="Omar Ramírez González">
+<link rel="canonical" href="https://ketcero.com/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="alternate icon" href="/favicon.ico">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Ket Cero">
+<meta property="og:title" content="Ket Cero · Machine learning desde cero">
+<meta property="og:description" content="Machine learning desde cero, en español: cursos con lecciones animadas paso a paso hechas con los datos reales del entrenamiento.">
+<meta property="og:url" content="https://ketcero.com/">
+<meta property="og:locale" content="es_CO">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../sitio/estilo.css">
+<style>
+/* idea 4: portada más ancha y animación más grande */
+.cuerpo { max-width:1360px; }
+.portada { grid-template-columns:minmax(0,1fr) 640px; position:relative; }
+.cabeza .explica { margin:0 0 18px; font-size:15px; color:var(--gris); max-width:560px; }
+.cabeza .cuenta { margin:-88px 0 0; position:relative; font:13px/1.7 "IBM Plex Mono", monospace; color:var(--gris); min-height:46px; }
+.cabeza .cuenta b { color:var(--tinta); font-weight:400; }
+.franja { position:absolute; left:0; right:0; bottom:0; display:grid; grid-template-columns:1fr auto 1fr; align-items:center;
+  border-top:1px solid var(--linea); padding:14px 0; font:13px "IBM Plex Mono", monospace; color:var(--gris); }
+.franja a { color:var(--gris); } .franja a:hover { color:var(--tinta); }
+.franja span { text-align:right; }
+.bajar { color:var(--tinta) !important; }
+main .portada { padding-bottom:80px; }
+.panel-codigo { margin-top:36px; border:1px solid var(--linea); padding:14px 0; max-width:640px; }
+.codigo-cero { margin:0; font:12.5px/1.75 "IBM Plex Mono", monospace; color:var(--texto); overflow-x:auto; }
+.codigo-cero .linea { display:grid; grid-template-columns:36px max-content 1fr; gap:0 18px; padding:0 16px 0 0; border-left:2px solid transparent; white-space:pre; }
+.codigo-cero .num { text-align:right; color:var(--gris); opacity:.6; }
+.codigo-cero .nota { color:var(--gris); }
+.codigo-cero .activa { background:var(--marca); border-left-color:var(--tinta); }
+.codigo-cero .activa .cod { color:var(--tinta); }
+.codigo-cero .activa .nota { color:var(--tinta); }
+</style>
+</head>
+<body>
+<header><div class="in">
+<div class="izq"><button id="menu" class="hamb" type="button" aria-expanded="false" aria-controls="cajon" aria-label="Abrir los cursos"><span></span><span></span><span></span></button>
+<a class="marca" href="/"><svg width="34" height="24" viewBox="0 0 44 30" aria-hidden="true"><line x1="5" y1="3" x2="5" y2="27" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><ellipse cx="19" cy="15" rx="6" ry="11" fill="none" stroke="#C8502A" stroke-width="3"/><polyline points="31,3 39,15 31,27" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>Ket Cero<small>Machine learning desde cero</small></a></div>
+<nav><div class="desplegable"><button id="cursos" type="button" aria-expanded="false" aria-controls="lista-cursos">Cursos</button><div id="lista-cursos" class="lista" hidden><a href="/cursos/deep-learning/">Deep Learning<small>6 temas · 2 lecciones</small></a></div></div><a href="/omar/">Quién soy</a><button id="tema" type="button" role="switch" aria-checked="true"><span>Modo oscuro</span><span class="pista"><span class="perilla"></span></span></button></nav>
+</div></header>
+<div id="velo" class="velo" hidden></div>
+<aside id="cajon" class="cajon" aria-label="Cursos">
+<p class="t">Deep Learning</p><ol><li><a href="/cursos/deep-learning/#redes-profundas"><em>1</em>Redes neuronales profundas<span>0</span></a></li><li><a href="/cursos/deep-learning/#cnn"><em>2</em>Redes convolucionales<span>1</span></a></li><li><a href="/cursos/deep-learning/#deteccion"><em>3</em>Detección de objetos<span>1</span></a></li><li><a href="/cursos/deep-learning/#segmentacion"><em>4</em>Segmentación de imágenes<span>0</span></a></li><li><a href="/cursos/deep-learning/#generativos-secuencias"><em>5</em>Modelos generativos y secuencias<span>0</span></a></li><li><a href="/cursos/deep-learning/#transformers-grafos"><em>6</em>Transformers y redes de grafos<span>0</span></a></li></ol>
+</aside>
+<div class="cuerpo">
+<main>
+<section class="cabeza portada">
+<div>
+<div class="mono">Actualizado el 5 de noviembre de 2026</div>
+<h1>Machine learning desde cero, con cada operación a la vista.</h1>
+<p>Lecciones animadas paso a paso, hechas con los datos reales del entrenamiento: qué entra a la red, qué se multiplica, qué se suma y por qué al final acierta.</p>
+<a class="ir" href="/cursos/deep-learning/">Empezar el curso de Deep Learning →</a>
+<div id="codigo" class="panel-codigo"></div>
+</div>
+<div class="lado"><p class="explica">Una red ya entrenada mira un 0: su primer filtro busca bordes, casilla por casilla.</p><div id="cero" class="cero"></div></div>
+<div class="franja"><a href="#">Última lección: Mini-YOLO por dentro · 5 nov 2026 →</a><a class="bajar" href="#lista-de-cursos">Cursos ↓</a><span>Próxima: Transfer learning, hojas de café sanas o enfermas</span></div>
+</section>
+<section class="tema" id="lista-de-cursos"><h2>Cursos</h2><p>Empieza por aquí.</p><a class="fila curso" href="/cursos/deep-learning/"><div class="n">01</div><div><b>Deep Learning</b><p>Redes neuronales profundas en el orden de las sesiones del curso: de las redes densas a los transformers. Cada lección es una animación paso a paso con los datos reales del entrenamiento.</p><div class="d">6 temas · 2 lecciones publicadas</div></div></a></section>
+</main>
+</div>
+<script src="../sitio/js/cero_datos.js"></script>
+<script src="../herramientas/animacion_cero/cero.js"></script>
+<script>montarCero(document.getElementById("cero"), window.DATOS_CERO, { codigo: document.getElementById("codigo") });</script>
+<footer><div class="in"><span>Ket Cero · un proyecto de <a href="/omar/">Omar Ramírez González</a></span><span>ketcero.com</span></div></footer>
+<script>
+(function () {
+  var b = document.getElementById("tema"), r = document.documentElement;
+  function oscuro() { return r.dataset.tema !== "claro"; }  // oscuro por defecto
+  function rotulo() { b.setAttribute("aria-checked", oscuro() ? "true" : "false"); }
+  b.addEventListener("click", function () {
+    r.dataset.tema = oscuro() ? "claro" : "oscuro";
+    try { localStorage.setItem("tema", r.dataset.tema); } catch (e) {}
+    rotulo();
+  });
+  rotulo();
+})();
+(function () {
+  var m = document.getElementById("menu"), c = document.getElementById("cajon"), v = document.getElementById("velo");
+  function medir() {
+    var raya = document.querySelector(".marca small");
+    var x = raya && raya.offsetParent ? raya.getBoundingClientRect().left : 0;
+    document.documentElement.style.setProperty("--ancho-cajon", x > 200 ? x + "px" : "86vw");
+  }
+  medir();
+  addEventListener("resize", medir);
+  function poner(abierto) {
+    m.setAttribute("aria-expanded", abierto ? "true" : "false");
+    c.classList.toggle("abierto", abierto);
+    v.hidden = !abierto;
+    if (abierto) c.querySelector("a").focus();
+  }
+  m.addEventListener("click", function () { poner(m.getAttribute("aria-expanded") !== "true"); });
+  v.addEventListener("click", function () { poner(false); });
+  c.addEventListener("click", function (e) { if (e.target.closest("a")) poner(false); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !v.hidden) { poner(false); m.focus(); } });
+})();
+(function () {
+  var b = document.getElementById("cursos"), l = document.getElementById("lista-cursos");
+  function poner(abierto) { b.setAttribute("aria-expanded", abierto ? "true" : "false"); l.hidden = !abierto; }
+  b.addEventListener("click", function (e) { e.stopPropagation(); poner(l.hidden); });
+  document.addEventListener("click", function (e) { if (!l.hidden && !l.contains(e.target)) poner(false); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !l.hidden) { poner(false); b.focus(); } });
+})();
+</script>
+</body>
+</html>

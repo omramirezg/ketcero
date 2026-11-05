@@ -208,23 +208,77 @@ def partir(origen, destino):
 
 
 # Capa que el sitio agrega a cada animación publicada (los originales del curso no se tocan):
-# modo oscuro por inversión de colores (las fotos se vuelven a invertir para conservar sus colores reales),
-# la misma preferencia «tema» del resto del sitio, y una barra con la vuelta al curso y el aviso de versión preliminar.
-CAPA_HEAD = """<script>try{if(localStorage.getItem("tema")!=="claro")document.documentElement.classList.add("kc-oscuro")}catch(e){document.documentElement.classList.add("kc-oscuro")}</script>
+# - la misma cabecera del sitio (marca, Cursos, Quién soy, interruptor de modo oscuro) y el aviso de versión preliminar;
+# - la animación se escala en el alto que queda debajo de la cabecera (se ajusta su función escalar());
+# - la interfaz con la letra y el estilo sobrio del sitio, sin cursivas;
+# - modo oscuro por inversión de colores (invert .93 deja el blanco en #121212, como el fondo del sitio); la cabecera
+#   y las fotos llevan colores «pre-invertidos» para verse igual que en el resto del sitio.
+KC_ALTO = 65
+CAPA_TEMPRANA = """<script>var KC_ALTO = %d;try{if(localStorage.getItem("tema")!=="claro")document.documentElement.classList.add("kc-oscuro")}catch(e){document.documentElement.classList.add("kc-oscuro")}</script>
+""" % KC_ALTO
+CAPA_HEAD = """<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono&display=swap" rel="stylesheet">
 <style>
-html.kc-oscuro { background:#fff; filter:invert(1) hue-rotate(180deg); }
-html.kc-oscuro img, html.kc-oscuro image, html.kc-oscuro video, html.kc-oscuro canvas { filter:invert(1) hue-rotate(180deg); }
-.kc-barra { position:fixed; top:8px; left:12px; z-index:9999; display:flex; align-items:center; gap:16px; padding:5px 10px; background:#fff; border:1px solid #E2E2E2; font:12px/1.4 "IBM Plex Mono", Consolas, monospace; color:#6B6B6B; }
-.kc-barra a { color:#161616; text-decoration:none; }
-.kc-barra a:hover { text-decoration:underline; }
-.kc-barra button { display:inline-flex; align-items:center; gap:8px; background:none; border:0; padding:0; font:inherit; color:#161616; cursor:pointer; }
-.kc-pista { position:relative; width:28px; height:15px; border:1px solid #6B6B6B; border-radius:8px; }
-.kc-perilla { position:absolute; top:2px; left:2px; width:9px; height:9px; border-radius:50%; background:#6B6B6B; transition:transform .15s; }
-html:not(.kc-oscuro) .kc-barra button[aria-checked="true"] .kc-pista, .kc-barra button[aria-checked="true"] .kc-pista { background:#161616; border-color:#161616; }
-.kc-barra button[aria-checked="true"] .kc-perilla { transform:translateX(13px); background:#fff; }
+/* --- cabecera del sitio --- */
+#kc-cab { --f:#FFFFFF; --t:#161616; --g:#6B6B6B; --l:#E2E2E2; --cero:#C8502A;
+  position:fixed; top:0; left:0; right:0; height:%(alto)dpx; box-sizing:border-box; z-index:50; display:flex; align-items:center; justify-content:space-between;
+  padding:0 24px; background:var(--f); border-bottom:1px solid var(--l); font:14px "IBM Plex Sans", system-ui, sans-serif; color:var(--t); }
+html.kc-oscuro #kc-cab { --f:#FFFFFF; --t:#000000; --g:#616161; --l:#E3E3E3; --cero:#FF8255; }   /* tras invertir: #121212, #EDEDED, #9A9A9A, #2A2A2A, coral */
+#kc-cab a { color:inherit; text-decoration:none; }
+#kc-cab .kc-marca { display:flex; align-items:center; gap:10px; font-weight:600; font-size:18px; color:var(--t); }
+#kc-cab .kc-marca small { font-weight:400; color:var(--g); font-size:14px; margin-left:8px; padding-left:12px; border-left:1px solid var(--l); }
+#kc-cab nav { display:flex; align-items:center; gap:28px; }
+#kc-cab nav a, #kc-cab nav button { color:var(--g); font:14px "IBM Plex Sans", system-ui, sans-serif; }
+#kc-cab nav a:hover, #kc-cab nav button:hover { color:var(--t); }
+#kc-cab .kc-aviso { font:12px "IBM Plex Mono", monospace; color:var(--g); }
+#kc-cab .kc-volver { color:var(--t) !important; }
+#kc-tema { display:inline-flex; align-items:center; gap:10px; background:none; border:0; padding:0; cursor:pointer; }
+.kc-pista { position:relative; width:34px; height:18px; box-sizing:border-box; border:1px solid var(--g); border-radius:9px; }
+.kc-perilla { position:absolute; top:2px; left:2px; width:12px; height:12px; border-radius:50%%; background:var(--g); transition:transform .15s; }
+#kc-tema[aria-checked="true"] .kc-pista { background:var(--t); border-color:var(--t); }
+#kc-tema[aria-checked="true"] .kc-perilla { transform:translateX(16px); background:var(--f); }
+/* --- la animación debajo de la cabecera --- */
+#codigo { top:%(alto)dpx !important; }
+#codbtn { top:%(boton)dpx !important; }
+/* --- estilo del sitio en la interfaz de la animación --- */
+* { font-style:normal !important; }
+#modos button, #cabeza, #cabeza button, #texto, #inicio, #inicio h1, #inicio h2, #inicio p, #estado, #barra, #pie, #codcab, #codbtn, #velS, #vctl, #pestBanda {
+  font-family:"IBM Plex Sans", system-ui, sans-serif !important; }
+#cont, #inicio .sub, #inicio .op .n, #inicio .pie, #estado .txt { font-family:"IBM Plex Mono", monospace !important; }
+#modos button { background:transparent !important; color:#6B6B6B !important; border-color:#D6D6D6 !important; font-size:15px !important; }
+#modos button.on { color:#161616 !important; border-color:#161616 !important; font-weight:500; }
+#modos button:not(.on):hover { color:#161616 !important; background:transparent !important; }
+#cabeza .sec { color:#6B6B6B !important; font-weight:400 !important; }
+#cabeza .sec.hecho { color:#3A3A3A !important; }
+#cabeza .sec.act { color:#161616 !important; font-weight:500 !important; border-color:#161616 !important; border-bottom-color:#161616 !important; }
+#cabeza .sec:hover { color:#161616 !important; }
+#regla { border-top:1px solid #161616 !important; }
+#regla2 { border-top:1px solid #D6D6D6 !important; }
+#inicio h1 { text-align:left !important; left:200px !important; font-weight:600 !important; font-size:34px !important; letter-spacing:-.5px; }
+#inicio .sub { text-align:left !important; left:200px !important; font-size:14px !important; color:#6B6B6B !important; }
+#inicio .op { border:1px solid #E2E2E2 !important; box-shadow:none !important; background:transparent !important; }
+#inicio .op:hover { border-color:#161616 !important; }
+#inicio .op h2 { text-align:left !important; margin:34px 36px 0 !important; font-weight:600 !important; font-size:28px !important; }
+#inicio .op p { text-align:left !important; margin:16px 36px 0 !important; font-size:18px !important; line-height:1.55 !important; color:#3A3A3A; }
+#inicio .op .n { text-align:left !important; left:36px !important; right:36px !important; font-size:13px !important; color:#6B6B6B !important; }
+#inicio .pie { text-align:left !important; left:200px !important; font-size:13px !important; }
+#estado { background:transparent !important; border-color:#E2E2E2 !important; }
+#codbtn { font-size:14px !important; }
+#codbtn:not(.on) { border-color:#D6D6D6 !important; }
+#codbtn.on { background:transparent !important; border-color:#161616 !important; color:#161616 !important; }
+/* --- modo oscuro --- */
+html.kc-oscuro { filter:invert(.93) hue-rotate(180deg); }
+html.kc-oscuro img, html.kc-oscuro image, html.kc-oscuro video, html.kc-oscuro canvas { filter:hue-rotate(180deg) invert(1) contrast(1.163); }
+html.kc-oscuro #kc-cab .kc-cero { stroke:#FF8255; }
 </style>
-"""
-CAPA_BODY = """<div class="kc-barra"><a href="{curso}">← Ket Cero</a><span>Versión preliminar: en revisión, puede tener errores</span><button id="kc-tema" type="button" role="switch" aria-checked="true">Modo oscuro<span class="kc-pista"><span class="kc-perilla"></span></span></button></div>
+""" % {"alto": KC_ALTO, "boton": KC_ALTO + 10}
+LOGO_KC = ('<svg width="34" height="24" viewBox="0 0 44 30" aria-hidden="true"><line x1="5" y1="3" x2="5" y2="27" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>'
+           '<ellipse class="kc-cero" cx="19" cy="15" rx="6" ry="11" fill="none" stroke="#C8502A" stroke-width="3"/>'
+           '<polyline points="31,3 39,15 31,27" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>')
+CAPA_BODY = """<header id="kc-cab"><a class="kc-marca" href="/">""" + LOGO_KC + """Ket Cero<small>Machine learning desde cero</small></a>
+<nav><span class="kc-aviso">Versión preliminar: en revisión, puede tener errores</span><a class="kc-volver" href="{curso}">← Volver al curso</a><a href="/cursos/">Cursos</a><a href="/omar/">Quién soy</a>
+<button id="kc-tema" type="button" role="switch" aria-checked="true">Modo oscuro<span class="kc-pista"><span class="kc-perilla"></span></span></button></nav></header>
 <script>
 (function () {
   var r = document.documentElement, b = document.getElementById("kc-tema");
@@ -242,10 +296,16 @@ CAPA_BODY = """<div class="kc-barra"><a href="{curso}">← Ket Cero</a><span>Ver
 
 def agregar_capa(ruta, curso):
     s = io.open(ruta, encoding="utf-8").read()
+    # la animación se escala en el alto que deja la cabecera y se baja esa misma altura
+    assert s.count("innerHeight") == 3 and "m.style.top = ((innerHeight" in s, ruta
+    s = s.replace("m.style.top = ((innerHeight", "m.style.top = KC_ALTO + ((innerHeight")
+    s = s.replace("innerHeight", "(innerHeight - KC_ALTO)")
     i = s.index("<head>") + len("<head>")
-    s = s[:i] + "\n" + CAPA_HEAD + s[i:]
-    j = s.rindex("</body>")
-    s = s[:j] + CAPA_BODY.replace("{curso}", curso) + s[j:]
+    s = s[:i] + "\n" + CAPA_TEMPRANA + s[i:]
+    j = s.index("</head>")
+    s = s[:j] + CAPA_HEAD + s[j:]
+    k = s.rindex("</body>")
+    s = s[:k] + CAPA_BODY.replace("{curso}", curso) + s[k:]
     io.open(ruta, "w", encoding="utf-8").write(s)
 
 

@@ -14,7 +14,46 @@
   // coma decimal y signo menos tipográfico
   const num = (v, d = 3) => (v < 0 ? "−" : "") + Math.abs(v).toFixed(d).replace(".", ",");
 
-  function montarCero(caja, D) {
+  // Panel de código que acompaña la animación: la línea que se ejecuta se resalta y su comentario lleva el valor real.
+  function montarCodigo(caja, D) {
+    const f = D.filtro_principal, n = D.indice_prueba;
+    const lineas = [
+      ["x = X_test[" + n + ", 0]", "el 0 escrito a mano, 28 × 28"],
+      ["w = cnn[0].weight[" + f + ", 0]", "filtro " + (f + 1) + " de la primera capa, 5 × 5"],
+      ["b = cnn[0].bias[" + f + "]", ""],
+      ["mapa = torch.zeros(24, 24)", ""],
+      ["for i in range(24):", ""],
+      ["    for j in range(24):", ""],
+      ["        ventana = x[i:i+5, j:j+5]", ""],
+      ["        mapa[i, j] = (ventana * w).sum() + b", ""],
+      ["mapas = cnn[0](X_test[" + n + ":" + (n + 1) + "])", "los 6 filtros a la vez"],
+      ["prob = F.softmax(cnn(X_test[" + n + ":" + (n + 1) + "]), 1)", ""],
+    ];
+    caja.innerHTML = "";
+    const pre = document.createElement("pre");
+    pre.className = "codigo-cero";
+    const filas = lineas.map(([codigo, nota], k) => {
+      const fila = document.createElement("div");
+      fila.className = "linea";
+      fila.innerHTML = '<span class="num">' + (k + 1) + '</span><span class="cod"></span><span class="nota"></span>';
+      fila.children[1].textContent = codigo;
+      fila.children[2].textContent = nota ? "# " + nota : "";
+      pre.appendChild(fila);
+      return fila;
+    });
+    caja.appendChild(pre);
+    const notas = lineas.map(l => l[1]);
+    return function marcar(activas, valores) {
+      filas.forEach((fila, k) => {
+        fila.classList.toggle("activa", activas.indexOf(k) >= 0);
+        const v = valores && valores[k];
+        fila.children[2].textContent = v ? "# " + v : notas[k] ? "# " + notas[k] : "";
+      });
+    };
+  }
+
+  function montarCero(caja, D, opciones) {
+    const marcar = opciones && opciones.codigo ? montarCodigo(opciones.codigo, D) : () => {};
     const f = D.filtro_principal, K = D.filtros[f], b = D.sesgos[f], X = D.entrada, MAPA = D.mapas[f];
     const topePos = Math.max(...MAPA.flat().filter(v => v > 0), 1e-6);
     const topeNeg = Math.max(...MAPA.flat().filter(v => v < 0).map(v => -v), 1e-6);
@@ -114,10 +153,12 @@
       ventana.setAttribute("opacity", 0); marca.setAttribute("opacity", 0);
       mini.setAttribute("opacity", 1);
       if (cual === "mapas") {
+        marcar([8], { 8: "6 mapas de 24 × 24, uno por filtro" });
         salida.setAttribute("opacity", 0);
         linea1.textContent = ancho < 860 ? "6 filtros, 6 mapas del mismo 0" : "los 6 filtros de conv1 dan 6 mapas: cada uno ve un borde distinto del 0";
         linea2.textContent = "coral: positivo · teal: negativo";
       } else {
+        marcar([9], { 9: "0 → " + num(D.probabilidades[0], 4) });
         linea1.textContent = ""; linea2.textContent = "";
         salida.setAttribute("opacity", 1);
         salida.textContent = `salida de la red:  0 → ${num(D.probabilidades[0], 4)}`;
@@ -130,6 +171,7 @@
         const i = Math.floor(k / 24), j = k % 24;
         ponerVentana(i, j);
         celdasMapa[k].setAttribute("fill", colorSigno(MAPA[i][j], topePos, topeNeg));
+        marcar([4, 5, 6, 7], { 4: "i = " + i, 5: "j = " + j, 6: "filas " + i + "–" + (i + 4) + ", columnas " + j + "–" + (j + 4), 7: "= " + num(z(i, j)) });
         if (ancho < 600) {
           linea1.textContent = `casilla (${i + 1}, ${j + 1}) = ${num(z(i, j))}`;
           linea2.textContent = "suma de 25 productos x·w + b";
