@@ -1,0 +1,10 @@
+// Cloudflare Workers sirve la carpeta sitio/ como sitio estático (sin código de servidor).
+{
+  "name": "ketcero",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": "./sitio",
+    "not_found_handling": "404-page",
+    "html_handling": "auto-trailing-slash"
+  }
+}

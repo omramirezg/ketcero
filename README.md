@@ -13,14 +13,14 @@ Sitio de [ketcero.com](https://ketcero.com): animaciones que muestran la ciencia
 2. Corre `python herramientas/construir.py`.
 3. Sube los cambios a GitHub: Cloudflare Pages publica solo.
 
-Ningún archivo puede pasar de 25 MB (límite de Cloudflare Pages); el script avisa si alguno se pasa.
+Ningún archivo puede pasar de 25 MB (límite de Cloudflare). Si una animación pesa más, el script saca sus datos grandes a `<animación>_datos/*.js` en pedazos de 15 MB, que la página carga antes de su código.
 
-## Publicar en Cloudflare Pages (una sola vez)
+## Publicar en Cloudflare (una sola vez)
 
-1. Crea un repositorio **público** en GitHub, por ejemplo `ketcero`, y sube esta carpeta.
-2. En Cloudflare: **Compute → Workers & Pages → Create → Pages → Connect to Git** y elige el repositorio.
-3. Configuración de compilación:
-   - Framework preset: **None**
+El sitio se publica como **Worker con archivos estáticos**: `wrangler.jsonc` le dice a Cloudflare que sirva la carpeta `sitio/`.
+
+1. En Cloudflare: **Compute → Workers & Pages → Create → Import a repository** y elige `omramirezg/ketcero`.
+2. Configuración:
    - Build command: *(vacío)*
-   - Build output directory: **`sitio`**
-4. Cuando termine, en el proyecto: **Custom domains → Set up a custom domain → `ketcero.com`** (y también `www.ketcero.com`).
+   - Deploy command: `npx wrangler deploy`
+3. Cuando termine, en el Worker: **Settings → Domains & Routes → Add → Custom domain → `ketcero.com`** (y también `www.ketcero.com`).

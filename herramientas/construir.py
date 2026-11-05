@@ -3,7 +3,7 @@
 Uso:  python herramientas/construir.py
 Vuelve a correrlo cada vez que cambie una animación o se agregue una nueva al CATALOGO.
 """
-import html, io, os, shutil
+import html, io, json, os, re, shutil
 from datetime import date
 
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -16,34 +16,13 @@ LIMITE_MB = 25  # Cloudflare Pages no acepta archivos más grandes
 # Cada tema: carpeta en /ia/, título, descripción y sus animaciones (ruta en el curso, título, descripción).
 CATALOGO = [
     ("cnn", "Redes convolucionales", "Cómo una CNN mira una imagen: filtros que recorren la foto, mapas, pooling y la decisión final, con dígitos de MNIST.", [
-        ("Semana_02/02_Clase_viernes_30_oct/1_Densa_vs_CNN_MNIST/Animacion_A1_la_ventana.html", "La ventana de 3 × 3", "Un filtro recorre el dígito y en cada posición multiplica y suma: así nace un mapa de características."),
-        ("Semana_02/02_Clase_viernes_30_oct/1_Densa_vs_CNN_MNIST/Animacion_A2_filtro_RGB.html", "Un filtro sobre una foto a color", "Con tres canales (rojo, verde y azul) el filtro también tiene tres capas, y sus resultados se suman."),
-        ("Semana_02/02_Clase_viernes_30_oct/1_Densa_vs_CNN_MNIST/Animacion_A3_de_la_imagen_a_la_prediccion.html", "De la imagen a la predicción", "El recorrido de una imagen por toda la red, hasta los puntajes de cada dígito."),
         ("Semana_02/02_Clase_viernes_30_oct/1_Densa_vs_CNN_MNIST/Animacion_A4_la_CNN_completa.html", "La CNN completa, por dentro", "La red entera con un lote real: convoluciones, pooling, aplanado, capa densa y la vuelta del entrenamiento."),
-        ("Semana_02/02_Clase_viernes_30_oct/1_Densa_vs_CNN_MNIST/Animacion_A5_canales_en_3D.html", "Los canales, en 3D", "Los mapas de cada filtro apilados en profundidad, para ver qué es un «canal»."),
-        ("Semana_02/02_Clase_viernes_30_oct/1_Densa_vs_CNN_MNIST/Animacion_A6_la_red_en_3D.html", "La red en 3D", "La arquitectura completa en tres dimensiones, capa por capa."),
-        ("Semana_02/02_Clase_viernes_30_oct/1_Densa_vs_CNN_MNIST/Animacion_A7_aplanar_a_densa_a_escala.html", "De aplanar a la densa, a escala", "Cómo los mapas se vuelven un vector largo y entran a la capa densa, con los tamaños reales."),
     ]),
-    ("transfer-learning", "Transfer learning", "Reutilizar una red que ya aprendió de millones de fotos para resolver un problema nuevo con pocos datos.", [
-        ("Semana_02/02_Clase_viernes_30_oct/2_Transfer_Hojas_de_cafe/Animacion_T_tres_competidores.html", "Los tres competidores", "Desde cero, red congelada o ajuste fino: la misma foto de una hoja de café y tres formas de aprender."),
-        ("Semana_02/02_Clase_viernes_30_oct/2_Transfer_Hojas_de_cafe/Animacion_T_transfer_learning_por_dentro.html", "Transfer learning por dentro: hojas de café", "ResNet18 preentrenada decidiendo si una hoja de café está sana o enferma, paso a paso."),
-        ("Semana_02/04_Complementarios/Transfer_Perros_vs_gatos/Animacion_T_transfer_learning_A.html", "Perros y gatos", "El caso clásico: una red de ImageNet adaptada para distinguir perros de gatos."),
-        ("Semana_02/04_Complementarios/Transfer_EuroSAT/Animacion_T_transfer_learning_C.html", "Imágenes de satélite (EuroSAT)", "Transfer learning cuando las fotos se parecen poco a las de ImageNet."),
-    ]),
-    ("zero-shot", "Zero-shot con CLIP", "Clasificar sin entrenar: un modelo que entiende imágenes y texto a la vez.", [
-        ("Semana_02/03_Asesoria_miercoles_4_nov/3_Zero_shot_GTSRB/Animacion_Z_CLIP_vs_CNN.html", "CLIP zero-shot contra una CNN entrenada", "Señales de tránsito: CLIP solo con descripciones en texto, frente a una CNN entrenada con miles de fotos."),
-    ]),
-    ("deteccion", "Detección de objetos", "Encontrar y encerrar objetos en una imagen: cajas, puntajes y cómo se mide si el detector es bueno.", [
-        ("Semana_03/02_Clase_viernes_6_nov/2_YOLO11_huecos/Animacion_B2_del_monton_de_cajas_al_mAP.html", "Del montón de cajas al mAP", "De miles de cajas candidatas a la métrica que resume qué tan bueno es un detector."),
-        ("Semana_03/02_Clase_viernes_6_nov/2_YOLO11_huecos/Animacion_B4_la_trampa_de_las_copias.html", "La trampa de las copias", "Por qué fotos casi repetidas entre entrenamiento y prueba inflan los resultados."),
-    ]),
-    ("llm", "Modelos de lenguaje", "Construir un modelo de lenguaje desde la idea más simple.", [
-        ("Temas_de_estudio_extra/04_Construir_mi_LLM/Animacion_Clase_01_el_bigrama.html", "El bigrama de letras", "El modelo de lenguaje más pequeño posible: predecir la siguiente letra contando parejas."),
-    ]),
-    ("aprendizaje-automatico", "Aprendizaje automático", "Los modelos clásicos, entendidos número por número.", [
-        ("Temas_de_estudio_extra/03_Ruta_ML_Engineer/Semana_01_Regresion_lineal/Animacion_regresion_lineal.html", "La regresión lineal: ¿cuánto vale una casa?", "Ajustar una recta a los datos con descenso de gradiente, paso a paso."),
+    ("deteccion", "Detección de objetos", "Encontrar y encerrar objetos en una imagen: cajas, puntajes y cómo aprende la red a ponerlas en el lugar correcto.", [
+        ("Semana_03/02_Clase_viernes_6_nov/1_Mini_YOLO_digitos_en_la_calle/Animacion_B1_Mini_YOLO_por_dentro.html", "Mini YOLO por dentro: dígitos en la calle", "Una red pequeña al estilo YOLO aprende a encontrar dígitos sobre fotos de la calle: los datos, la red al nacer, la ida, la vuelta y la predicción."),
     ]),
 ]
+PARTE_MB = 15  # tamaño de cada pedazo de datos cuando una animación pasa del límite
 
 PRONTO = [
     ("Física", "Movimiento, energía, ondas y campos, con las ecuaciones animadas."),
@@ -101,8 +80,48 @@ def mb(ruta):
     return os.path.getsize(ruta) / 1e6
 
 
+def partir(origen, destino):
+    """Para animaciones de más de LIMITE_MB: saca los datos grandes (const X = {...JSON...};) a archivos .js aparte.
+
+    Cada dato se guarda como texto JSON en pedazos de PARTE_MB, en <nombre>_datos/X_k.js; la página los carga
+    en orden antes de su código y los vuelve a armar con JSON.parse. El código de la animación no cambia.
+    """
+    s = io.open(origen, encoding="utf-8").read()
+    ini = s.index("<script>") + len("<script>")
+    fin = s.index("</script>", ini)
+    js = s[ini:fin]
+    carpeta = os.path.splitext(os.path.basename(destino))[0] + "_datos"
+    os.makedirs(os.path.join(os.path.dirname(destino), carpeta), exist_ok=True)
+    lector = json.JSONDecoder()
+    etiquetas, partes_js, cursor = [], [], 0
+    for m in re.finditer(r"(?m)^const (\w+) = ", js):
+        a = m.end()
+        try:
+            _, b = lector.raw_decode(js, a)
+        except ValueError:
+            continue
+        if (b - a) / 1e6 < 1:
+            continue
+        nombre, texto, paso = m.group(1), js[a:b], int(PARTE_MB * 1e6)
+        for k in range(0, len(texto), paso):
+            archivo = f"{nombre}_{k // paso}.js"
+            io.open(os.path.join(os.path.dirname(destino), carpeta, archivo), "w", encoding="utf-8").write(
+                "(window.__D = window.__D || {});\n"
+                f"(__D.{nombre} = __D.{nombre} || []).push({json.dumps(texto[k:k + paso], ensure_ascii=False)});\n")
+            etiquetas.append(f'<script src="{carpeta}/{archivo}"></script>')
+        partes_js += [js[cursor:a], f"JSON.parse(__D.{nombre}.join(''))"]
+        cursor = b
+    partes_js.append(js[cursor:])
+    nuevo = s[:ini - len("<script>")] + "\n".join(etiquetas) + "\n<script>" + "".join(partes_js) + s[fin:]
+    io.open(destino, "w", encoding="utf-8").write(nuevo)
+    pesos = [mb(destino)] + [mb(os.path.join(os.path.dirname(destino), carpeta, f)) for f in os.listdir(os.path.join(os.path.dirname(destino), carpeta))]
+    if max(pesos) > LIMITE_MB:
+        raise SystemExit(f"{os.path.basename(destino)}: un pedazo quedó de {max(pesos):.1f} MB; baja PARTE_MB")
+
+
 def copiar_animaciones():
     """Copia cada animación a /ia/<tema>/ con su nombre original (así siguen funcionando los enlaces entre ellas)."""
+    shutil.rmtree(os.path.join(SITIO, "ia"), ignore_errors=True)
     filas = []
     for clave, _, _, anims in CATALOGO:
         destino = os.path.join(SITIO, "ia", clave)
@@ -112,8 +131,9 @@ def copiar_animaciones():
             nombre = os.path.basename(fuente)
             peso = mb(origen)
             if peso > LIMITE_MB:
-                raise SystemExit(f"{nombre} pesa {peso:.1f} MB: pasa el límite de {LIMITE_MB} MB de Cloudflare Pages")
-            shutil.copy2(origen, os.path.join(destino, nombre))
+                partir(origen, os.path.join(destino, nombre))
+            else:
+                shutil.copy2(origen, os.path.join(destino, nombre))
             filas.append((clave, nombre, titulo, peso))
     return filas
 
