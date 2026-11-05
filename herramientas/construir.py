@@ -395,6 +395,18 @@ def construir_cursos():
     return pagina("Cursos · Ket Cero", "Cursos de machine learning desde cero, en español, con animaciones paso a paso.", "/cursos/", cuerpo, "/cursos/")
 
 
+def franja_portada():
+    """Pie de la primera pantalla: la última lección publicada, la señal para bajar y la siguiente en el orden del curso."""
+    orden = [(clave, lec) for clave, _, _, lecciones in TEMARIO for lec in lecciones]
+    k = max(i for i, (_, lec) in enumerate(orden) if "fuente" in lec)
+    ultima = orden[k][1]
+    proxima = next((lec for _, lec in orden[k + 1:] if "fuente" not in lec), None)
+    derecha = f'<span>Próxima: {html.escape(proxima["titulo"].split(":")[0])}</span>' if proxima else "<span></span>"
+    corto = lambda titulo: titulo.split(":")[0]
+    return (f'<div class="franja"><a href="{ultima["url"]}">Última lección: {html.escape(corto(ultima["titulo"]))} →</a>'
+            f'<a class="bajar" href="#lista-de-cursos">Cursos ↓</a>{derecha}</div>')
+
+
 def construir_inicio():
     cuerpo = f"""<div class="cuerpo">
 <main>
@@ -402,17 +414,22 @@ def construir_inicio():
 <div>
 <div class="mono">Actualizado el {ACTUALIZADO}</div>
 <h1>Machine learning desde cero, con cada operación a la vista.</h1>
-<p>Lecciones animadas paso a paso, hechas con los datos reales del entrenamiento: qué entra a la red, qué se multiplica, qué se suma y por qué al final acierta.</p>
+<p>Deja de imaginarte cómo funciona una red neuronal. Míralo. Lecciones animadas, número por número.</p>
 <a class="ir" href="/cursos/deep-learning/">Empezar el curso de Deep Learning →</a>
+<div id="codigo" class="panel-codigo"></div>
 </div>
+<div class="lado">
+<p class="explica">Una red ya entrenada mira un 0: su primer filtro busca bordes, casilla por casilla.</p>
 <div id="cero" class="cero"></div>
+</div>
+{franja_portada()}
 </section>
 <section class="tema" id="lista-de-cursos"><h2>Cursos</h2><p>Empieza por aquí.</p>{filas_cursos()}</section>
 </main>
 </div>
 <script src="/js/cero_datos.js"></script>
 <script src="/js/cero.js"></script>
-<script>montarCero(document.getElementById("cero"), window.DATOS_CERO);</script>"""
+<script>montarCero(document.getElementById("cero"), window.DATOS_CERO, {{ codigo: document.getElementById("codigo") }});</script>"""
     return pagina("Ket Cero · Machine learning desde cero",
                   "Machine learning desde cero, en español: cursos con lecciones animadas paso a paso hechas con los datos reales del entrenamiento.",
                   "/", cuerpo, "/")

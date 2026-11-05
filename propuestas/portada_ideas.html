@@ -41,6 +41,17 @@ main .portada { padding-bottom:80px; }
 .codigo-cero .activa { background:var(--marca); border-left-color:var(--tinta); }
 .codigo-cero .activa .cod { color:var(--tinta); }
 .codigo-cero .activa .nota { color:var(--tinta); }
+/* la animación reserva abajo el sitio de los 6 mapas: se baja la mitad de ese hueco para que lo visible quede centrado */
+.lado { position:relative; top:58px; }
+@media (max-width: 1180px) { .lado { top:0; } }
+/* colores de VS Code: Dark+ en modo oscuro, Light+ en modo claro */
+.codigo-cero { --c-clave:#C586C0; --c-funcion:#DCDCAA; --c-modulo:#4EC9B0; --c-var:#9CDCFE; --c-num:#B5CEA8; --c-com:#6A9955; --c-texto:#D4D4D4; }
+:root[data-tema="claro"] .codigo-cero { --c-clave:#AF00DB; --c-funcion:#795E26; --c-modulo:#267F99; --c-var:#001080; --c-num:#098658; --c-com:#008000; --c-texto:#1F1F1F; }
+.codigo-cero .cod { color:var(--c-texto); }
+.codigo-cero .t-clave { color:var(--c-clave); } .codigo-cero .t-funcion { color:var(--c-funcion); }
+.codigo-cero .t-modulo { color:var(--c-modulo); } .codigo-cero .t-var { color:var(--c-var); } .codigo-cero .t-num { color:var(--c-num); }
+.codigo-cero .nota, .codigo-cero .activa .nota { color:var(--c-com); }
+.codigo-cero .activa .cod { color:var(--c-texto); }
 </style>
 </head>
 <body>

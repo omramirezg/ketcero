@@ -37,17 +37,22 @@
 <div>
 <div class="mono">Actualizado el 5 de noviembre de 2026</div>
 <h1>Machine learning desde cero, con cada operación a la vista.</h1>
-<p>Lecciones animadas paso a paso, hechas con los datos reales del entrenamiento: qué entra a la red, qué se multiplica, qué se suma y por qué al final acierta.</p>
+<p>Deja de imaginarte cómo funciona una red neuronal. Míralo. Lecciones animadas, número por número.</p>
 <a class="ir" href="/cursos/deep-learning/">Empezar el curso de Deep Learning →</a>
+<div id="codigo" class="panel-codigo"></div>
 </div>
+<div class="lado">
+<p class="explica">Una red ya entrenada mira un 0: su primer filtro busca bordes, casilla por casilla.</p>
 <div id="cero" class="cero"></div>
+</div>
+<div class="franja"><a href="/ia/deteccion/Animacion_B1_Mini_YOLO_por_dentro.html">Última lección: Mini-YOLO por dentro →</a><a class="bajar" href="#lista-de-cursos">Cursos ↓</a><span>Próxima: YOLO11 encuentra huecos en la calle</span></div>
 </section>
 <section class="tema" id="lista-de-cursos"><h2>Cursos</h2><p>Empieza por aquí.</p><a class="fila curso" href="/cursos/deep-learning/"><div class="n">01</div><div><b>Deep Learning</b><p>Redes neuronales profundas en el orden de las sesiones del curso: de las redes densas a los transformers. Cada lección es una animación paso a paso con los datos reales del entrenamiento.</p><div class="d">6 temas · 2 lecciones publicadas</div></div></a></section>
 </main>
 </div>
 <script src="/js/cero_datos.js"></script>
 <script src="/js/cero.js"></script>
-<script>montarCero(document.getElementById("cero"), window.DATOS_CERO);</script>
+<script>montarCero(document.getElementById("cero"), window.DATOS_CERO, { codigo: document.getElementById("codigo") });</script>
 <footer><div class="in"><span>Ket Cero · un proyecto de <a href="/omar/">Omar Ramírez González</a></span><span>ketcero.com</span></div></footer>
 <script>
 (function () {

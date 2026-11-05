@@ -35,7 +35,7 @@ nav button { display:inline-flex; align-items:center; gap:10px; vertical-align:m
 .cajon li a em { font-style:normal; font:12px/1.6 "IBM Plex Mono", monospace; }
 .cajon li a span { padding-top:2px; }
 
-.cuerpo { max-width:1240px; margin:0 auto; padding:0 32px; display:grid; grid-template-columns: 1fr; }
+.cuerpo { max-width:1240px; margin:0 auto; padding:0 32px; display:grid; grid-template-columns:minmax(0,1fr); }
 .cuerpo.solo { grid-template-columns: 1fr; max-width:820px; }
 .izq { display:flex; align-items:center; gap:18px; }
 .hamb { width:40px; height:40px; display:inline-flex; flex-direction:column; justify-content:center; gap:5px; padding:0 10px; background:none; border:1px solid var(--linea); border-radius:4px; cursor:pointer; }
@@ -118,3 +118,42 @@ footer .in { max-width:1240px; margin:0 auto; padding:24px 32px 48px; display:fl
 :root:not([data-tema="claro"]) .fila.pub:hover img { filter:none; }
 .aviso { margin-top:16px !important; padding:10px 14px; border:1px solid var(--linea); border-left:2px solid var(--gris); font-size:15px !important; color:var(--gris) !important; max-width:700px; }
 @media (min-width: 901px) { main .portada { min-height:calc(100vh - 65px - 40px); padding-bottom:40px; box-sizing:border-box; } }
+
+/* Portada: más ancha, panel de código a la izquierda, animación centrada y franja al pie de la primera pantalla */
+.cuerpo { max-width:1360px; }
+footer .in { max-width:1360px; }
+.portada { grid-template-columns:minmax(0,1fr) 640px; position:relative; }
+.cabeza .explica { margin:0 0 18px; font-size:15px; color:var(--gris); max-width:560px; }
+.lado { position:relative; top:58px; }  /* la animación reserva abajo el sitio de los 6 mapas: se baja la mitad de ese hueco */
+main .portada { padding-bottom:80px; }
+.franja { position:absolute; left:0; right:0; bottom:0; display:grid; grid-template-columns:1fr auto 1fr; align-items:center;
+  border-top:1px solid var(--linea); padding:14px 0; font:13px "IBM Plex Mono", monospace; color:var(--gris); }
+.franja a { color:var(--gris); } .franja a:hover { color:var(--tinta); }
+.franja span { text-align:right; }
+.franja .bajar { color:var(--tinta); }
+.portada > div { min-width:0; }
+.panel-codigo { margin-top:36px; border:1px solid var(--linea); padding:14px 0; max-width:640px; }
+.codigo-cero { margin:0; font:12.5px/1.75 "IBM Plex Mono", monospace; overflow-x:auto; }
+.codigo-cero .linea { display:grid; grid-template-columns:36px max-content 1fr; gap:0 18px; padding:0 16px 0 0; border-left:2px solid transparent; white-space:pre; }
+.codigo-cero .num { text-align:right; color:var(--gris); opacity:.6; }
+.codigo-cero .activa { background:var(--marca); border-left-color:var(--tinta); }
+/* colores de VS Code: Dark+ en modo oscuro, Light+ en modo claro (solo el código lleva color) */
+.codigo-cero { --c-clave:#C586C0; --c-funcion:#DCDCAA; --c-modulo:#4EC9B0; --c-var:#9CDCFE; --c-num:#B5CEA8; --c-com:#6A9955; --c-texto:#D4D4D4; }
+:root[data-tema="claro"] .codigo-cero { --c-clave:#AF00DB; --c-funcion:#795E26; --c-modulo:#267F99; --c-var:#001080; --c-num:#098658; --c-com:#008000; --c-texto:#1F1F1F; }
+.codigo-cero .cod { color:var(--c-texto); }
+.codigo-cero .t-clave { color:var(--c-clave); } .codigo-cero .t-funcion { color:var(--c-funcion); }
+.codigo-cero .t-modulo { color:var(--c-modulo); } .codigo-cero .t-var { color:var(--c-var); } .codigo-cero .t-num { color:var(--c-num); }
+.codigo-cero .nota { color:var(--c-com); }
+@media (max-width: 1180px) {
+  .portada { grid-template-columns:minmax(0,1fr); gap:32px; }
+  .lado { top:0; }
+  .franja { position:static; margin-top:32px; }
+}
+@media (max-width: 900px) {
+  .franja { grid-template-columns:1fr; gap:6px; }
+  .franja span { text-align:left; }
+  .portada { grid-template-columns:minmax(0,1fr); gap:28px; }
+  .codigo-cero { font-size:11px; }
+}
+.panel-codigo { max-width:min(640px, 100%); overflow:hidden; }
+@media (max-width: 900px) { .panel-codigo { display:none; } }

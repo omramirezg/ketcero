@@ -14,6 +14,18 @@
   // coma decimal y signo menos tipográfico
   const num = (v, d = 3) => (v < 0 ? "−" : "") + Math.abs(v).toFixed(d).replace(".", ",");
 
+  // Colores de sintaxis al estilo de VS Code: palabras clave, funciones, módulos, variables y números.
+  const PALABRAS = /^(for|in|import|from|def|return|if|else)$/, MODULOS = /^(torch|F|nn)$/;
+  function colorear(codigo) {
+    const fuera = t => t.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+    return codigo.replace(/([A-Za-z_]\w*)(\s*\()?|(\d+)|([^A-Za-z_\d]+)/g, (m, nombre, parentesis, numero, resto) => {
+      if (numero) return '<span class="t-num">' + numero + "</span>";
+      if (resto) return fuera(resto);
+      const clase = PALABRAS.test(nombre) ? "t-clave" : MODULOS.test(nombre) ? "t-modulo" : parentesis ? "t-funcion" : "t-var";
+      return '<span class="' + clase + '">' + nombre + "</span>" + (parentesis || "");
+    });
+  }
+
   // Panel de código que acompaña la animación: la línea que se ejecuta se resalta y su comentario lleva el valor real.
   function montarCodigo(caja, D) {
     const f = D.filtro_principal, n = D.indice_prueba;
@@ -36,7 +48,7 @@
       const fila = document.createElement("div");
       fila.className = "linea";
       fila.innerHTML = '<span class="num">' + (k + 1) + '</span><span class="cod"></span><span class="nota"></span>';
-      fila.children[1].textContent = codigo;
+      fila.children[1].innerHTML = colorear(codigo);
       fila.children[2].textContent = nota ? "# " + nota : "";
       pre.appendChild(fila);
       return fila;
@@ -173,10 +185,10 @@
         celdasMapa[k].setAttribute("fill", colorSigno(MAPA[i][j], topePos, topeNeg));
         marcar([4, 5, 6, 7], { 4: "i = " + i, 5: "j = " + j, 6: "filas " + i + "–" + (i + 4) + ", columnas " + j + "–" + (j + 4), 7: "= " + num(z(i, j)) });
         if (ancho < 600) {
-          linea1.textContent = `casilla (${i + 1}, ${j + 1}) = ${num(z(i, j))}`;
+          linea1.textContent = `mapa[${i}, ${j}] = ${num(z(i, j))}`;
           linea2.textContent = "suma de 25 productos x·w + b";
         } else {
-          linea1.textContent = `casilla (${i + 1}, ${j + 1}): suma de 25 productos + b = ${num(z(i, j))}`;
+          linea1.textContent = `mapa[${i}, ${j}] = suma de 25 productos + b = ${num(z(i, j))}`;
           linea2.textContent = "z = Σ x·w + b   ·   coral: positivo · teal: negativo";
         }
         k++;
