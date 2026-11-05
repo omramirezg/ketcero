@@ -129,8 +129,6 @@ def pagina(titulo, descripcion, ruta, cuerpo, actual="", extra_head=""):
 <aside id="cajon" class="cajon" aria-label="Temario">
 <p class="t">Temario</p>
 <ol>{temas}</ol>
-<p class="t">Autor</p>
-<p><a href="/omar/">{AUTOR}</a></p>
 </aside>
 {cuerpo}
 <footer><div class="in"><span>Ket Cero · un proyecto de <a href="/omar/">{AUTOR}</a></span><span>ketcero.com</span></div></footer>
