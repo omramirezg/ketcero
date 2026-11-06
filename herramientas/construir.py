@@ -21,6 +21,24 @@ ACTUALIZADO = "5 de noviembre de 2026"
 # Cloudflare Web Analytics: pega aquí el token que da el panel (ver notas/PASOS_GOOGLE_Y_ANALITICA.md); vacío = sin analítica
 ANALITICA = ""
 
+# Lección de los tipos de segmentación (sesión 4): va antes de la U-Net. Imagen fija; el clip se graba aparte.
+TIPOS_SEGMENTACION = {
+    "titulo": "Tipos de segmentación: semántica, de instancias y panóptica",
+    "slug": "tipos-de-segmentacion",
+    "fuente": "Semana_03/02_Clase_viernes_6_nov/3_UNet_edificios_satelite/Animacion_U0_tipos_de_segmentacion.html",
+    "miniatura": "tipos-segmentacion.jpg", "fotos": "jpeg",
+    "alt": "La misma foto satelital segmentada de tres formas distintas",
+    "desc": "La misma foto, tres tareas: qué cambia entre clasificar, detectar y segmentar, y en qué se diferencian la segmentación semántica, la de instancias y la panóptica.",
+    "datos": "14 pasos", "pasos": 14, "minutos": 15,
+    "aprender": [
+        "Qué es segmentar: darle una respuesta a cada píxel, frente a clasificar la foto o encerrar objetos en cajas.",
+        "Segmentación semántica, de instancias y panóptica: qué responde cada una para el mismo píxel.",
+        "Binaria, multiclase y multietiqueta: cuántos canales tiene la salida y qué función se usa en cada caso (sigmoide o softmax).",
+        "Qué cambia en el código entre los tres casos: la capa de salida, la pérdida y cómo se decide cada píxel.",
+    ],
+    "requisitos": "Saber qué es una convolución ayuda; la lección no necesita nada más.",
+}
+
 # Lección de U-Net (sesión 4, segmentación). La imagen fija sale de entrenar/10; el clip se graba aparte.
 UNET_PREPARADA = {
     "titulo": "U-Net por dentro: edificios en fotos satelitales",
@@ -86,8 +104,9 @@ TEMARIO = [
         {"titulo": "YOLO11 encuentra huecos en la calle"},
     ]),
     ("segmentacion", "Segmentación de imágenes", "Etiquetar cada píxel de una imagen, no solo encerrar el objeto en una caja.", [
-        {"titulo": "Cómo se etiquetan las imágenes para entrenar"},
+        TIPOS_SEGMENTACION,
         UNET_PREPARADA,
+        {"titulo": "Cómo se etiquetan las imágenes para entrenar"},
     ]),
     ("generativos-secuencias", "Modelos generativos y secuencias", "Redes que inventan imágenes y redes que leen datos en orden.", [
         {"titulo": "GANs: dos redes que compiten"},

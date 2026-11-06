@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.dataset.tema=t}catch(e){}</script>
+<title>Tipos de segmentación: semántica, de instancias y panóptica · Ket Cero</title>
+<meta name="description" content="La misma foto, tres tareas: qué cambia entre clasificar, detectar y segmentar, y en qué se diferencian la segmentación semántica, la de instancias y la panóptica.">
+<meta name="author" content="Omar Ramírez González">
+<link rel="canonical" href="https://ketcero.com/cursos/deep-learning/tipos-de-segmentacion/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="alternate icon" href="/favicon.ico">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Ket Cero">
+<meta property="og:title" content="Tipos de segmentación: semántica, de instancias y panóptica · Ket Cero">
+<meta property="og:description" content="La misma foto, tres tareas: qué cambia entre clasificar, detectar y segmentar, y en qué se diferencian la segmentación semántica, la de instancias y la panóptica.">
+<meta property="og:url" content="https://ketcero.com/cursos/deep-learning/tipos-de-segmentacion/">
+<meta property="og:image" content="https://ketcero.com/img/compartir.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Ket Cero: un 0 escrito a mano y lo que ve un filtro de la red">
+<meta property="og:locale" content="es_CO">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preload" href="/fuentes/IBMPlexSans-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/kc/fuentes.css?v=63f628749e">
+<link rel="stylesheet" href="/estilo.css?v=05ee266470">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "LearningResource",
+ "name": "Tipos de segmentación: semántica, de instancias y panóptica",
+ "description": "La misma foto, tres tareas: qué cambia entre clasificar, detectar y segmentar, y en qué se diferencian la segmentación semántica, la de instancias y la panóptica.",
+ "url": "https://ketcero.com/cursos/deep-learning/tipos-de-segmentacion/",
+ "inLanguage": "es",
+ "learningResourceType": "Animación interactiva",
+ "educationalLevel": "Universitario",
+ "timeRequired": "PT15M",
+ "teaches": [
+  "Qué es segmentar: darle una respuesta a cada píxel, frente a clasificar la foto o encerrar objetos en cajas.",
+  "Segmentación semántica, de instancias y panóptica: qué responde cada una para el mismo píxel.",
+  "Binaria, multiclase y multietiqueta: cuántos canales tiene la salida y qué función se usa en cada caso (sigmoide o softmax).",
+  "Qué cambia en el código entre los tres casos: la capa de salida, la pérdida y cómo se decide cada píxel."
+ ],
+ "image": "https://ketcero.com/img/tipos-segmentacion.webp",
+ "author": {
+  "@type": "Person",
+  "name": "Omar Ramírez González",
+  "url": "https://ketcero.com/omar/"
+ },
+ "isPartOf": {
+  "@type": "Course",
+  "name": "Deep Learning",
+  "url": "https://ketcero.com/cursos/deep-learning/"
+ }
+}
+</script>
+</head>
+<body>
+<a class="saltar" href="#contenido">Saltar al contenido</a>
+<header><div class="in">
+<div class="izq"><button id="menu" class="hamb" type="button" aria-expanded="false" aria-controls="cajon" aria-label="Abrir los cursos"><span></span><span></span><span></span></button>
+<a class="marca" href="/" aria-label="Ket Cero, inicio"><svg width="34" height="24" viewBox="0 0 44 30" aria-hidden="true"><line x1="5" y1="3" x2="5" y2="27" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><ellipse cx="19" cy="15" rx="6" ry="11" fill="none" stroke="#C8502A" stroke-width="3"/><polyline points="31,3 39,15 31,27" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>Ket Cero<small>Machine learning desde cero</small></a></div>
+<nav aria-label="Principal"><div class="desplegable"><button id="cursos" type="button" aria-expanded="false" aria-controls="lista-cursos" aria-current="page">Cursos</button><div id="lista-cursos" class="lista" hidden><a href="/cursos/deep-learning/">Deep Learning<small>6 temas · 4 lecciones</small></a></div></div><a href="/omar/">Quién soy</a><button id="tema" type="button" role="switch" aria-checked="true"><span>Modo oscuro</span><span class="pista"><span class="perilla"></span></span></button></nav>
+</div></header>
+<div id="velo" class="velo" hidden></div>
+<aside id="cajon" class="cajon" aria-label="Cursos">
+<p class="t">Deep Learning</p><ol><li><a href="/cursos/deep-learning/#redes-profundas"><em>1</em>Redes neuronales profundas<span>0</span></a></li><li><a href="/cursos/deep-learning/#cnn"><em>2</em>Redes convolucionales<span>1</span></a></li><li><a href="/cursos/deep-learning/#deteccion"><em>3</em>Detección de objetos<span>1</span></a></li><li><a href="/cursos/deep-learning/#segmentacion"><em>4</em>Segmentación de imágenes<span>2</span></a></li><li><a href="/cursos/deep-learning/#generativos-secuencias"><em>5</em>Modelos generativos y secuencias<span>0</span></a></li><li><a href="/cursos/deep-learning/#transformers-grafos"><em>6</em>Transformers y redes de grafos<span>0</span></a></li></ol>
+</aside>
+<div class="cuerpo solo leccion">
+<main id="contenido">
+<section class="cabeza">
+<div class="mono"><a href="/cursos/">Cursos</a> / <a href="/cursos/deep-learning/">Deep Learning</a> / <a href="/cursos/deep-learning/#segmentacion">Segmentación de imágenes</a> · lección 4.1</div>
+<h1>Tipos de segmentación: semántica, de instancias y panóptica</h1>
+<p>La misma foto, tres tareas: qué cambia entre clasificar, detectar y segmentar, y en qué se diferencian la segmentación semántica, la de instancias y la panóptica.</p>
+<div class="acciones"><a class="boton" href="/ia/segmentacion/Animacion_U0_tipos_de_segmentacion" data-abre-animacion>Abrir la animación →</a>
+<a id="seguir" class="ir" hidden data-leccion="tipos-de-segmentacion" data-animacion="/ia/segmentacion/Animacion_U0_tipos_de_segmentacion" data-abre-animacion href="/ia/segmentacion/Animacion_U0_tipos_de_segmentacion"></a></div>
+<p class="aviso">Versión preliminar: todavía está en revisión y puede tener errores.</p>
+</section>
+<a class="figura" href="/ia/segmentacion/Animacion_U0_tipos_de_segmentacion" data-abre-animacion><img src="/img/tipos-segmentacion.webp?v=5acbbf9b62" alt="La misma foto satelital segmentada de tres formas distintas" width="940" height="587" loading="lazy"></a>
+<section class="ficha">
+<h2>Qué vas a aprender</h2>
+<ul><li>Qué es segmentar: darle una respuesta a cada píxel, frente a clasificar la foto o encerrar objetos en cajas.</li><li>Segmentación semántica, de instancias y panóptica: qué responde cada una para el mismo píxel.</li><li>Binaria, multiclase y multietiqueta: cuántos canales tiene la salida y qué función se usa en cada caso (sigmoide o softmax).</li><li>Qué cambia en el código entre los tres casos: la capa de salida, la pérdida y cómo se decide cada píxel.</li></ul>
+<h2>Antes de empezar</h2>
+<p>Saber qué es una convolución ayuda; la lección no necesita nada más.</p>
+<h2>Cuánto dura</h2>
+<p>14 pasos. A tu ritmo, unos 15 minutos. Avanza con las flechas del teclado o con los botones de abajo; Ctrl + rueda del mouse acerca el dibujo.</p>
+</section>
+<nav class="vecinas" aria-label="Lecciones"><a href="/cursos/deep-learning/mini-yolo-digitos-en-la-calle/">← Mini-YOLO por dentro: dígitos en la calle</a><a href="/cursos/deep-learning/unet-edificios-en-fotos-satelitales/">U-Net por dentro: edificios en fotos satelitales →</a></nav>
+</main>
+</div>
+<div id="cargando" class="cargando" role="status" hidden><div><svg width="34" height="24" viewBox="0 0 44 30" aria-hidden="true"><line x1="5" y1="3" x2="5" y2="27" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><ellipse cx="19" cy="15" rx="6" ry="11" fill="none" stroke="#C8502A" stroke-width="3"/><polyline points="31,3 39,15 31,27" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><p>Cargando la animación…</p><small>Trae los datos reales de cada paso: la primera vez tarda unos segundos.</small></div></div>
+<footer><div class="in"><span>Ket Cero · un proyecto de <a href="/omar/">Omar Ramírez González</a></span><span>ketcero.com</span></div></footer>
+<script>
+(function () {
+  var b = document.getElementById("tema"), r = document.documentElement;
+  function oscuro() { return r.dataset.tema !== "claro"; }  // oscuro por defecto
+  function rotulo() { b.setAttribute("aria-checked", oscuro() ? "true" : "false"); }
+  b.addEventListener("click", function () {
+    r.dataset.tema = oscuro() ? "claro" : "oscuro";
+    try { localStorage.setItem("tema", r.dataset.tema); } catch (e) {}
+    rotulo();
+  });
+  rotulo();
+})();
+(function () {
+  var m = document.getElementById("menu"), c = document.getElementById("cajon"), v = document.getElementById("velo");
+  function medir() {
+    var raya = document.querySelector(".marca small");
+    var x = raya && raya.offsetParent ? raya.getBoundingClientRect().left : 0;
+    document.documentElement.style.setProperty("--ancho-cajon", x > 200 ? x + "px" : "86vw");
+  }
+  medir();
+  addEventListener("resize", medir);
+  function poner(abierto) {
+    m.setAttribute("aria-expanded", abierto ? "true" : "false");
+    c.classList.toggle("abierto", abierto);
+    v.hidden = !abierto;
+    if (abierto) c.querySelector("a").focus();
+  }
+  m.addEventListener("click", function () { poner(m.getAttribute("aria-expanded") !== "true"); });
+  v.addEventListener("click", function () { poner(false); });
+  c.addEventListener("click", function (e) { if (e.target.closest("a")) poner(false); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !v.hidden) { poner(false); m.focus(); } });
+})();
+(function () {
+  var b = document.getElementById("cursos"), l = document.getElementById("lista-cursos");
+  function poner(abierto) { b.setAttribute("aria-expanded", abierto ? "true" : "false"); l.hidden = !abierto; }
+  b.addEventListener("click", function (e) { e.stopPropagation(); poner(l.hidden); });
+  document.addEventListener("click", function (e) { if (!l.hidden && !l.contains(e.target)) poner(false); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !l.hidden) { poner(false); b.focus(); } });
+})();
+(function () {
+  // lecciones ya abiertas (las marca la capa de las animaciones) y «seguir donde quedaste»
+  var vistas = [];
+  try { vistas = JSON.parse(localStorage.getItem("kc-vistas") || "[]"); } catch (e) {}
+  [].forEach.call(document.querySelectorAll("[data-leccion]"), function (el) {
+    if (vistas.indexOf(el.getAttribute("data-leccion")) < 0 || el.id === "seguir") return;
+    var s = document.createElement("span"); s.className = "vista"; s.textContent = "vista";
+    (el.querySelector(".d") || el).appendChild(s);
+  });
+  var seguir = document.getElementById("seguir");
+  if (seguir) try {
+    var h = localStorage.getItem("kc-paso-" + seguir.getAttribute("data-leccion"));
+    if (h && /^#[a-z_0-9]+\/\d+$/.test(h)) {
+      var p = h.slice(1).split("/");
+      seguir.href = seguir.getAttribute("data-animacion") + h;
+      seguir.textContent = "Seguir donde quedaste: " + p[0] + ", paso " + p[1] + " →";
+      seguir.hidden = false;
+    }
+  } catch (e) {}
+})();
+(function () {
+  // «Cargando la animación…» mientras el navegador trae una animación pesada
+  var c = document.getElementById("cargando");
+  document.addEventListener("click", function (e) {
+    var a = e.target.closest && e.target.closest("a[data-abre-animacion]");
+    if (a && c && e.button === 0 && !e.ctrlKey && !e.metaKey && !e.shiftKey) c.hidden = false;
+  });
+  addEventListener("pageshow", function () { if (c) c.hidden = true; });
+})();
+</script>
+<script>
+(function () {
+  var quieto = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  document.querySelectorAll("video.clip").forEach(function (v) {
+    if (quieto) { v.removeAttribute("autoplay"); v.pause(); return; }
+    // más rápido que el clip grabado: cada paso dura ~1,3 s en vez de 2,6 s
+    v.defaultPlaybackRate = 2; v.playbackRate = 2;
+    v.addEventListener("play", function () { v.playbackRate = 2; });
+    if (!v.hasAttribute("data-al-pasar")) return;
+    var fila = v.closest("a") || v;
+    fila.addEventListener("mouseenter", function () { v.play().catch(function () {}); });
+    fila.addEventListener("mouseleave", function () { v.pause(); });
+  });
+})();
+</script>
+</body>
+</html>
