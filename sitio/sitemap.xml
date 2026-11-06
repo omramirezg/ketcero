@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-<url><loc>https://ketcero.com/</loc><lastmod>2026-11-05</lastmod></url>
-<url><loc>https://ketcero.com/cursos/</loc><lastmod>2026-11-05</lastmod></url>
-<url><loc>https://ketcero.com/cursos/deep-learning/</loc><lastmod>2026-11-05</lastmod></url>
-<url><loc>https://ketcero.com/cursos/deep-learning/la-cnn-completa/</loc><lastmod>2026-11-05</lastmod></url>
-<url><loc>https://ketcero.com/cursos/deep-learning/mini-yolo-digitos-en-la-calle/</loc><lastmod>2026-11-05</lastmod></url>
-<url><loc>https://ketcero.com/omar/</loc><lastmod>2026-11-05</lastmod></url>
-<url><loc>https://ketcero.com/ia/cnn/Animacion_A4_la_CNN_completa</loc><lastmod>2026-11-05</lastmod></url>
-<url><loc>https://ketcero.com/ia/deteccion/Animacion_B1_Mini_YOLO_por_dentro</loc><lastmod>2026-11-05</lastmod></url>
+<url><loc>https://ketcero.com/</loc><lastmod>2026-11-06</lastmod></url>
+<url><loc>https://ketcero.com/cursos/</loc><lastmod>2026-11-06</lastmod></url>
+<url><loc>https://ketcero.com/cursos/deep-learning/</loc><lastmod>2026-11-06</lastmod></url>
+<url><loc>https://ketcero.com/cursos/deep-learning/la-cnn-completa/</loc><lastmod>2026-11-06</lastmod></url>
+<url><loc>https://ketcero.com/cursos/deep-learning/mini-yolo-digitos-en-la-calle/</loc><lastmod>2026-11-06</lastmod></url>
+<url><loc>https://ketcero.com/cursos/deep-learning/unet-edificios-en-fotos-satelitales/</loc><lastmod>2026-11-06</lastmod></url>
+<url><loc>https://ketcero.com/omar/</loc><lastmod>2026-11-06</lastmod></url>
+<url><loc>https://ketcero.com/ia/cnn/Animacion_A4_la_CNN_completa</loc><lastmod>2026-11-06</lastmod></url>
+<url><loc>https://ketcero.com/ia/deteccion/Animacion_B1_Mini_YOLO_por_dentro</loc><lastmod>2026-11-06</lastmod></url>
+<url><loc>https://ketcero.com/ia/segmentacion/Animacion_U1_UNet_por_dentro</loc><lastmod>2026-11-06</lastmod></url>
 </urlset>

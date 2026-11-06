@@ -21,6 +21,25 @@ ACTUALIZADO = "5 de noviembre de 2026"
 # Cloudflare Web Analytics: pega aquí el token que da el panel (ver notas/PASOS_GOOGLE_Y_ANALITICA.md); vacío = sin analítica
 ANALITICA = ""
 
+# Lección de U-Net (sesión 4, segmentación). La imagen fija sale de entrenar/10; el clip se graba aparte.
+UNET_PREPARADA = {
+    "titulo": "U-Net por dentro: edificios en fotos satelitales",
+    "slug": "unet-edificios-en-fotos-satelitales",
+    "fuente": "Semana_03/02_Clase_viernes_6_nov/3_UNet_edificios_satelite/Animacion_U1_UNet_por_dentro.html",
+    "miniatura": "unet.jpg", "fotos": "jpeg",  # fotos satelitales en JPEG; los mapas de la red son PNG
+    "alt": "La U-Net marca píxel por píxel los edificios de una foto satelital",
+    "desc": "Una U-Net aprende a pintar, píxel por píxel, dónde hay edificios en fotos satelitales: el camino que baja, el que sube y los atajos que los unen.",
+    "datos": "131 pasos entrenar · 41 predecir · 50 épocas", "pasos": 131 + 41, "minutos": 45,
+    "aprender": [
+        "Cómo baja la U-Net (convolución, BatchNorm, ReLU y max pool) y por qué guarda lo de cada nivel para el salto.",
+        "Qué hace la convolución transpuesta: cada casilla se abre en un bloque de 2 × 2.",
+        "Qué es pegar el salto: los canales que suben y los del salto, uno detrás de otro.",
+        "Por qué se usa BCE + Dice cuando solo el 14 % de los píxeles es edificio, y por qué la exactitud engaña.",
+        "Cómo el gradiente se parte en cada concatenación y se suma en la bajada, y cómo AdamW mueve cada peso.",
+    ],
+    "requisitos": "Haber visto «La CNN completa, por dentro»: la U-Net usa las mismas convoluciones y pooling, y agrega el camino de subida.",
+}
+
 # Temario de machine learning. Cada tema: (carpeta en /ia/, título, descripción, lecciones).
 # Lección publicada: dict con fuente (ruta en el curso), slug de su página, miniatura, descripción, datos,
 # qué se aprende, requisitos y minutos aproximados. Lección pendiente: solo el título.
@@ -68,7 +87,7 @@ TEMARIO = [
     ]),
     ("segmentacion", "Segmentación de imágenes", "Etiquetar cada píxel de una imagen, no solo encerrar el objeto en una caja.", [
         {"titulo": "Cómo se etiquetan las imágenes para entrenar"},
-        {"titulo": "Segmentación semántica, píxel por píxel"},
+        UNET_PREPARADA,
     ]),
     ("generativos-secuencias", "Modelos generativos y secuencias", "Redes que inventan imágenes y redes que leen datos en orden.", [
         {"titulo": "GANs: dos redes que compiten"},
@@ -315,7 +334,7 @@ CAPA_DIR = os.path.join(RAIZ, "herramientas", "capa")  # temprano.js, capa.css y
 def agregar_capa(ruta, lec):
     """Las líneas fijas que se agregan a una animación grande. No deben cambiar cuando se mejora la capa."""
     s = io.open(ruta, encoding="utf-8").read()
-    atributos = f' data-kc-leccion="{lec["slug"]}"' + (" data-kc-fotos" if lec.get("fotos") else "")
+    atributos = f' data-kc-leccion="{lec["slug"]}"' + ((f' data-kc-fotos="{lec["fotos"]}"' if isinstance(lec["fotos"], str) else " data-kc-fotos") if lec.get("fotos") else "")
     s = s.replace("<html", "<html" + atributos, 1)
     # la animación se escala en el alto que deja la cabecera y se baja esa misma altura
     assert s.count("innerHeight") == 3 and "m.style.top = ((innerHeight" in s, ruta
