@@ -212,4 +212,13 @@
   }
   addEventListener("resize", ubicar);
   ubicar();
+  // la barra solo aparece con el mouse sobre el dibujo (o sobre la barra), si hay zoom o si está ampliado
+  var sobre = false, quitar = null;
+  document.addEventListener("mousemove", function (ev) {
+    var b = svg.getBoundingClientRect(), c = caja.getBoundingClientRect();
+    var dentro = (ev.clientX >= b.left && ev.clientX <= b.right && ev.clientY >= b.top && ev.clientY <= b.bottom) ||
+      (ev.clientX >= c.left && ev.clientX <= c.right && ev.clientY >= c.top && ev.clientY <= c.bottom);
+    if (dentro) { clearTimeout(quitar); if (!sobre) { sobre = true; r.classList.add("kc-sobre-dibujo"); } }
+    else if (sobre) { clearTimeout(quitar); quitar = setTimeout(function () { sobre = false; r.classList.remove("kc-sobre-dibujo"); }, 600); }
+  });
 })();

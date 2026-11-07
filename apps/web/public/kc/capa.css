@@ -111,3 +111,9 @@ html.kc-ampliado #kc-cab, html.kc-ampliado #codigo, html.kc-ampliado #codbtn, ht
 html.kc-ampliado #marco { transform:none !important; left:0 !important; top:0 !important; width:100vw !important; height:100vh !important; }
 html.kc-ampliado #dibujo { visibility:visible !important; position:fixed !important; left:24px !important; top:20px !important; width:calc(100vw - 48px) !important; height:calc(100vh - 76px) !important; }
 html.kc-ampliado body { background:#FFFFFF; }
+
+/* la barra del zoom solo aparece al pasar el mouse por el dibujo; en pantallas táctiles queda siempre a la vista */
+@media (hover: hover) {
+  #kc-zoom { opacity:0; pointer-events:none; transition:opacity .2s; }
+  html.kc-sobre-dibujo #kc-zoom, html.kc-zoom-activo #kc-zoom, html.kc-ampliado #kc-zoom, #kc-zoom:focus-within { opacity:1; pointer-events:auto; }
+}
