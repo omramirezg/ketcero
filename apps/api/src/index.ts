@@ -3,7 +3,9 @@
 // se despliega apps/api/wrangler.jsonc, que sirve los mismos archivos más la API. Ver notas/COMO_PUBLICAR_ASTRO.md.
 import { entrar, paginaEntrar, pedirEnlace, salir, yo } from "./acceso";
 import type { Entorno } from "./config";
+import { accesoACurso, webhookPagos } from "./pagos";
 import { leerProgreso, sincronizar } from "./progreso";
+import { tokenDeVideo } from "./stream";
 import { error } from "./util";
 
 type Ruta = [método: string, patrón: RegExp, (req: Request, env: Entorno, m: RegExpMatchArray) => Promise<Response> | Response];
@@ -16,6 +18,9 @@ const RUTAS: Ruta[] = [
   ["GET", /^\/api\/yo$/, (r, e) => yo(r, e)],
   ["GET", /^\/api\/progreso$/, (r, e) => leerProgreso(r, e)],
   ["PUT", /^\/api\/progreso$/, (r, e) => sincronizar(r, e)],
+  ["POST", /^\/api\/pagos\/webhook\/(lemonsqueezy|paddle)$/, (r, e, m) => webhookPagos(r, e, m[1] as "lemonsqueezy" | "paddle")],
+  ["GET", /^\/api\/cursos\/([\w-]+)\/acceso$/, (r, e, m) => accesoACurso(r, e, m[1])],
+  ["GET", /^\/api\/cursos\/([\w-]+)\/videos\/(\w+)\/token$/, (r, e, m) => tokenDeVideo(r, e, m[1], m[2])],
 ];
 
 export async function atender(req: Request, env: Entorno): Promise<Response> {

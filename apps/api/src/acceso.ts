@@ -1,7 +1,7 @@
 // Entrar sin contraseña: el estudiante escribe su correo, le llega un enlace de un solo uso y al abrirlo queda
 // con una sesión de 30 días en una cookie HttpOnly. El enlace abre una página con un botón «Entrar» (POST),
 // así los antivirus de correo que visitan los enlaces no gastan el token.
-import { DIAS_SESION, ENLACES_POR_CORREO_HORA, ENLACES_POR_IP_HORA, MINUTOS_ENLACE, type Entorno } from "./config";
+import { DIAS_SESION, ENLACES_POR_CORREO_HORA, ENLACES_POR_IP_HORA, MINUTOS_ENLACE, activo, type Entorno } from "./config";
 import { enviar, mensajeDeEntrada } from "./correo";
 import { verificarTurnstile } from "./turnstile";
 import { azar, cookie, correoValido, error, escapar, json, leerCookie, sha256 } from "./util";
@@ -93,5 +93,9 @@ export async function salir(req: Request, env: Entorno): Promise<Response> {
 export async function yo(req: Request, env: Entorno): Promise<Response> {
   const u = await usuarioDe(req, env);
   if (!u) return error(401, "No has entrado");
-  return json({ correo: u.correo });
+  const cursos = activo(env.PAGOS_ACTIVOS)
+    ? (await env.DB.prepare("SELECT curso FROM acceso_cursos WHERE usuario_id = ? AND (hasta IS NULL OR hasta > ?)")
+        .bind(u.id, Date.now()).all<{ curso: string }>()).results.map((r) => r.curso)
+    : [];
+  return json(activo(env.PAGOS_ACTIVOS) ? { correo: u.correo, cursos } : { correo: u.correo });
 }

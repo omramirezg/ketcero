@@ -13,6 +13,7 @@ export interface Entorno {
   TURNSTILE_SECRETO?: string;     // secreto
   PAGOS_ACTIVOS: string;          // «si» | «no» (fase 3)
   PAGOS_PROVEEDOR?: string;       // «lemonsqueezy» | «paddle»
+  CURSOS_DE_PAGO?: string;        // slugs separados por coma; los demás cursos son gratis
   LEMONSQUEEZY_SECRETO?: string;  // secreto de la firma del webhook
   PADDLE_SECRETO?: string;        // secreto de la firma del webhook
   STREAM_ACTIVO?: string;         // «si» | «no»

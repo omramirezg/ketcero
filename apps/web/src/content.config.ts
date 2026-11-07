@@ -14,6 +14,8 @@ const cursos = defineCollection({
     descripcion: z.string(),
     actualizado: z.string(),
     ruta: z.string(),
+    // «pago» solo tiene efecto con la API prendida (PAGOS_ACTIVOS y CURSOS_DE_PAGO en apps/api/wrangler.jsonc)
+    acceso: z.enum(["gratis", "pago"]).default("gratis"),
     temas: z.array(z.object({
       clave: z.string(),
       titulo: z.string(),

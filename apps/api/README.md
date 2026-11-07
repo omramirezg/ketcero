@@ -14,6 +14,18 @@ Un Worker de Cloudflare que atiende `/api/*` y deja todo lo demás a los archivo
 | `GET /api/yo` | `{correo}` o 401 |
 | `GET /api/progreso` · `PUT /api/progreso` | lee o sincroniza `{entradas: [{clave, valor, actualizado}]}`; gana el cambio más reciente |
 
+Y, apagado (fase 3):
+
+| Ruta | Para qué |
+|---|---|
+| `POST /api/pagos/webhook/lemonsqueezy` | aviso de Lemon Squeezy, firma `X-Signature` (HMAC-SHA256 del cuerpo) |
+| `POST /api/pagos/webhook/paddle` | aviso de Paddle Billing, firma `Paddle-Signature: ts=…;h1=…` (rechaza más de 5 min) |
+| `GET /api/cursos/<curso>/acceso` | `{tipo: gratis|pago, acceso, entraste}` |
+| `GET /api/cursos/<curso>/videos/<uid>/token` | JWT RS256 de Cloudflare Stream (1 hora) para quien tiene acceso |
+
+Una compra da acceso al correo del checkout (`custom_data.correo`), aunque todavía no tenga cuenta; un reembolso
+lo quita; el mismo aviso dos veces cuenta una sola. Cuentas, DIAN y precios: `notas/PAGOS_Y_CURSOS.md` (fuera del repositorio).
+
 Seguridad: en D1 solo se guardan hashes SHA-256 de los enlaces y de las sesiones; límite de 5 enlaces por correo
 y 20 por IP cada hora; lo que cambia datos solo se acepta desde el mismo origen; `volver` solo admite rutas internas.
 

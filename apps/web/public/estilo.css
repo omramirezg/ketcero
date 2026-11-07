@@ -274,3 +274,10 @@ a:focus-visible, button:focus-visible { outline:2px solid var(--tinta); outline-
 .cuenta input:focus { outline:1px solid var(--gris); }
 .cuenta .boton { background:none; cursor:pointer; font-family:"IBM Plex Sans", sans-serif; }
 .cuenta .estado-cuenta a { color:var(--tinta); border-bottom:1px solid var(--linea); }
+
+/* Video de Cloudflare Stream (solo con PUBLIC_STREAM_CLIENTE) */
+.video { margin:24px 0; }
+.video-marco { position:relative; aspect-ratio:16/9; border:1px solid var(--linea); background:var(--marca); }
+.video-marco iframe { position:absolute; inset:0; width:100%; height:100%; border:0; }
+.video-aviso { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; margin:0; color:var(--gris); font-size:15px; }
+.video figcaption { margin-top:8px; font:13px "IBM Plex Mono", monospace; color:var(--gris); }

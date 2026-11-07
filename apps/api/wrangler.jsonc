@@ -28,6 +28,8 @@
     "CORREO_PROVEEDOR": "consola",
     "TURNSTILE_ACTIVO": "no",
     "PAGOS_ACTIVOS": "no",
+    "PAGOS_PROVEEDOR": "lemonsqueezy",
+    "CURSOS_DE_PAGO": "",
     "STREAM_ACTIVO": "no"
   },
   "env": {

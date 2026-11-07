@@ -1,0 +1,41 @@
+---
+// Un video de Cloudflare Stream dentro de una lección (apagado: solo se dibuja si al construir existe
+// PUBLIC_STREAM_CLIENTE, el código «customer-…» de la cuenta de Stream).
+// Si el video es de un curso de pago, la página pide un token firmado a /api/cursos/<curso>/videos/<uid>/token;
+// sin acceso muestra un aviso en vez del video. Requiere añadir frame-src https://*.cloudflarestream.com a la CSP.
+interface Props { curso: string; uid: string; titulo: string; pago?: boolean }
+const { curso, uid, titulo, pago = false } = Astro.props;
+const cliente = import.meta.env.PUBLIC_STREAM_CLIENTE as string | undefined;
+---
+{cliente && (
+<figure class="video" data-video data-curso={curso} data-uid={uid} data-cliente={cliente} data-pago={pago ? "si" : "no"}>
+  <div class="video-marco">
+    {pago
+      ? <p class="video-aviso">Cargando el video…</p>
+      : <iframe src={`https://customer-${cliente}.cloudflarestream.com/${uid}/iframe`} title={titulo} loading="lazy"
+          allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>}
+  </div>
+  <figcaption>{titulo}</figcaption>
+</figure>
+)}
+<script>
+  document.querySelectorAll<HTMLElement>("figure[data-video][data-pago='si']").forEach(async (f) => {
+    const { curso, uid, cliente } = f.dataset;
+    const marco = f.querySelector<HTMLElement>(".video-marco")!;
+    const r = await fetch(`/api/cursos/${curso}/videos/${uid}/token`).catch(() => null);
+    if (!r || !r.ok) {
+      const p = document.createElement("p");
+      p.className = "video-aviso";
+      p.textContent = r?.status === 401 ? "Entra con tu correo para ver este video." : "Este video es parte del curso completo.";
+      marco.replaceChildren(p);
+      return;
+    }
+    const { token } = await r.json();
+    const i = document.createElement("iframe");
+    i.src = `https://customer-${cliente}.cloudflarestream.com/${token}/iframe`;
+    i.title = f.querySelector("figcaption")?.textContent ?? "Video";
+    i.allow = "accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture";
+    i.allowFullscreen = true;
+    marco.replaceChildren(i);
+  });
+</script>
