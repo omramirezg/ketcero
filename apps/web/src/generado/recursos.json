@@ -10,7 +10,7 @@
   "mini-yolo-digitos-en-la-calle": {
    "url": "/ia/deteccion/Animacion_B1_Mini_YOLO_por_dentro",
    "pagina": "/cursos/deep-learning/mini-yolo-digitos-en-la-calle/",
-   "peso_mb": 70.7,
+   "peso_mb": 70.8,
    "miniatura": "/img/mini-yolo.webp",
    "clip": "/img/mini-yolo"
   },
@@ -24,7 +24,7 @@
   "unet-edificios-en-fotos-satelitales": {
    "url": "/ia/segmentacion/Animacion_U1_UNet_por_dentro",
    "pagina": "/cursos/deep-learning/unet-edificios-en-fotos-satelitales/",
-   "peso_mb": 53.0,
+   "peso_mb": 53.1,
    "miniatura": "/img/unet.webp",
    "clip": null
   }

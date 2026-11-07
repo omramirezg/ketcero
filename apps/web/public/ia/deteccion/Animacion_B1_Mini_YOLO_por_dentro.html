@@ -35,6 +35,22 @@
   #dibujo [data-capa]{cursor:pointer}
   #dibujo [data-capa]:hover > .hit{fill-opacity:.08;stroke:#1F3A5F;stroke-width:1.2}
   #dibujo [data-capa].sin{opacity:.32;pointer-events:none}
+  /* colores «D» de la banda, por familia (data-fam que pone la banda del generador): azul al bajar, violeta en el fondo, coral al subir, ámbar al final.
+     Solo las figuras de los bloques (rellenos blancos y trazos); nunca la zona de clic (.hit), ni las tarjetas de la escena. El marco rojo del bloque de turno va aparte, encima. */
+  #dibujo g[data-fam="entrada"] :is(rect,path,polygon,circle,ellipse):not(.hit)[fill="#FFFFFF"]{fill:#ECECEC !important}
+  #dibujo g[data-fam="entrada"] :is(rect,path,polygon,circle,ellipse):not(.hit):not([stroke="none"]){stroke:#5A5A5A !important}
+  #dibujo g[data-fam="bajada"] :is(rect,path,polygon,circle,ellipse):not(.hit)[fill="#FFFFFF"]{fill:#DCE7F3 !important}
+  #dibujo g[data-fam="bajada"] :is(rect,path,polygon,circle,ellipse):not(.hit):not([stroke="none"]){stroke:#2F5F8F !important}
+  #dibujo g[data-fam="pool"] :is(rect,path,polygon,circle,ellipse):not(.hit):not([stroke="none"]){stroke:#4A5F8F !important}
+  #dibujo g[data-fam="fondo"] :is(rect,path,polygon,circle,ellipse):not(.hit)[fill="#FFFFFF"]{fill:#EADCF0 !important}
+  #dibujo g[data-fam="fondo"] :is(rect,path,polygon,circle,ellipse):not(.hit):not([stroke="none"]){stroke:#6E3F8F !important}
+  #dibujo g[data-fam="subir"] :is(rect,path,polygon,circle,ellipse):not(.hit):not([stroke="none"]){stroke:#A2483A !important}
+  #dibujo g[data-fam="pegar"] :is(rect,path,polygon,circle,ellipse):not(.hit)[fill="#FFFFFF"]{fill:#F6E2D6 !important}
+  #dibujo g[data-fam="pegar"] :is(rect,path,polygon,circle,ellipse):not(.hit):not([stroke="none"]){stroke:#A85A2C !important}
+  #dibujo g[data-fam="subida"] :is(rect,path,polygon,circle,ellipse):not(.hit)[fill="#FFFFFF"]{fill:#F8E1D8 !important}
+  #dibujo g[data-fam="subida"] :is(rect,path,polygon,circle,ellipse):not(.hit):not([stroke="none"]){stroke:#B4532C !important}
+  #dibujo g[data-fam="salida"] :is(rect,path,polygon,circle,ellipse):not(.hit)[fill="#FFFFFF"]{fill:#F3E6C8 !important}
+  #dibujo g[data-fam="salida"] :is(rect,path,polygon,circle,ellipse):not(.hit):not([stroke="none"]){stroke:#8F6A1F !important}
   #aviso{position:absolute;left:calc(var(--dx,0px) + 800px);top:76px;transform:translateX(-50%);z-index:4;padding:5px 14px;background:#F6F6F6;border:1px solid #DCDCDC;border-radius:4px;font-size:15px;color:var(--tinta);white-space:nowrap;opacity:0;transition:opacity 250ms;pointer-events:none}
   #aviso.on{opacity:1}
   #regla{position:absolute;left:calc(var(--dx,0px) + 48px);right:calc(var(--dx,0px) + 48px);top:62px;z-index:1;border-top:1.5px solid var(--marino)}
