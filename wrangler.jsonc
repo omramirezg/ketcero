@@ -2,6 +2,8 @@
 {
   "name": "ketcero",
   "compatibility_date": "2026-11-01",
+  // wrangler corre esta construcción antes de publicar, así no hace falta configurarla en el panel de Cloudflare
+  "build": { "command": "npm ci && npm run build" },
   "assets": {
     "directory": "./apps/web/dist",
     "not_found_handling": "404-page",
