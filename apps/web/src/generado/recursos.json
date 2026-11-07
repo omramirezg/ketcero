@@ -30,10 +30,12 @@
   }
  },
  "versiones": {
-  "/estilo.css": "b73315504f",
+  "/estilo.css": "34b8e044df",
   "/favicon.ico": "c52c92cd7f",
   "/favicon.svg": "0dc589a9c0",
   "/robots.txt": "a4b879d8f9",
+  "/_headers": "fda275337e",
+  "/escenas/el-cero-que-aprende.json": "e6720cf2b6",
   "/fuentes/IBMPlexMono-latin-ext.woff2": "4af8cef522",
   "/fuentes/IBMPlexMono-latin.woff2": "bb87500e32",
   "/fuentes/IBMPlexSans-latin-ext.woff2": "69ec309900",
@@ -52,6 +54,15 @@
   "/kc/capa.css": "09dd364c9a",
   "/kc/capa.js": "5be3c48f1f",
   "/kc/fuentes.css": "ae4b6bedec",
-  "/kc/temprano.js": "bdee1f7d75"
+  "/kc/temprano.js": "bdee1f7d75",
+  "/practica/indice.json": "0439888a81",
+  "/practica/la-derivada-que-usa-una-red/01-derivada-numerica.ipynb": "0e8cf01880",
+  "/practica/la-derivada-que-usa-una-red/01-derivada-numerica.json": "bee76c9dc7",
+  "/practica/la-derivada-que-usa-una-red/02-regla-de-la-cadena.ipynb": "08a3b5f4e9",
+  "/practica/la-derivada-que-usa-una-red/02-regla-de-la-cadena.json": "aadac71345",
+  "/practica/la-derivada-que-usa-una-red/03-gradiente-del-lote.ipynb": "51ca4da479",
+  "/practica/la-derivada-que-usa-una-red/03-gradiente-del-lote.json": "19f9d1b9ec",
+  "/practica/la-derivada-que-usa-una-red/04-un-paso-de-descenso.ipynb": "204a3442bf",
+  "/practica/la-derivada-que-usa-una-red/04-un-paso-de-descenso.json": "67eceb6c70"
  }
 }
