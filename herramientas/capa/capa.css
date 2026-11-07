@@ -15,6 +15,14 @@ html.kc-oscuro #kc-cab { --f:#FFFFFF; --t:#000000; --g:#616161; --l:#E3E3E3; }  
 #kc-cab nav a:hover, #kc-cab nav button:hover { color:var(--t); }
 #kc-cab .kc-aviso { font:12px "IBM Plex Mono", monospace; color:var(--g); }
 #kc-cab .kc-volver { color:var(--t) !important; }
+#kc-cab .kc-grupo { display:inline-flex; align-items:stretch; height:30px; border:1px solid var(--l); }
+#kc-cab .kc-grupo > * { display:inline-flex; align-items:center; justify-content:center; text-decoration:none; }
+#kc-cab .kc-flecha { width:30px; font-size:17px !important; color:var(--t) !important; }
+#kc-cab .kc-flecha:hover { background:var(--l); }
+#kc-cab .kc-flecha.kc-sin { color:var(--l) !important; cursor:default; }
+#kc-cab .kc-flecha.kc-sin:hover { background:none; }
+#kc-cab .kc-numero { padding:0 14px; border-left:1px solid var(--l); border-right:1px solid var(--l); color:var(--t) !important; font:13px "IBM Plex Mono", monospace !important; }
+#kc-cab .kc-numero:hover { background:var(--l); }
 #kc-cab .kc-cero { stroke:#C8502A; }
 html.kc-oscuro #kc-cab .kc-cero { stroke:#FF8255; }
 #kc-tema, #kc-ayuda-boton { display:inline-flex; align-items:center; gap:10px; background:none; border:0; padding:0; cursor:pointer; }
@@ -27,7 +35,7 @@ html.kc-oscuro #kc-cab .kc-cero { stroke:#FF8255; }
   outline:2px solid #161616; outline-offset:3px; }
 @media (max-width: 1420px) { #kc-cab .kc-marca small { display:none; } }
 @media (max-width: 1180px) { #kc-cab .kc-aviso { display:none; } }
-@media (max-width: 760px) { #kc-cab .kc-vecina, #kc-cab .kc-volver { display:none; } }
+@media (max-width: 760px) { #kc-cab .kc-numero { padding:0 8px; } }
 
 /* --- cajas de la capa: atajos, seguir donde quedaste, aviso para celular --- */
 .kc-caja { --f:#FFFFFF; --t:#161616; --g:#6B6B6B; --l:#E2E2E2;

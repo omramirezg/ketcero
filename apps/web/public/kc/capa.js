@@ -12,12 +12,18 @@ var KC_ANALITICA = "";
   var logo = '<svg width="34" height="24" viewBox="0 0 44 30" aria-hidden="true"><line x1="5" y1="3" x2="5" y2="27" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>' +
     '<ellipse class="kc-cero" cx="19" cy="15" rx="6" ry="11" fill="none" stroke-width="3"/>' +
     '<polyline points="31,3 39,15 31,27" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-  var vecinas = (lec.anterior ? '<a class="kc-vecina" href="' + lec.anterior.pagina + '" title="Lección anterior: ' + esc(lec.anterior.titulo) + '">← Lección anterior</a>' : "") +
-    (lec.siguiente ? '<a class="kc-vecina" href="' + lec.siguiente.pagina + '" title="Lección siguiente: ' + esc(lec.siguiente.titulo) + '">Lección siguiente →</a>' : "");
+  // un solo grupo de navegación: ‹ Lección 4.2 › (las flechas van a la anterior y la siguiente; el número, a la página de la lección)
+  function flecha(v, texto, cual) {
+    return v ? '<a class="kc-flecha" href="' + v.pagina + '" title="Lección ' + cual + ': ' + esc(v.titulo) + '" aria-label="Lección ' + cual + ': ' + esc(v.titulo) + '">' + texto + '</a>'
+             : '<span class="kc-flecha kc-sin" aria-hidden="true">' + texto + '</span>';
+  }
+  var grupo = '<span class="kc-grupo">' + flecha(lec.anterior, "‹", "anterior") +
+    '<a class="kc-numero" href="' + (lec.pagina || "/cursos/") + '" title="Volver a la página de la lección: ' + esc(lec.titulo || "") + '">Lección ' + esc(lec.numero || "") + '</a>' +
+    flecha(lec.siguiente, "›", "siguiente") + '</span>';
   document.body.insertAdjacentHTML("afterbegin",
     '<header id="kc-cab"><a class="kc-marca" href="/" aria-label="Ket Cero, inicio">' + logo + 'Ket Cero<small>Machine learning desde cero</small></a>' +
     '<nav aria-label="Lección"><span class="kc-aviso" title="Esta animación todavía está en revisión y puede tener errores">Versión preliminar: puede tener errores</span>' +
-    '<a class="kc-volver" href="' + (lec.pagina || "/cursos/") + '">Volver a la lección</a>' + vecinas +
+    grupo +
     '<button id="kc-ayuda-boton" type="button" aria-expanded="false" aria-controls="kc-ayuda" aria-label="Atajos de teclado y del mouse">?</button>' +
     '<button id="kc-tema" type="button" role="switch" aria-checked="true">Modo oscuro<span class="kc-pista"><span class="kc-perilla"></span></span></button></nav></header>' +
     '<div id="kc-ayuda" class="kc-caja" role="dialog" aria-label="Atajos" hidden><h2>Atajos</h2><dl>' +
