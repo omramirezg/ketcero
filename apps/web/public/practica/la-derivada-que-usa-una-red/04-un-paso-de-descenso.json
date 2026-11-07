@@ -1,0 +1,12 @@
+{
+ "leccion": "la-derivada-que-usa-una-red",
+ "id": "04-un-paso-de-descenso",
+ "titulo": "Un paso de descenso de gradiente",
+ "enunciado": [
+  "El gradiente apunta hacia donde la pérdida SUBE más rápido. Para aprender, la red da un paso pequeño en la dirección contraria: `w ← w − lr · ∂L/∂w` y `b ← b − lr · ∂L/∂b`.",
+  "Escribe `paso(w, b, X, Y, lr)` que devuelva el nuevo `(w, b)`. Ya tienes `gradiente_lote` del ejercicio anterior.",
+  "Para comprobarlo: después de 500 pasos con `lr = 0,05`, la recta debe quedar en `w ≈ 2` y `b ≈ 1`."
+ ],
+ "inicial": "import numpy as np\n\ndef gradiente_lote(w, b, X, Y):\n    r = w * X + b - Y\n    return np.mean(2 * r * X), np.mean(2 * r)\n\ndef paso(w, b, X, Y, lr):\n    dL_dw, dL_db = gradiente_lote(w, b, X, Y)\n    return w, b\n",
+ "pruebas": "X = np.array([0.0, 1.0, 2.0, 3.0])\nY = np.array([1.0, 3.0, 5.0, 7.0])\n\n\ndef prueba_un_paso(ns):\n    \"\"\"Un paso desde w = 0, b = 0 con lr = 0,1\"\"\"\n    r = funcion(ns, \"paso\")(0.0, 0.0, X, Y, 0.1)\n    cerca(r[0], 0.0 - 0.1 * float(np.mean(-2 * Y * X)), \"w nuevo\")\n    cerca(r[1], 0.0 - 0.1 * float(np.mean(-2 * Y)), \"b nuevo\")\n\n\ndef prueba_baja_la_perdida(ns):\n    \"\"\"Después de un paso, la pérdida es más pequeña\"\"\"\n    w, b = funcion(ns, \"paso\")(0.0, 0.0, X, Y, 0.05)\n    antes = float(np.mean((0.0 * X - Y) ** 2))\n    despues = float(np.mean((w * X + b - Y) ** 2))\n    if not despues < antes:\n        raise Falla(\"La pérdida subió: el paso va hacia arriba de la colina\", f\"menor que {antes:.4g}\", f\"{despues:.4g}\")\n\n\ndef prueba_converge(ns):\n    \"\"\"Con 500 pasos llega a la recta w = 2, b = 1\"\"\"\n    p = funcion(ns, \"paso\")\n    w, b = 0.0, 0.0\n    for _ in range(500):\n        w, b = p(w, b, X, Y, 0.05)\n    cerca(w, 2.0, \"w después de 500 pasos\", tol=1e-2)\n    cerca(b, 1.0, \"b después de 500 pasos\", tol=1e-2)\n"
+}

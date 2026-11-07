@@ -1,4 +1,4 @@
-"""Lee los ejercicios de Ket Cero (un .py por ejercicio, con secciones «# === nombre ===»).
+"""Lee los ejercicios de Ket Cero (lo usan el sitio al construir, las pruebas y «ketcero comprobar») (un .py por ejercicio, con secciones «# === nombre ===»).
 
 Secciones: titulo, enunciado (líneas con «# »), inicial (código que ve el estudiante), solucion (de referencia,
 nunca se publica), «error: …» (respuestas equivocadas típicas, para probar que las pruebas las atrapan) y
@@ -11,7 +11,9 @@ SECCION = re.compile(r"^# === (.+?) ===\s*$")
 
 def leer(ruta):
     secciones, actual, lineas = {}, None, []
-    for linea in io.open(ruta, encoding="utf-8").read().split("\n"):
+    with io.open(ruta, encoding="utf-8") as f:
+        texto_archivo = f.read()
+    for linea in texto_archivo.split("\n"):
         m = SECCION.match(linea)
         if m:
             if actual:

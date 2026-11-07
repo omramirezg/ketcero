@@ -7,3 +7,6 @@ node_modules/
 apps/web/dist/
 apps/web/.astro/
 .wrangler/
+packages/ketcero-py/build/
+*.egg-info/
+.ketcero/

@@ -1,7 +1,7 @@
 /// <reference lib="webworker" />
 // Web Worker que corre Python en el navegador con Pyodide. Se carga solo cuando el estudiante pulsa «Comprobar»
 // por primera vez; si una corrección se pasa del tiempo, la página mata este trabajador y crea otro.
-import arnes from "./arnes.py?raw";
+import arnes from "../../ketcero-py/src/ketcero/arnes.py?raw"; // la misma fuente que el paquete de pip
 
 export const PYODIDE = "https://cdn.jsdelivr.net/pyodide/v0.29.4/full/";
 

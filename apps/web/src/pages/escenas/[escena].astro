@@ -1,0 +1,41 @@
+---
+// Borrador del motor v2: muestra una escena (JSON en public/escenas/) con el runtime de @ketcero/motor/escena.
+// No aparece en ningún menú ni en el sitemap y lleva noindex.
+import { readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
+import Base from "../../layouts/Base.astro";
+
+export function getStaticPaths() {
+  const dir = join(process.cwd(), "public", "escenas");
+  return readdirSync(dir).filter((f) => f.endsWith(".json")).map((f) => {
+    const datos = JSON.parse(readFileSync(join(dir, f), "utf-8"));
+    return { params: { escena: f.replace(/\.json$/, "") }, props: { titulo: datos.titulo as string, pasos: datos.pasos.length as number } };
+  });
+}
+const { escena } = Astro.params;
+const { titulo, pasos } = Astro.props;
+const ruta = `/escenas/${escena}/`;
+---
+<Base titulo={`${titulo} · Ket Cero`} descripcion={`Escena animada en ${pasos} pasos.`} ruta={ruta} actual={ruta} cabeza='<meta name="robots" content="noindex, nofollow">'>
+<div class="cuerpo leccion">
+<main id="contenido">
+<section class="cabeza">
+<div class="mono">Motor v2 · borrador</div>
+<h1>{titulo}</h1>
+<p class="aviso">Borrador: esta página todavía no está enlazada desde ningún lado. Avanza con las flechas del teclado; Ctrl + rueda acerca el dibujo.</p>
+</section>
+<div id="escena" data-fuente={`/escenas/${escena}.json`}><p>Cargando la escena…</p></div>
+</main>
+</div>
+<script>
+  import { ESTILOS, montarEscena } from "@ketcero/motor/escena";
+  const caja = document.getElementById("escena")!;
+  const estilo = document.createElement("style");
+  estilo.textContent = ESTILOS;
+  document.head.appendChild(estilo);
+  fetch(caja.dataset.fuente!).then((r) => r.json()).then((e) => {
+    const inicio = Number(new URLSearchParams(location.search).get("paso") ?? 1) - 1;
+    montarEscena(caja, e, inicio);
+  }).catch((err) => { caja.textContent = "No se pudo cargar la escena: " + err.message; });
+</script>
+</Base>

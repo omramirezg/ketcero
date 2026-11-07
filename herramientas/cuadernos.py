@@ -3,18 +3,20 @@
 Cada cuaderno trae: el enunciado, la celda con el código inicial y una celda «Comprobar» con el mismo arnés y las
 mismas pruebas que corre el sitio en el navegador. Así el resultado es idéntico en los tres lugares.
 
-Salida: apps/web/public/practica/<lección>/<ejercicio>.ipynb (se guardan en el repositorio, porque Colab y
-vscode.dev los abren directo desde GitHub).
+Salida (se guardan en el repositorio, porque Colab y vscode.dev los abren directo desde GitHub):
+  apps/web/public/practica/<lección>/<ejercicio>.ipynb
+  apps/web/public/practica/<lección>/<ejercicio>.json   (enunciado, código inicial y pruebas: lo usa «ketcero descargar»)
+  apps/web/public/practica/indice.json                 (lecciones y ejercicios: lo usa «ketcero listar»)
 
 Uso:  python herramientas/cuadernos.py
 """
-import glob, io, json, os, sys
+import glob, io, json, os, re, sys
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, os.path.join(REPO, "packages", "practica", "src"))
-import ejercicios  # noqa: E402
+sys.path.insert(0, os.path.join(REPO, "packages", "ketcero-py", "src"))
+from ketcero import ejercicios  # noqa: E402
 
-ARNES = io.open(os.path.join(REPO, "packages", "practica", "src", "arnes.py"), encoding="utf-8").read()
+ARNES = io.open(os.path.join(REPO, "packages", "ketcero-py", "src", "ketcero", "arnes.py"), encoding="utf-8").read()
 SALIDA = os.path.join(REPO, "apps", "web", "public", "practica")
 
 
@@ -47,18 +49,40 @@ def cuaderno(leccion, e):
             "nbformat": 4, "nbformat_minor": 5}
 
 
+def frontmatter(ruta):
+    """Lee «clave: valor» del frontmatter de la página .mdx de la lección."""
+    if not os.path.exists(ruta):
+        return {}
+    texto = io.open(ruta, encoding="utf-8").read().split("---")[1]
+    return {m.group(1): json.loads(m.group(2)) if m.group(2).startswith('"') else m.group(2)
+            for m in re.finditer(r"^(\w+):\s*(.+?)\s*$", texto, re.M)}
+
+
+def escribir(ruta, datos):
+    with io.open(ruta, "w", encoding="utf-8", newline="\n") as f:
+        json.dump(datos, f, ensure_ascii=False, indent=1)
+        f.write("\n")
+
+
 def main():
-    hechos = 0
+    hechos, indice = 0, []
     for carpeta in sorted(d for d in glob.glob(os.path.join(REPO, "contenido", "practica", "*")) if os.path.isdir(d)):
         leccion = os.path.basename(carpeta)
+        fm = frontmatter(carpeta + ".mdx")
         destino = os.path.join(SALIDA, leccion)
         os.makedirs(destino, exist_ok=True)
+        lista = []
         for e in ejercicios.de_leccion(carpeta):
-            with io.open(os.path.join(destino, e["id"] + ".ipynb"), "w", encoding="utf-8", newline="\n") as f:
-                json.dump(cuaderno(leccion, e), f, ensure_ascii=False, indent=1)
-                f.write("\n")
+            escribir(os.path.join(destino, e["id"] + ".ipynb"), cuaderno(leccion, e))
+            escribir(os.path.join(destino, e["id"] + ".json"), {
+                "leccion": leccion, "id": e["id"], "titulo": e["titulo"], "enunciado": e["enunciado"],
+                "inicial": e["inicial"], "pruebas": e["pruebas"]})  # la solución nunca sale
+            lista.append({"id": e["id"], "titulo": e["titulo"]})
             hechos += 1
-    print(f"{hechos} cuadernos en {os.path.relpath(SALIDA, REPO)}")
+        indice.append({"slug": leccion, "titulo": fm.get("titulo", leccion), "estado": fm.get("estado", "borrador"),
+                       "pagina": f"/practica/{leccion}/", "ejercicios": lista})
+    escribir(os.path.join(SALIDA, "indice.json"), {"formato": "ketcero-practica", "version": 1, "lecciones": indice})
+    print(f"{hechos} ejercicios (cuaderno + json) e indice.json en {os.path.relpath(SALIDA, REPO)}")
 
 
 if __name__ == "__main__":

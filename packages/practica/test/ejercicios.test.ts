@@ -33,7 +33,7 @@ describe("lector de ejercicios", () => {
     it(`${leccion}: TypeScript y Python leen lo mismo`, () => {
       const ts = ejerciciosDeLeccion(join(PRACTICA, leccion));
       const py = JSON.parse(python(["-c",
-        "import json,sys; sys.path.insert(0,'packages/practica/src'); import ejercicios; " +
+        "import json,sys; sys.path.insert(0,'packages/ketcero-py/src'); from ketcero import ejercicios; " +
         `print(json.dumps(ejercicios.de_leccion(sys.argv[1]), ensure_ascii=False))`, join(PRACTICA, leccion)]));
       expect(ts).toEqual(py);
     });
@@ -86,7 +86,7 @@ describe("cuadernos para Colab y vscode.dev", () => {
 
 describe("arnés", () => {
   const correr = (codigo: string, pruebas: string) =>
-    JSON.parse(python(["-c", "import sys,json; sys.path.insert(0,'packages/practica/src'); import arnes; " +
+    JSON.parse(python(["-c", "import sys,json; sys.path.insert(0,'packages/ketcero-py/src'); from ketcero import arnes; " +
       "d=json.load(sys.stdin); print(arnes.corregir_json(d['c'], d['p']))"], JSON.stringify({ c: codigo, p: pruebas })));
 
   it("explica cuando el código ni siquiera corre", () => {

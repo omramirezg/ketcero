@@ -11,6 +11,8 @@
     "build": "npm run build -w @ketcero/web",
     "build:todo": "npm run recursos && npm run build",
     "dev": "npm run dev -w @ketcero/web",
-    "test": "npm run test --workspaces --if-present"
+    "test": "npm run test --workspaces --if-present && npm run test:py",
+    "test:py": "python -m unittest discover -s packages/ketcero-py/tests",
+    "escenas": "python herramientas/exportar_escena_cero.py"
   }
 }

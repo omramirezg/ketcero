@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ketcero"
+version = "0.1.0"
+description = "Ket Cero desde la terminal: baja los ejercicios de práctica, compruébalos con las mismas pruebas del sitio y arma escenas animadas."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Omar Ramírez González" }]
+dependencies = []  # solo la biblioteca estándar; NumPy se usa si está instalado (los ejercicios lo piden)
+
+[project.optional-dependencies]
+numpy = ["numpy>=1.24"]
+
+[project.urls]
+Sitio = "https://ketcero.com"
+
+[project.scripts]
+ketcero = "ketcero.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

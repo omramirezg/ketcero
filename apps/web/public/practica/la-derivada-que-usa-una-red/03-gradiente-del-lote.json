@@ -1,0 +1,12 @@
+{
+ "leccion": "la-derivada-que-usa-una-red",
+ "id": "03-gradiente-del-lote",
+ "titulo": "El gradiente de un lote entero",
+ "enunciado": [
+  "Ahora sin sigmoide y con muchos ejemplos a la vez: la predicción es `p = w · X + b` (X es un arreglo de NumPy) y la pérdida es el promedio `L = mean((p − Y)²)`.",
+  "Escribe `gradiente_lote(w, b, X, Y)` que devuelva `(∂L/∂w, ∂L/∂b)` para todo el lote, sin un solo `for`: `∂L/∂w = mean(2 · (p − Y) · X)` y `∂L/∂b = mean(2 · (p − Y))`.",
+  "Ojo: es el promedio, no la suma. Con la suma, el gradiente crece con el tamaño del lote."
+ ],
+ "inicial": "import numpy as np\n\ndef gradiente_lote(w, b, X, Y):\n    p = w * X + b\n    return 0.0, 0.0\n",
+ "pruebas": "X = np.array([0.0, 1.0, 2.0, 3.0])\nY = np.array([1.0, 3.0, 5.0, 7.0])\n\n\ndef _ref(w, b, X, Y):\n    r = w * X + b - Y\n    return float(np.mean(2 * r * X)), float(np.mean(2 * r))\n\n\ndef prueba_dw(ns):\n    \"\"\"∂L/∂w con w = 0,5 y b = 0 sobre 4 ejemplos\"\"\"\n    r = funcion(ns, \"gradiente_lote\")(0.5, 0.0, X, Y)\n    cerca(r[0], _ref(0.5, 0.0, X, Y)[0], \"∂L/∂w\")\n\n\ndef prueba_db(ns):\n    \"\"\"∂L/∂b en el mismo punto\"\"\"\n    r = funcion(ns, \"gradiente_lote\")(0.5, 0.0, X, Y)\n    cerca(r[1], _ref(0.5, 0.0, X, Y)[1], \"∂L/∂b\")\n\n\ndef prueba_en_el_minimo(ns):\n    \"\"\"En la recta perfecta (w = 2, b = 1) el gradiente es cero\"\"\"\n    r = funcion(ns, \"gradiente_lote\")(2.0, 1.0, X, Y)\n    cerca(r[0], 0.0, \"∂L/∂w en el mínimo\")\n    cerca(r[1], 0.0, \"∂L/∂b en el mínimo\")\n\n\ndef prueba_lote_grande(ns):\n    \"\"\"No cambia de escala si el lote se repite 10 veces\"\"\"\n    XX, YY = np.tile(X, 10), np.tile(Y, 10)\n    r = funcion(ns, \"gradiente_lote\")(0.5, 0.0, XX, YY)\n    cerca(r[0], _ref(0.5, 0.0, X, Y)[0], \"∂L/∂w con 40 ejemplos\")\n"
+}

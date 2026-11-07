@@ -3,5 +3,15 @@
   "private": true,
   "type": "module",
   "main": "src/index.ts",
-  "exports": { ".": "./src/index.ts", "./cero": "./src/cero.ts", "./escena": "./src/escena.ts" }
+  "exports": {
+    ".": "./src/index.ts",
+    "./cero": "./src/cero.ts",
+    "./escena": "./src/escena.ts"
+  },
+  "scripts": {
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "vitest": "^5.1.0"
+  }
 }

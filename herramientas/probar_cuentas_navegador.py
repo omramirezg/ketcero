@@ -12,8 +12,8 @@ import json, os, sys, time
 from playwright.sync_api import sync_playwright
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, os.path.join(REPO, "packages", "practica", "src"))
-import ejercicios  # noqa: E402
+sys.path.insert(0, os.path.join(REPO, "packages", "ketcero-py", "src"))
+from ketcero import ejercicios  # noqa: E402
 
 PUERTO = sys.argv[1] if len(sys.argv) > 1 else "8787"
 BASE = f"http://localhost:{PUERTO}"

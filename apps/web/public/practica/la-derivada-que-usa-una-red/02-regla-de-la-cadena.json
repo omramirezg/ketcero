@@ -1,0 +1,12 @@
+{
+ "leccion": "la-derivada-que-usa-una-red",
+ "id": "02-regla-de-la-cadena",
+ "titulo": "La regla de la cadena en una neurona",
+ "enunciado": [
+  "Una neurona con un solo peso: `z = w · x + b`, después `a = σ(z)` (la sigmoide) y la pérdida `L = (a − y)²`.",
+  "Escribe `gradiente(w, b, x, y)` que devuelva la pareja `(∂L/∂w, ∂L/∂b)`, eslabón por eslabón:",
+  "`∂L/∂a = 2 · (a − y)`, `∂a/∂z = a · (1 − a)`, `∂z/∂w = x` y `∂z/∂b = 1`. Multiplica los eslabones que van de L hasta cada peso."
+ ],
+ "inicial": "import math\n\ndef sigmoide(z):\n    return 1 / (1 + math.exp(-z))\n\ndef gradiente(w, b, x, y):\n    z = w * x + b\n    a = sigmoide(z)\n    # ∂L/∂a, ∂a/∂z, y luego ∂L/∂w y ∂L/∂b\n    return 0.0, 0.0\n",
+ "pruebas": "def _referencia(w, b, x, y):\n    a = 1 / (1 + math.exp(-(w * x + b)))\n    g = 2 * (a - y) * a * (1 - a)\n    return g * x, g\n\n\ndef _par(ns, w, b, x, y):\n    r = funcion(ns, \"gradiente\")(w, b, x, y)\n    if not isinstance(r, (tuple, list)) or len(r) != 2:\n        raise Falla(\"gradiente debe devolver una pareja (∂L/∂w, ∂L/∂b)\", \"(número, número)\", repr(r))\n    return r\n\n\ndef prueba_dw(ns):\n    \"\"\"∂L/∂w en w = 0,5, b = −0,2, x = 2, y = 1\"\"\"\n    cerca(_par(ns, 0.5, -0.2, 2.0, 1.0)[0], _referencia(0.5, -0.2, 2.0, 1.0)[0], \"∂L/∂w\")\n\n\ndef prueba_db(ns):\n    \"\"\"∂L/∂b en el mismo punto\"\"\"\n    cerca(_par(ns, 0.5, -0.2, 2.0, 1.0)[1], _referencia(0.5, -0.2, 2.0, 1.0)[1], \"∂L/∂b\")\n\n\ndef prueba_otro_ejemplo(ns):\n    \"\"\"Otro ejemplo: w = −1, b = 0,3, x = −1,5, y = 0\"\"\"\n    r = _par(ns, -1.0, 0.3, -1.5, 0.0)\n    e = _referencia(-1.0, 0.3, -1.5, 0.0)\n    cerca(r[0], e[0], \"∂L/∂w\")\n    cerca(r[1], e[1], \"∂L/∂b\")\n"
+}

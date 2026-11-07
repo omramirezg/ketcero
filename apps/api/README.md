@@ -20,7 +20,7 @@ Y, apagado (fase 3):
 |---|---|
 | `POST /api/pagos/webhook/lemonsqueezy` | aviso de Lemon Squeezy, firma `X-Signature` (HMAC-SHA256 del cuerpo) |
 | `POST /api/pagos/webhook/paddle` | aviso de Paddle Billing, firma `Paddle-Signature: ts=…;h1=…` (rechaza más de 5 min) |
-| `GET /api/cursos/<curso>/acceso` | `{tipo: gratis|pago, acceso, entraste}` |
+| `GET /api/cursos/<curso>/acceso` | `{tipo, acceso, entraste}` (tipo: `gratis` o `pago`) |
 | `GET /api/cursos/<curso>/videos/<uid>/token` | JWT RS256 de Cloudflare Stream (1 hora) para quien tiene acceso |
 
 Una compra da acceso al correo del checkout (`custom_data.correo`), aunque todavía no tenga cuenta; un reembolso

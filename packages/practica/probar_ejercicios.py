@@ -6,8 +6,8 @@ Escribe un JSON con el resultado (lo lee vitest) y sale con código 1 si algo no
 import glob, json, os, sys
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.join(AQUI, "src"))
-import arnes, ejercicios  # noqa: E402
+sys.path.insert(0, os.path.join(os.path.dirname(AQUI), "ketcero-py", "src"))
+from ketcero import arnes, ejercicios  # noqa: E402
 
 RAIZ = os.path.dirname(os.path.dirname(AQUI))
 

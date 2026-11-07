@@ -1,0 +1,30 @@
+{
+ "formato": "ketcero-practica",
+ "version": 1,
+ "lecciones": [
+  {
+   "slug": "la-derivada-que-usa-una-red",
+   "titulo": "La derivada que usa una red",
+   "estado": "borrador",
+   "pagina": "/practica/la-derivada-que-usa-una-red/",
+   "ejercicios": [
+    {
+     "id": "01-derivada-numerica",
+     "titulo": "La derivada, con números"
+    },
+    {
+     "id": "02-regla-de-la-cadena",
+     "titulo": "La regla de la cadena en una neurona"
+    },
+    {
+     "id": "03-gradiente-del-lote",
+     "titulo": "El gradiente de un lote entero"
+    },
+    {
+     "id": "04-un-paso-de-descenso",
+     "titulo": "Un paso de descenso de gradiente"
+    }
+   ]
+  }
+ ]
+}

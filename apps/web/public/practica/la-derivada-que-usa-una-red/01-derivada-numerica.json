@@ -1,0 +1,12 @@
+{
+ "leccion": "la-derivada-que-usa-una-red",
+ "id": "01-derivada-numerica",
+ "titulo": "La derivada, con números",
+ "enunciado": [
+  "Escribe `derivada(f, x, h)`: la pendiente de `f` en el punto `x`, calculada solo con dos evaluaciones de `f`.",
+  "Usa la diferencia centrada: evalúa un poquito a la derecha, `f(x + h)`, un poquito a la izquierda, `f(x - h)`, resta y divide por la distancia entre los dos puntos, que es `2 * h`.",
+  "Para comprobar a mano: con `f(x) = x²` y `x = 3`, la pendiente debe dar 6."
+ ],
+ "inicial": "def derivada(f, x, h=1e-5):\n    # f(x + h) es la altura un poquito a la derecha; f(x - h), un poquito a la izquierda\n    return 0.0\n",
+ "pruebas": "def prueba_cuadrado(ns):\n    \"\"\"La pendiente de x² en x = 3 es 6\"\"\"\n    d = funcion(ns, \"derivada\")\n    cerca(d(lambda x: x * x, 3.0), 6.0, \"derivada(x², 3)\")\n\n\ndef prueba_seno(ns):\n    \"\"\"La pendiente de sen(x) en x = 0 es cos(0) = 1\"\"\"\n    d = funcion(ns, \"derivada\")\n    cerca(d(math.sin, 0.0), 1.0, \"derivada(sen, 0)\")\n\n\ndef prueba_otro_punto(ns):\n    \"\"\"Funciona en cualquier punto: x³ en x = −2 da 12\"\"\"\n    d = funcion(ns, \"derivada\")\n    cerca(d(lambda x: x ** 3, -2.0), 12.0, \"derivada(x³, −2)\")\n"
+}
