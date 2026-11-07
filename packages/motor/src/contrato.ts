@@ -49,6 +49,8 @@ export interface DatosCero {
 }
 
 export interface OpcionesCero {
+  /** Solo el dibujo: sin líneas de texto con las cuentas ni la tabla de pesos del filtro (portada). */
+  sencilla?: boolean;
   /** Contenedor del panel de código en vivo (en celular no se pasa). */
   codigo?: HTMLElement | null;
 }

@@ -25,10 +25,8 @@ const cabeza = ld({ "@context": "https://schema.org", "@type": "WebSite", name: 
 <h1>Machine learning desde cero, con cada operación a la vista.</h1>
 <p>Deja de imaginarte cómo funciona una red neuronal. Míralo. Lecciones animadas, número por número.</p>
 <a class="ir" href={`/cursos/${dl.slug}/`}>Empezar el curso de {dl.nombre} →</a>
-<div id="codigo" class="panel-codigo"></div>
 </div>
 <div class="lado">
-<p class="explica">Una red ya entrenada mira un 0: su primer filtro busca bordes, casilla por casilla.</p>
 <div id="cero" class="cero"></div>
 </div>
 <div class="franja"><a href={ultima.pagina}>Última lección: {corto(ultima.titulo)} →</a><a class="bajar" href="#lista-de-cursos">Cursos ↓</a>{proxima ? <span>Próxima: {corto(proxima.titulo)}</span> : <span></span>}</div>
@@ -39,6 +37,6 @@ const cabeza = ld({ "@context": "https://schema.org", "@type": "WebSite", name: 
 <script is:inline src={v("/js/cero_datos.js")}></script>
 <script>
   import { montarCero } from "@ketcero/motor/cero";
-  montarCero(document.getElementById("cero")!, (window as any).DATOS_CERO, { codigo: document.getElementById("codigo") });
+  montarCero(document.getElementById("cero")!, (window as any).DATOS_CERO, { sencilla: true });
 </script>
 </Base>

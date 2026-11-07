@@ -179,6 +179,7 @@ function montarCero(caja: HTMLElement, D: DatosCero, opciones?: OpcionesCero): v
 
     linea1 = el(svg, "text", { x: 0, y: yTexto, "font-size": angosta ? 12 : 14, fill: "var(--tinta)" }, "");
     linea2 = el(svg, "text", { x: 0, y: yTexto + 20, "font-size": 12, fill: "var(--gris)" }, "");
+    if (opciones?.sencilla) { linea1.style.display = "none"; linea2.style.display = "none"; }
 
     // los 6 mapas pequeños y la salida, ocultos hasta su fase
     mini = el(svg, "g", { opacity: 0 });
@@ -286,8 +287,8 @@ function montarCero(caja: HTMLElement, D: DatosCero, opciones?: OpcionesCero): v
         marcar([], {}, 0);
         linea1.textContent = "x: el 0, 28 × 28 píxeles entre 0 y 1"; linea2.textContent = "";
       } else if (a === 1) {
-        ver.filtro = true; mostrar(gFiltro, true, true);
-        if (gFiltro) rotMapa.textContent = "el filtro: 25 pesos";
+        if (!opciones?.sencilla) { ver.filtro = true; mostrar(gFiltro, true, true); }
+        if (gFiltro && !opciones?.sencilla) rotMapa.textContent = "el filtro: 25 pesos";
         marcar([], {}, 1);
         linea1.textContent = `w: los 25 pesos del filtro ${f + 1}`; linea2.textContent = "coral: positivo · teal: negativo";
       } else if (a === 2) {

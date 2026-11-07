@@ -122,7 +122,7 @@ footer .in { max-width:1240px; margin:0 auto; padding:24px 32px 48px; display:fl
 /* Portada: más ancha, panel de código a la izquierda, animación centrada y franja al pie de la primera pantalla */
 .cuerpo { max-width:1360px; }
 footer .in { max-width:1360px; }
-.portada { grid-template-columns:minmax(0,1fr) 640px; position:relative; }
+.portada { grid-template-columns:minmax(0,1fr) 720px; position:relative; }
 .cabeza .explica { margin:0 0 18px; font-size:15px; color:var(--gris); max-width:560px; }
 .lado { position:relative; top:var(--bajar-lado, 0px); }  /* la animación reserva abajo el sitio de los 6 mapas: se baja la mitad de ese hueco */
 main .portada { padding-bottom:80px; }
