@@ -1,0 +1,17 @@
+{
+  "name": "@ketcero/api",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev --local --port 8787",
+    "migrar:local": "wrangler d1 migrations apply ketcero --local",
+    "comprobar-despliegue": "wrangler deploy --dry-run --outdir .wrangler/seco",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261107.1",
+    "typescript": "^7.0.2",
+    "vitest": "^5.1.0",
+    "wrangler": "^4.158.0"
+  }
+}

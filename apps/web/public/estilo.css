@@ -246,8 +246,8 @@ a:focus-visible, button:focus-visible { outline:2px solid var(--tinta); outline-
 .ejercicio .botones { display:flex; flex-wrap:wrap; align-items:center; gap:12px 20px; margin-top:14px; }
 .ejercicio .boton { background:none; font-family:"IBM Plex Sans", sans-serif; cursor:pointer; }
 .ejercicio .boton:disabled { opacity:.5; cursor:default; }
-.ejercicio .reiniciar { background:none; border:0; padding:0; font:14px "IBM Plex Sans", sans-serif; color:var(--gris); cursor:pointer; border-bottom:1px solid var(--linea); }
-.ejercicio .reiniciar:hover { color:var(--tinta); }
+.ejercicio .reiniciar, .cuenta .reiniciar { background:none; border:0; padding:0; font:14px "IBM Plex Sans", sans-serif; color:var(--gris); cursor:pointer; border-bottom:1px solid var(--linea); }
+.ejercicio .reiniciar:hover, .cuenta .reiniciar:hover { color:var(--tinta); }
 .ejercicio .estado { font-size:14.5px; color:var(--texto); }
 .ejercicio .resultados { list-style:none; margin:14px 0 0; padding:0; }
 .ejercicio .resultados:empty { display:none; }
@@ -263,3 +263,14 @@ a:focus-visible, button:focus-visible { outline:2px solid var(--tinta); outline-
 .ejercicio, .practica-texto { --c-clave:#C586C0; --c-funcion:#DCDCAA; --c-modulo:#4EC9B0; --c-var:#9CDCFE; --c-num:#B5CEA8; --c-com:#6A9955; --c-cadena:#CE9178; --c-texto:#D4D4D4; }
 :root[data-tema="claro"] .ejercicio, :root[data-tema="claro"] .practica-texto { --c-clave:#AF00DB; --c-funcion:#795E26; --c-modulo:#267F99; --c-var:#001080; --c-num:#098658; --c-com:#008000; --c-cadena:#A31515; --c-texto:#1F1F1F; }
 @media (max-width: 720px) { .ejercicio .detalle { margin-left:0; } }
+
+/* Guardar el progreso (solo aparece con la API prendida) */
+.cuenta { margin-top:28px; padding:18px 0 4px; border-top:1px solid var(--linea); }
+.cuenta h2 { font:600 18px "IBM Plex Sans", sans-serif; margin:0 0 8px; }
+.cuenta p { color:var(--texto); margin:0 0 12px; }
+.cuenta form { display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px; }
+.cuenta label { font:13px "IBM Plex Mono", monospace; color:var(--gris); }
+.cuenta input { flex:1 1 220px; max-width:320px; padding:9px 12px; font:15px "IBM Plex Sans", sans-serif; color:var(--tinta); background:var(--fondo); border:1px solid var(--linea); }
+.cuenta input:focus { outline:1px solid var(--gris); }
+.cuenta .boton { background:none; cursor:pointer; font-family:"IBM Plex Sans", sans-serif; }
+.cuenta .estado-cuenta a { color:var(--tinta); border-bottom:1px solid var(--linea); }

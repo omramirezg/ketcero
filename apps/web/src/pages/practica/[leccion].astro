@@ -4,6 +4,7 @@
 import { getCollection, render } from "astro:content";
 import Base from "../../layouts/Base.astro";
 import Ejercicio from "../../components/Ejercicio.astro";
+import { API_ACTIVA } from "../../lib/progreso";
 
 export async function getStaticPaths() {
   return (await getCollection("practica")).map((p) => ({ params: { leccion: p.data.slug }, props: { p } }));
@@ -22,6 +23,15 @@ const cabeza = p.data.estado === "borrador" ? '<meta name="robots" content="noin
 <p>{p.data.descripcion}</p>
 {p.data.estado === "borrador" && <p class="aviso">Borrador: esta página todavía no está enlazada desde ningún lado.</p>}
 </section>
+{API_ACTIVA && <section class="cuenta" aria-labelledby="t-cuenta">
+<h2 id="t-cuenta">Guardar tu progreso</h2>
+<div data-sin-sesion>
+<p>Lo que resuelves ya queda guardado en este navegador. Si quieres verlo también en otro computador, entra con tu correo: te llega un enlace y listo, sin contraseña.</p>
+<form data-entrar><label for="correo">Tu correo</label><input id="correo" name="correo" type="email" required autocomplete="email"><button class="boton" type="submit">Mandarme el enlace</button></form>
+</div>
+<p data-con-sesion hidden>Entraste como <span data-correo></span>. Tu progreso se sincroniza solo. <button type="button" class="reiniciar" data-salir>Salir</button></p>
+<p class="estado-cuenta" aria-live="polite"></p>
+</section>}
 <article class="ficha practica-texto">
 <Content components={{ Ejercicio }} />
 </article>
@@ -29,6 +39,53 @@ const cabeza = p.data.estado === "borrador" ? '<meta name="robots" content="noin
 </div>
 <script>
   import { montarTodos } from "@ketcero/practica/cliente";
+  import { API_ACTIVA, guardar, leerLocal, pedirEnlace, quienSoy, salir, sincronizar } from "../../lib/progreso";
+
   montarTodos();
+
+  // Lo resuelto se guarda en este navegador (y, si hay cuenta, también en la nube).
+  document.addEventListener("ketcero:comprobado", (ev) => {
+    const d = (ev as CustomEvent).detail;
+    const clave = `practica:${d.leccion}/${d.id}`;
+    const antes = leerLocal()[clave]?.valor as { resuelto?: boolean } | undefined;
+    if (antes?.resuelto && d.bien < d.total) return; // no se pierde un «resuelto» por seguir practicando
+    guardar(clave, { resuelto: d.bien === d.total, bien: d.bien, total: d.total });
+  });
+
+  function marcarResueltos() {
+    const todo = leerLocal();
+    document.querySelectorAll<HTMLElement>("section.ejercicio").forEach((caja) => {
+      const datos = JSON.parse(caja.querySelector("script[type='application/json']")!.textContent!);
+      const v = todo[`practica:${datos.leccion}/${datos.id}`]?.valor as { resuelto?: boolean } | undefined;
+      const estado = caja.querySelector<HTMLElement>(".estado")!;
+      if (v?.resuelto && !estado.textContent) estado.textContent = "Ya lo resolviste antes.";
+    });
+  }
+  marcarResueltos();
+  document.addEventListener("ketcero:progreso", marcarResueltos);
+
+  if (API_ACTIVA) {
+    const panel = document.querySelector<HTMLElement>(".cuenta")!;
+    const aviso = panel.querySelector<HTMLElement>(".estado-cuenta")!;
+    const mostrar = (correo: string | null) => {
+      panel.querySelector<HTMLElement>("[data-sin-sesion]")!.hidden = !!correo;
+      panel.querySelector<HTMLElement>("[data-con-sesion]")!.hidden = !correo;
+      panel.querySelector<HTMLElement>("[data-correo]")!.textContent = correo ?? "";
+    };
+    quienSoy().then((correo) => { mostrar(correo); if (correo) sincronizar(); });
+    panel.querySelector<HTMLFormElement>("[data-entrar]")!.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const correo = (panel.querySelector<HTMLInputElement>("#correo")!).value.trim();
+      aviso.textContent = "Mandando…";
+      const r = await pedirEnlace(correo);
+      aviso.textContent = r.mensaje;
+      if (r.enlace) { // solo en local: el correo no sale, el enlace se muestra aquí para probar
+        const a = document.createElement("a");
+        a.href = r.enlace; a.textContent = " Abrir el enlace de prueba"; a.dataset.enlacePrueba = "";
+        aviso.append(a);
+      }
+    });
+    panel.querySelector<HTMLButtonElement>("[data-salir]")!.addEventListener("click", async () => { await salir(); mostrar(null); });
+  }
 </script>
 </Base>

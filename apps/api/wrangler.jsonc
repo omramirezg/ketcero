@@ -1,0 +1,54 @@
+// Worker con la API de Ket Cero (cuentas, progreso y, apagado, cursos de pago) + los mismos archivos de Astro.
+// NO está desplegado. El sitio publicado usa el wrangler.jsonc de la raíz (solo archivos).
+// Para prenderlo: crear la base D1 de verdad, poner su database_id aquí, aplicar las migraciones y desplegar
+// este archivo en lugar del de la raíz. Pasos en notas/COMO_PUBLICAR_ASTRO.md.
+{
+  "name": "ketcero",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": "../web/dist",
+    "binding": "ASSETS",
+    "not_found_handling": "404-page",
+    "html_handling": "auto-trailing-slash",
+    "run_worker_first": ["/api/*"]
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "ketcero",
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "migraciones"
+    }
+  ],
+  "observability": { "enabled": true },
+  "vars": {
+    "ORIGEN": "https://ketcero.com",
+    "ENTORNO": "produccion",
+    "CORREO_PROVEEDOR": "consola",
+    "TURNSTILE_ACTIVO": "no",
+    "PAGOS_ACTIVOS": "no",
+    "STREAM_ACTIVO": "no"
+  },
+  "env": {
+    // wrangler dev --env local: todo en el computador (D1 en .wrangler/state), correos al registro
+    "local": {
+      "vars": {
+        "ORIGEN": "http://localhost:8787",
+        "ENTORNO": "local",
+        "CORREO_PROVEEDOR": "consola",
+        "TURNSTILE_ACTIVO": "no",
+        "PAGOS_ACTIVOS": "no",
+        "STREAM_ACTIVO": "no"
+      },
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "ketcero",
+          "database_id": "00000000-0000-0000-0000-000000000000",
+          "migrations_dir": "migraciones"
+        }
+      ]
+    }
+  }
+}
