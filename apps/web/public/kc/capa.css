@@ -100,6 +100,8 @@ html.kc-oscuro { filter:invert(.92) hue-rotate(180deg) sepia(.14); }
    en las demás (dígitos y mapas) las imágenes se oscurecen igual que los dibujos */
 html.kc-oscuro[data-kc-fotos=""] img, html.kc-oscuro[data-kc-fotos=""] image, html.kc-oscuro video,
 html.kc-oscuro[data-kc-fotos="jpeg"] img[src^="data:image/jpeg"], html.kc-oscuro[data-kc-fotos="jpeg"] image[href^="data:image/jpeg"] { filter:hue-rotate(180deg) invert(1) contrast(1.163); }
+html.kc-oscuro .kc-foto { filter:hue-rotate(180deg) invert(1) contrast(1.163); }   /* píxeles reales pintados con rect: conservan su color */
+html.kc-oscuro .kc-foto img, html.kc-oscuro .kc-foto image, html.kc-oscuro .kc-foto .kc-foto { filter:none !important; }   /* sin doble inversión: el grupo ya la deshizo */
 /* data-kc-fotos="jpeg": solo las fotos (JPEG) conservan sus colores; los mapas (PNG) se oscurecen como los dibujos */
 
 /* --- zoom del dibujo --- */
