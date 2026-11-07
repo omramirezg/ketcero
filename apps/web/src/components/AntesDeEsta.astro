@@ -1,0 +1,13 @@
+---
+// «Antes de esta lección»: las lecciones que conviene haber visto, con su enlace (sale de prerrequisitos).
+import { cursos, todasPublicadas, type Leccion } from "../lib/sitio";
+interface Props { leccion: Leccion }
+const { leccion } = Astro.props;
+const todas = todasPublicadas(await cursos());
+const antes = leccion.prerrequisitos.map((s) => {
+  const l = todas.find((x) => x.slug === s);
+  if (!l) throw new Error(`Prerrequisito desconocido: ${s} (en ${leccion.slug})`);
+  return l;
+});
+---
+{antes.length > 0 && <><p class="t-antes">Antes de esta lección</p><ul class="antes">{antes.map((l) => <li><a href={l.pagina}>{l.numero} · {l.titulo}</a></li>)}</ul></>}

@@ -4,11 +4,13 @@
 - Sirve las direcciones sin «.html» (/ia/cnn/Animacion_A4_la_CNN_completa → .html) y las carpetas con index.html.
 - Usa sitio/404.html cuando una página no existe.
 
-Uso:  python herramientas/servidor_local.py [puerto]
+Uso:  python herramientas/servidor_local.py [puerto] [carpeta]
+      carpeta: por omisión la salida de Astro (apps/web/dist); usa «sitio» para la del generador anterior.
 """
 import fnmatch, http.server, os, sys
 
-RAIZ = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "sitio")
+REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+RAIZ = os.path.join(REPO, sys.argv[2] if len(sys.argv) > 2 else os.path.join("apps", "web", "dist"))
 
 
 def leer_reglas():

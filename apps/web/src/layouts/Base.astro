@@ -1,0 +1,59 @@
+---
+// Plantilla común: cabecera con la marca, menú de cursos, cajón del temario, contenido y pie con la firma.
+import Logo from "../components/Logo.astro";
+import { AUTOR, ANALITICA, DOMINIO, cursos, v } from "../lib/sitio";
+import { BOTON_JS, CLIP_JS, TEMA_JS } from "../lib/guiones";
+
+interface Props { titulo: string; descripcion: string; ruta: string; actual?: string; cabeza?: string }
+const { titulo, descripcion, ruta, actual = "", cabeza = "" } = Astro.props;
+const lista = await cursos();
+const enCursos = actual.startsWith("/cursos/");
+---
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script is:inline set:html={TEMA_JS}></script>
+<title>{titulo}</title>
+<meta name="description" content={descripcion}>
+<meta name="author" content={AUTOR}>
+<link rel="canonical" href={DOMINIO + ruta}>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="alternate icon" href="/favicon.ico">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Ket Cero">
+<meta property="og:title" content={titulo}>
+<meta property="og:description" content={descripcion}>
+<meta property="og:url" content={DOMINIO + ruta}>
+<meta property="og:image" content={DOMINIO + "/img/compartir.png"}>
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Ket Cero: un 0 escrito a mano y lo que ve un filtro de la red">
+<meta property="og:locale" content="es_CO">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preload" href="/fuentes/IBMPlexSans-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href={v("/kc/fuentes.css")}>
+<link rel="stylesheet" href={v("/estilo.css")}>
+{ANALITICA && <script is:inline defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon={JSON.stringify({ token: ANALITICA })}></script>}
+<Fragment set:html={cabeza} />
+<slot name="cabeza" />
+</head>
+<body>
+<a class="saltar" href="#contenido">Saltar al contenido</a>
+<header><div class="in">
+<div class="izq"><button id="menu" class="hamb" type="button" aria-expanded="false" aria-controls="cajon" aria-label="Abrir los cursos"><span></span><span></span><span></span></button>
+<a class="marca" href="/" aria-label="Ket Cero, inicio"><Logo />Ket Cero<small>Machine learning desde cero</small></a></div>
+<nav aria-label="Principal"><div class="desplegable"><button id="cursos" type="button" aria-expanded="false" aria-controls="lista-cursos" aria-current={enCursos ? "page" : undefined}>Cursos</button><div id="lista-cursos" class="lista" hidden>{lista.map((c) => <a href={`/cursos/${c.slug}/`}>{c.nombre}<small>{c.temasNum.length} temas · {c.publicadas.length} lecciones</small></a>)}</div></div><a href="/omar/" aria-current={actual === "/omar/" ? "page" : undefined}>Quién soy</a><button id="tema" type="button" role="switch" aria-checked="true"><span>Modo oscuro</span><span class="pista"><span class="perilla"></span></span></button></nav>
+</div></header>
+<div id="velo" class="velo" hidden></div>
+<aside id="cajon" class="cajon" aria-label="Cursos">
+{lista.map((c) => <><p class="t">{c.nombre}</p><ol>{c.temasNum.map((t) => <li><a href={`/cursos/${c.slug}/#${t.clave}`}><em>{t.t}</em>{t.titulo}<span>{t.publicadas}</span></a></li>)}</ol></>)}
+</aside>
+<slot />
+<div id="cargando" class="cargando" role="status" hidden><div><Logo /><p>Cargando la animación…</p><small>Trae los datos reales de cada paso: la primera vez tarda unos segundos.</small></div></div>
+<footer><div class="in"><span>Ket Cero · un proyecto de <a href="/omar/">{AUTOR}</a></span><span>ketcero.com</span></div></footer>
+<script is:inline set:html={BOTON_JS}></script>
+<script is:inline set:html={CLIP_JS}></script>
+</body>
+</html>

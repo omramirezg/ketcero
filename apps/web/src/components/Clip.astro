@@ -1,0 +1,11 @@
+---
+// La animación corriendo, en un video corto sin sonido. En el temario se anima al pasar el mouse; en la página de
+// la lección se reproduce sola en bucle. Si la lección no tiene clip, queda su imagen fija.
+import { v, type Leccion } from "../lib/sitio";
+interface Props { leccion: Leccion; alPasar?: boolean; carga?: "lazy" | "eager" }
+const { leccion, alPasar = false, carga = "lazy" } = Astro.props;
+const poster = v(leccion.miniaturaUrl);
+---
+{leccion.clipBase
+  ? <video class="clip" muted loop playsinline preload={alPasar ? "none" : "auto"} data-al-pasar={alPasar ? "" : undefined} autoplay={!alPasar} poster={poster} aria-label={leccion.alt}><source src={v(leccion.clipBase + ".webm")} type="video/webm"><source src={v(leccion.clipBase + ".mp4")} type="video/mp4"></video>
+  : <img src={poster} alt={leccion.alt} width="940" height="587" loading={carga}>}

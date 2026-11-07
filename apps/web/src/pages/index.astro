@@ -1,0 +1,44 @@
+---
+import Base from "../layouts/Base.astro";
+import FilasCursos from "../components/FilasCursos.astro";
+import { AUTOR, DOMINIO, cursos, ld, v } from "../lib/sitio";
+
+const lista = await cursos();
+const dl = lista[0];
+// Pie de la primera pantalla: la última lección publicada y la siguiente en el orden del curso.
+const orden = dl.temasNum.flatMap((t) => t.items);
+const k = orden.map((x) => !!x.leccion).lastIndexOf(true);
+const ultima = orden[k].leccion!;
+const proxima = orden.slice(k + 1).find((x) => !x.leccion);
+const corto = (t: string) => t.split(":")[0];
+const cabeza = ld({ "@context": "https://schema.org", "@type": "WebSite", name: "Ket Cero", url: DOMINIO + "/", inLanguage: "es",
+  description: "Machine learning desde cero, en español: lecciones animadas paso a paso con los datos reales del entrenamiento." })
+  + ld({ "@context": "https://schema.org", "@type": "Organization", name: "Ket Cero", url: DOMINIO + "/", logo: DOMINIO + "/favicon.svg",
+  founder: { "@type": "Person", name: AUTOR, url: `${DOMINIO}/omar/` }, sameAs: ["https://github.com/omramirezg/ketcero"] });
+---
+<Base titulo="Ket Cero · Machine learning desde cero" descripcion="Machine learning desde cero, en español: cursos con lecciones animadas paso a paso hechas con los datos reales del entrenamiento." ruta="/" actual="/" cabeza={cabeza}>
+<div class="cuerpo">
+<main id="contenido">
+<section class="cabeza portada">
+<div>
+<div class="mono">Actualizado el {dl.actualizado}</div>
+<h1>Machine learning desde cero, con cada operación a la vista.</h1>
+<p>Deja de imaginarte cómo funciona una red neuronal. Míralo. Lecciones animadas, número por número.</p>
+<a class="ir" href={`/cursos/${dl.slug}/`}>Empezar el curso de {dl.nombre} →</a>
+<div id="codigo" class="panel-codigo"></div>
+</div>
+<div class="lado">
+<p class="explica">Una red ya entrenada mira un 0: su primer filtro busca bordes, casilla por casilla.</p>
+<div id="cero" class="cero"></div>
+</div>
+<div class="franja"><a href={ultima.pagina}>Última lección: {corto(ultima.titulo)} →</a><a class="bajar" href="#lista-de-cursos">Cursos ↓</a>{proxima ? <span>Próxima: {corto(proxima.titulo)}</span> : <span></span>}</div>
+</section>
+<section class="tema" id="lista-de-cursos"><h2>Cursos</h2><p>Empieza por aquí.</p><FilasCursos /></section>
+</main>
+</div>
+<script is:inline src={v("/js/cero_datos.js")}></script>
+<script>
+  import { montarCero } from "@ketcero/motor/cero";
+  montarCero(document.getElementById("cero")!, (window as any).DATOS_CERO, { codigo: document.getElementById("codigo") });
+</script>
+</Base>

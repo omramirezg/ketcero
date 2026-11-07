@@ -1,0 +1,68 @@
+---
+// Las rutas de Ket Cero y qué necesita cada una: un grafo de prerrequisitos, no una lista.
+import Base from "../../layouts/Base.astro";
+import rutasJson from "../../../../../contenido/rutas.json";
+import { cursos } from "../../lib/sitio";
+
+type Ruta = { clave: string; numero: number; titulo: string; descripcion: string; necesita: string[]; curso: string | null };
+const rutas = (rutasJson as { rutas: Ruta[] }).rutas;
+const lista = await cursos();
+const nombre = (clave: string) => rutas.find((r) => r.clave === clave)!.titulo;
+
+// Grafo: cada ruta en su nivel (la longitud del camino más largo de prerrequisitos que llega a ella).
+const nivel = new Map<string, number>();
+const calc = (r: Ruta): number => {
+  if (nivel.has(r.clave)) return nivel.get(r.clave)!;
+  const n = r.necesita.length ? 1 + Math.max(...r.necesita.map((c) => calc(rutas.find((x) => x.clave === c)!))) : 0;
+  nivel.set(r.clave, n);
+  return n;
+};
+rutas.forEach(calc);
+const niveles = Math.max(...nivel.values()) + 1;
+const porNivel = Array.from({ length: niveles }, (_, n) => rutas.filter((r) => nivel.get(r.clave) === n));
+const ANCHO = 960, ALTO_NIVEL = 92, CAJA_A = 196, CAJA_H = 46;
+const pos = new Map<string, { x: number; y: number }>();
+porNivel.forEach((fila, n) => fila.forEach((r, i) => pos.set(r.clave, { x: ((i + 0.5) * ANCHO) / fila.length, y: 30 + n * ALTO_NIVEL })));
+const alto = 30 + (niveles - 1) * ALTO_NIVEL + CAJA_H + 20;
+---
+<Base titulo="Rutas · Ket Cero" descripcion="Las rutas de Ket Cero, de las matemáticas básicas a la robótica y la computación cuántica, y qué necesita cada una." ruta="/rutas/" actual="/rutas/">
+<div class="cuerpo">
+<main id="contenido">
+<section class="cabeza">
+<div class="mono">Rutas</div>
+<h1>De las matemáticas básicas a la computación cuántica</h1>
+<p>Cada ruta dice qué necesitas antes. Sigue las flechas: lo que está arriba es la base de lo que está abajo.</p>
+</section>
+<section class="tema">
+<svg class="grafo" viewBox={`0 0 ${ANCHO} ${alto}`} role="img" aria-label="Grafo de rutas y sus prerrequisitos">
+{rutas.flatMap((r) => r.necesita.map((c) => {
+  const a = pos.get(c)!, b = pos.get(r.clave)!;
+  const salto = nivel.get(r.clave)! - nivel.get(c)!;
+  if (salto <= 1) return <line x1={a.x} y1={a.y + CAJA_H} x2={b.x} y2={b.y} class="arista" />;
+  // si salta niveles, la arista rodea por el costado para no cruzar las cajas de en medio
+  const izq = b.x <= ANCHO / 2, lado = izq ? 12 : ANCHO - 12, borde = izq ? -CAJA_A / 2 : CAJA_A / 2;
+  return <path d={`M${a.x + borde} ${a.y + CAJA_H / 2} C${lado} ${a.y + CAJA_H / 2}, ${lado} ${b.y + CAJA_H / 2}, ${b.x + borde} ${b.y + CAJA_H / 2}`} class="arista" fill="none" />;
+}))}
+{rutas.map((r) => {
+  const p = pos.get(r.clave)!;
+  const curso = r.curso ? lista.find((c) => c.slug === r.curso) : undefined;
+  const caja = <g class={curso ? "nodo activo" : "nodo"}><rect x={p.x - CAJA_A / 2} y={p.y} width={CAJA_A} height={CAJA_H} rx="3" /><text x={p.x} y={p.y + 19} text-anchor="middle" class="num">{r.numero}</text><text x={p.x} y={p.y + 36} text-anchor="middle">{r.titulo.length > 28 ? r.titulo.split(" y ")[0] : r.titulo}</text></g>;
+  return curso ? <a href={`/cursos/${curso.slug}/`}>{caja}</a> : caja;
+})}
+</svg>
+</section>
+{rutas.map((r) => {
+  const curso = r.curso ? lista.find((c) => c.slug === r.curso) : undefined;
+  return (
+    <section class="tema" id={r.clave}>
+      <h2>{r.titulo} <span>Ruta {r.numero}</span></h2>
+      <p>{r.descripcion}</p>
+      {curso
+        ? <a class="fila curso" href={`/cursos/${curso.slug}/`}><div class="n">{String(r.numero).padStart(2, "0")}</div><div><b>{curso.nombre}</b><p>{r.necesita.length ? `Necesita: ${r.necesita.map(nombre).join(", ")}.` : "No necesita nada antes."}</p><div class="d">{curso.temasNum.length} temas · {curso.publicadas.length} lecciones publicadas</div></div></a>
+        : <div class="fila pend"><div class="n">{String(r.numero).padStart(2, "0")}</div><div><b>{r.necesita.length ? `Necesita: ${r.necesita.map(nombre).join(", ")}` : "No necesita nada antes"}</b></div><div class="d">en preparación</div></div>}
+    </section>
+  );
+})}
+</main>
+</div>
+</Base>

@@ -1,0 +1,16 @@
+{
+  "name": "ketcero",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "recursos": "python herramientas/recursos.py",
+    "build": "npm run build -w @ketcero/web",
+    "build:todo": "npm run recursos && npm run build",
+    "dev": "npm run dev -w @ketcero/web",
+    "test": "npm run test --workspaces --if-present"
+  }
+}

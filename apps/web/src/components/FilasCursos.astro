@@ -1,0 +1,5 @@
+---
+import { cursos } from "../lib/sitio";
+const lista = await cursos();
+---
+{lista.map((c, k) => <a class="fila curso" href={`/cursos/${c.slug}/`}><div class="n">{String(k + 1).padStart(2, "0")}</div><div><b>{c.nombre}</b><p>{c.descripcion}</p><div class="d">{c.temasNum.length} temas · {c.publicadas.length} lecciones publicadas</div></div></a>)}

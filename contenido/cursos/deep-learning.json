@@ -1,0 +1,103 @@
+{
+  "slug": "deep-learning",
+  "nombre": "Deep Learning",
+  "descripcion": "Redes neuronales profundas en el orden de las sesiones del curso: de las redes densas a los transformers. Cada lección es una animación paso a paso con los datos reales del entrenamiento.",
+  "actualizado": "5 de noviembre de 2026",
+  "ruta": "deep-learning",
+  "temas": [
+    {
+      "clave": "redes-profundas",
+      "titulo": "Redes neuronales profundas",
+      "descripcion": "Qué es una red, cuándo le gana al machine learning clásico y cómo aprende con descenso de gradiente.",
+      "lecciones": [
+        {
+          "titulo": "¿Machine learning o deep learning? Depende de cuántos datos hay",
+          "estado": "preparacion"
+        },
+        {
+          "titulo": "Una red que pinta un mapa de cultivos",
+          "estado": "preparacion"
+        }
+      ]
+    },
+    {
+      "clave": "cnn",
+      "titulo": "Redes convolucionales",
+      "descripcion": "Cómo una red lee una imagen.",
+      "lecciones": [
+        {
+          "slug": "la-cnn-completa"
+        },
+        {
+          "titulo": "Transfer learning: hojas de café sanas o enfermas",
+          "estado": "preparacion"
+        },
+        {
+          "titulo": "Clasificar sin entrenar: CLIP contra una CNN",
+          "estado": "preparacion"
+        }
+      ]
+    },
+    {
+      "clave": "deteccion",
+      "titulo": "Detección de objetos",
+      "descripcion": "Encontrar y encerrar objetos: cajas, puntajes, IoU y NMS.",
+      "lecciones": [
+        {
+          "slug": "mini-yolo-digitos-en-la-calle"
+        },
+        {
+          "titulo": "YOLO11 encuentra huecos en la calle",
+          "estado": "preparacion"
+        }
+      ]
+    },
+    {
+      "clave": "segmentacion",
+      "titulo": "Segmentación de imágenes",
+      "descripcion": "Etiquetar cada píxel de una imagen, no solo encerrar el objeto en una caja.",
+      "lecciones": [
+        {
+          "slug": "tipos-de-segmentacion"
+        },
+        {
+          "slug": "unet-edificios-en-fotos-satelitales"
+        },
+        {
+          "titulo": "Cómo se etiquetan las imágenes para entrenar",
+          "estado": "preparacion"
+        }
+      ]
+    },
+    {
+      "clave": "generativos-secuencias",
+      "titulo": "Modelos generativos y secuencias",
+      "descripcion": "Redes que inventan imágenes y redes que leen datos en orden.",
+      "lecciones": [
+        {
+          "titulo": "GANs: dos redes que compiten",
+          "estado": "preparacion"
+        },
+        {
+          "titulo": "RNNs: una red con memoria",
+          "estado": "preparacion"
+        }
+      ]
+    },
+    {
+      "clave": "transformers-grafos",
+      "titulo": "Transformers y redes de grafos",
+      "descripcion": "La atención, base de los modelos de lenguaje, y las redes que aprenden sobre conexiones.",
+      "lecciones": [
+        {
+          "titulo": "Transformers: la atención, número por número",
+          "estado": "preparacion"
+        },
+        {
+          "titulo": "Redes neuronales de grafos",
+          "estado": "preparacion"
+        }
+      ]
+    }
+  ]
+}

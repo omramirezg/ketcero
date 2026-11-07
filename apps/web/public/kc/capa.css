@@ -1,0 +1,105 @@
+/* Ket Cero · capa del sitio sobre las animaciones del curso (los originales no se tocan).
+   Modo oscuro: la página entera se invierte (invert .93 deja el blanco en #121212, como el fondo del sitio);
+   por eso la cabecera y los avisos de la capa usan colores «pre-invertidos» que, al invertirse, quedan iguales al sitio. */
+
+/* --- cabecera del sitio --- */
+#kc-cab { --f:#FFFFFF; --t:#161616; --g:#6B6B6B; --l:#E2E2E2;
+  position:fixed; top:0; left:0; right:0; height:65px; box-sizing:border-box; z-index:50; display:flex; align-items:center; justify-content:space-between;
+  padding:0 24px; background:var(--f); border-bottom:1px solid var(--l); font:14px "IBM Plex Sans", system-ui, sans-serif; color:var(--t); }
+html.kc-oscuro #kc-cab { --f:#FFFFFF; --t:#000000; --g:#616161; --l:#E3E3E3; }   /* tras invertir: #121212, #EDEDED, #9A9A9A, #2A2A2A */
+#kc-cab a { color:inherit; text-decoration:none; }
+#kc-cab .kc-marca { display:flex; align-items:center; gap:10px; font-weight:600; font-size:18px; color:var(--t); white-space:nowrap; }
+#kc-cab .kc-marca small { font-weight:400; color:var(--g); font-size:14px; margin-left:8px; padding-left:12px; border-left:1px solid var(--l); }
+#kc-cab nav { display:flex; align-items:center; gap:24px; white-space:nowrap; }
+#kc-cab nav a, #kc-cab nav button { color:var(--g); font:14px "IBM Plex Sans", system-ui, sans-serif; }
+#kc-cab nav a:hover, #kc-cab nav button:hover { color:var(--t); }
+#kc-cab .kc-aviso { font:12px "IBM Plex Mono", monospace; color:var(--g); }
+#kc-cab .kc-volver { color:var(--t) !important; }
+#kc-cab .kc-cero { stroke:#C8502A; }
+html.kc-oscuro #kc-cab .kc-cero { stroke:#FF8255; }
+#kc-tema, #kc-ayuda-boton { display:inline-flex; align-items:center; gap:10px; background:none; border:0; padding:0; cursor:pointer; }
+#kc-ayuda-boton { width:24px; height:24px; justify-content:center; border:1px solid var(--g) !important; border-radius:50%; font:13px "IBM Plex Mono", monospace !important; }
+.kc-pista { position:relative; width:34px; height:18px; box-sizing:border-box; border:1px solid var(--g); border-radius:9px; }
+.kc-perilla { position:absolute; top:2px; left:2px; width:12px; height:12px; border-radius:50%; background:var(--g); transition:transform .15s; }
+#kc-tema[aria-checked="true"] .kc-pista { background:var(--t); border-color:var(--t); }
+#kc-tema[aria-checked="true"] .kc-perilla { transform:translateX(16px); background:var(--f); }
+#kc-cab a:focus-visible, #kc-cab button:focus-visible, .kc-caja a:focus-visible, .kc-caja button:focus-visible, #kc-zoom button:focus-visible {
+  outline:2px solid #161616; outline-offset:3px; }
+@media (max-width: 1420px) { #kc-cab .kc-marca small { display:none; } }
+@media (max-width: 1180px) { #kc-cab .kc-aviso { display:none; } }
+@media (max-width: 760px) { #kc-cab .kc-vecina, #kc-cab .kc-volver { display:none; } }
+
+/* --- cajas de la capa: atajos, seguir donde quedaste, aviso para celular --- */
+.kc-caja { --f:#FFFFFF; --t:#161616; --g:#6B6B6B; --l:#E2E2E2;
+  position:fixed; z-index:60; background:var(--f); color:var(--t); border:1px solid var(--l); font:14px/1.6 "IBM Plex Sans", system-ui, sans-serif; }
+html.kc-oscuro .kc-caja { --t:#000000; --g:#616161; --l:#D0D0D0; }
+.kc-caja button { font:inherit; color:var(--t); background:none; border:1px solid var(--l); padding:4px 12px; cursor:pointer; }
+.kc-caja button:hover { border-color:var(--t); }
+.kc-caja a { color:var(--t); }
+#kc-ayuda { top:73px; right:24px; width:340px; padding:16px 18px; }
+#kc-ayuda h2 { margin:0 0 10px; font-size:15px; font-weight:600; }
+#kc-ayuda dl { margin:0; display:grid; grid-template-columns:auto 1fr; gap:6px 14px; }
+#kc-ayuda dt { font:12.5px "IBM Plex Mono", monospace; color:var(--t); }
+#kc-ayuda dd { margin:0; color:var(--g); font-size:13.5px; }
+#kc-seguir { top:73px; left:24px; padding:8px 10px 8px 14px; display:flex; align-items:center; gap:12px; font-size:13.5px; }
+#kc-seguir span { color:var(--g); }
+#kc-movil { inset:0; z-index:2147482000; display:flex; align-items:center; justify-content:center; padding:24px; border:0; text-align:center; }
+#kc-movil div { max-width:340px; }
+#kc-movil p { margin:0 0 6px; font-weight:500; font-size:17px; }
+#kc-movil small { display:block; color:var(--g); margin-bottom:18px; }
+#kc-movil a { display:block; margin-top:14px; font-size:14px; }
+.kc-caja[hidden] { display:none !important; }
+
+/* --- la animación debajo de la cabecera --- */
+#codigo { top:65px !important; }
+#codbtn { top:75px !important; }
+
+/* --- estilo del sitio en la interfaz de la animación --- */
+* { font-style:normal !important; }
+#modos button, #cabeza, #cabeza button, #texto, #inicio, #inicio h1, #inicio h2, #inicio p, #estado, #barra, #pie, #codcab, #codbtn, #velS, #vctl, #pestBanda {
+  font-family:"IBM Plex Sans", system-ui, sans-serif !important; }
+#cont, #inicio .sub, #inicio .op .n, #inicio .pie, #estado .txt { font-family:"IBM Plex Mono", monospace !important; }
+#modos button { background:transparent !important; color:#6B6B6B !important; border-color:#D6D6D6 !important; font-size:15px !important; }
+#modos button.on { color:#161616 !important; border-color:#161616 !important; font-weight:500; }
+#modos button:not(.on):hover { color:#161616 !important; background:transparent !important; }
+#cabeza .sec { color:#6B6B6B !important; font-weight:400 !important; }
+#cabeza .sec.hecho { color:#3A3A3A !important; }
+#cabeza .sec.act { color:#161616 !important; font-weight:500 !important; border-color:#161616 !important; border-bottom-color:#161616 !important; }
+#cabeza .sec:hover { color:#161616 !important; }
+#regla { border-top:1px solid #161616 !important; }
+#regla2 { border-top:1px solid #D6D6D6 !important; }
+#inicio h1 { text-align:left !important; left:200px !important; font-weight:600 !important; font-size:34px !important; letter-spacing:-.5px; }
+#inicio .sub { text-align:left !important; left:200px !important; font-size:14px !important; color:#6B6B6B !important; }
+#inicio .op { border:1px solid #E2E2E2 !important; box-shadow:none !important; background:transparent !important; }
+#inicio .op:hover { border-color:#161616 !important; }
+#inicio .op h2 { text-align:left !important; margin:34px 36px 0 !important; font-weight:600 !important; font-size:28px !important; }
+#inicio .op p { text-align:left !important; margin:16px 36px 0 !important; font-size:18px !important; line-height:1.55 !important; color:#3A3A3A; }
+#inicio .op .n { text-align:left !important; left:36px !important; right:36px !important; font-size:13px !important; color:#6B6B6B !important; }
+#inicio .pie { text-align:left !important; left:200px !important; font-size:13px !important; }
+#estado { background:transparent !important; border-color:#E2E2E2 !important; }
+#codbtn { font-size:14px !important; }
+#codbtn:not(.on) { border-color:#D6D6D6 !important; }
+#codbtn.on { background:transparent !important; border-color:#161616 !important; color:#161616 !important; }
+
+/* --- modo oscuro --- */
+html.kc-oscuro { filter:invert(.93) hue-rotate(180deg); }
+/* en las lecciones con fotos reales (data-kc-fotos) las imágenes se vuelven a invertir para conservar sus colores;
+   en las demás (dígitos y mapas) las imágenes se oscurecen igual que los dibujos */
+html.kc-oscuro[data-kc-fotos=""] img, html.kc-oscuro[data-kc-fotos=""] image, html.kc-oscuro video,
+html.kc-oscuro[data-kc-fotos="jpeg"] img[src^="data:image/jpeg"], html.kc-oscuro[data-kc-fotos="jpeg"] image[href^="data:image/jpeg"] { filter:hue-rotate(180deg) invert(1) contrast(1.163); }
+/* data-kc-fotos="jpeg": solo las fotos (JPEG) conservan sus colores; los mapas (PNG) se oscurecen como los dibujos */
+
+/* --- zoom del dibujo --- */
+#kc-zoom { position:fixed; z-index:45; display:none; align-items:center; background:#FFFFFF; border:1px solid #D6D6D6; font:13px "IBM Plex Sans", system-ui, sans-serif; color:#3A3A3A; user-select:none; }
+#kc-zoom button { background:none; border:0; border-left:1px solid #E2E2E2; padding:5px 11px; color:#3A3A3A; font:inherit; cursor:pointer; line-height:1.2; }
+#kc-zoom button:first-child { border-left:0; }
+#kc-zoom button:hover { color:#161616; }
+#kc-zoom .kc-nivel { min-width:34px; padding:0 4px; text-align:center; font:12px "IBM Plex Mono", monospace; color:#6B6B6B; border-left:1px solid #E2E2E2; }
+html.kc-zoom-activo #dibujo { cursor:grab; overflow:hidden !important; }
+html.kc-arrastrando #dibujo { cursor:grabbing; }
+#dibujo { touch-action:pan-x pan-y; }
+html.kc-zoom-activo #dibujo { touch-action:none; }
+html.kc-ampliado #kc-cab, html.kc-ampliado #codigo, html.kc-ampliado #codbtn, html.kc-ampliado #marco > :not(#dibujo), html.kc-ampliado .kc-caja { visibility:hidden !important; }
+html.kc-ampliado #marco { transform:none !important; left:0 !important; top:0 !important; width:100vw !important; height:100vh !important; }
+html.kc-ampliado #dibujo { visibility:visible !important; position:fixed !important; left:24px !important; top:20px !important; width:calc(100vw - 48px) !important; height:calc(100vh - 76px) !important; }
+html.kc-ampliado body { background:#FFFFFF; }

@@ -1,0 +1,18 @@
+---
+import Base from "../../layouts/Base.astro";
+import FilasCursos from "../../components/FilasCursos.astro";
+import { cursos } from "../../lib/sitio";
+const n = (await cursos()).length;
+---
+<Base titulo="Cursos · Ket Cero" descripcion="Cursos de machine learning desde cero, en español, con animaciones paso a paso." ruta="/cursos/" actual="/cursos/">
+<div class="cuerpo">
+<main id="contenido">
+<section class="cabeza">
+<div class="mono">{n} {n === 1 ? "curso" : "cursos"}</div>
+<h1>Cursos</h1>
+<p>Cada curso es un temario completo, con sus lecciones animadas paso a paso.</p>
+</section>
+<section class="tema"><FilasCursos /></section>
+</main>
+</div>
+</Base>

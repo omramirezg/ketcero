@@ -1,0 +1,33 @@
+---
+import Base from "../../../layouts/Base.astro";
+import Clip from "../../../components/Clip.astro";
+import { AUTOR, DOMINIO, cursos, ld, type Curso } from "../../../lib/sitio";
+
+export async function getStaticPaths() {
+  return (await cursos()).map((c) => ({ params: { curso: c.slug }, props: { c } }));
+}
+const { c } = Astro.props as { c: Curso };
+const ruta = `/cursos/${c.slug}/`;
+const cabeza = ld({ "@context": "https://schema.org", "@type": "Course", name: c.nombre, description: c.descripcion, url: DOMINIO + ruta, inLanguage: "es",
+  provider: { "@type": "Organization", name: "Ket Cero", url: DOMINIO }, author: { "@type": "Person", name: AUTOR, url: `${DOMINIO}/omar/` },
+  hasPart: c.publicadas.map((l) => ({ "@type": "LearningResource", name: l.titulo, url: DOMINIO + l.pagina, description: l.descripcion })) });
+---
+<Base titulo={`${c.nombre} · Ket Cero`} descripcion={`Curso de ${c.nombre} desde cero, en español. ${c.descripcion}`} ruta={ruta} actual={ruta} cabeza={cabeza}>
+<div class="cuerpo">
+<main id="contenido">
+<section class="cabeza">
+<div class="mono"><a href="/cursos/">Cursos</a> / {c.nombre} · actualizado el {c.actualizado}</div>
+<h1>{c.nombre}</h1>
+<p>{c.descripcion}</p>
+<p class="aviso">Las animaciones publicadas son versiones preliminares: todavía están en revisión y pueden tener errores.</p>
+</section>
+{c.temasNum.map((t) => (
+  <section class="tema" id={t.clave}><h2>{t.titulo} <span>Tema {t.t}</span></h2><p>{t.descripcion}</p>
+  {t.items.map((it) => it.leccion
+    ? <a class="fila pub" data-leccion={it.leccion.slug} href={it.leccion.pagina}><div class="n">{it.numero}</div><div><b>{it.titulo}</b><p>{it.leccion.descripcion}</p><div class="d">{it.leccion.datos} · versión preliminar</div></div><Clip leccion={it.leccion} alPasar /></a>
+    : <div class="fila pend"><div class="n">{it.numero}</div><div><b>{it.titulo}</b></div><div class="d">en preparación</div></div>)}
+  </section>
+))}
+</main>
+</div>
+</Base>

@@ -1,9 +1,9 @@
-// Cloudflare Workers sirve la carpeta sitio/ como sitio estático (sin código de servidor).
+// Cloudflare Workers sirve la salida de Astro (apps/web/dist) como sitio estático.
 {
   "name": "ketcero",
   "compatibility_date": "2026-11-01",
   "assets": {
-    "directory": "./sitio",
+    "directory": "./apps/web/dist",
     "not_found_handling": "404-page",
     "html_handling": "auto-trailing-slash"
   }

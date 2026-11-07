@@ -1,0 +1,17 @@
+---
+import Base from "../../layouts/Base.astro";
+import { AUTOR, DOMINIO, ld } from "../../lib/sitio";
+const cabeza = ld({ "@context": "https://schema.org", "@type": "Person", name: AUTOR, url: `${DOMINIO}/omar/`, jobTitle: "Monitor de Deep Learning",
+  sameAs: ["https://github.com/omramirezg"], worksFor: { "@type": "Organization", name: "Ket Cero", url: DOMINIO } });
+---
+<Base titulo={`${AUTOR} · Ket Cero`} descripcion={`${AUTOR}, creador de Ket Cero: machine learning desde cero, con animaciones paso a paso.`} ruta="/omar/" actual="/omar/" cabeza={cabeza}>
+<div class="cuerpo solo">
+<main id="contenido" class="texto">
+<section class="cabeza">
+<div class="mono">Quién soy</div>
+<h1>{AUTOR}</h1>
+<p>Creador de Ket Cero.</p>
+</section>
+</main>
+</div>
+</Base>

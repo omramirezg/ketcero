@@ -1,0 +1,57 @@
+{
+ "lecciones": {
+  "la-cnn-completa": {
+   "url": "/ia/cnn/Animacion_A4_la_CNN_completa",
+   "pagina": "/cursos/deep-learning/la-cnn-completa/",
+   "peso_mb": 20.4,
+   "miniatura": "/img/cnn-completa.webp",
+   "clip": "/img/cnn-completa"
+  },
+  "mini-yolo-digitos-en-la-calle": {
+   "url": "/ia/deteccion/Animacion_B1_Mini_YOLO_por_dentro",
+   "pagina": "/cursos/deep-learning/mini-yolo-digitos-en-la-calle/",
+   "peso_mb": 69.7,
+   "miniatura": "/img/mini-yolo.webp",
+   "clip": "/img/mini-yolo"
+  },
+  "tipos-de-segmentacion": {
+   "url": "/ia/segmentacion/Animacion_U0_tipos_de_segmentacion",
+   "pagina": "/cursos/deep-learning/tipos-de-segmentacion/",
+   "peso_mb": 0.9,
+   "miniatura": "/img/tipos-segmentacion.webp",
+   "clip": null
+  },
+  "unet-edificios-en-fotos-satelitales": {
+   "url": "/ia/segmentacion/Animacion_U1_UNet_por_dentro",
+   "pagina": "/cursos/deep-learning/unet-edificios-en-fotos-satelitales/",
+   "peso_mb": 52.2,
+   "miniatura": "/img/unet.webp",
+   "clip": null
+  }
+ },
+ "versiones": {
+  "/estilo.css": "b73315504f",
+  "/favicon.ico": "c52c92cd7f",
+  "/favicon.svg": "0dc589a9c0",
+  "/robots.txt": "a4b879d8f9",
+  "/fuentes/IBMPlexMono-latin-ext.woff2": "4af8cef522",
+  "/fuentes/IBMPlexMono-latin.woff2": "bb87500e32",
+  "/fuentes/IBMPlexSans-latin-ext.woff2": "69ec309900",
+  "/fuentes/IBMPlexSans-latin.woff2": "d8b4e62dbb",
+  "/fuentes/OFL.txt": "0ae1afdcc6",
+  "/img/cnn-completa.mp4": "c15b1625d6",
+  "/img/cnn-completa.webm": "269a8fc8f0",
+  "/img/cnn-completa.webp": "14ee38e837",
+  "/img/compartir.png": "7cae9fe152",
+  "/img/mini-yolo.mp4": "9800ea8b8a",
+  "/img/mini-yolo.webm": "5ec96b6701",
+  "/img/mini-yolo.webp": "8c053bcc8b",
+  "/img/tipos-segmentacion.webp": "c9192f2a44",
+  "/img/unet.webp": "1b2e8f5443",
+  "/js/cero_datos.js": "12e2dcddf6",
+  "/kc/capa.css": "09dd364c9a",
+  "/kc/capa.js": "5be3c48f1f",
+  "/kc/fuentes.css": "ae4b6bedec",
+  "/kc/temprano.js": "bdee1f7d75"
+ }
+}

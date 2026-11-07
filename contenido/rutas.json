@@ -1,0 +1,12 @@
+{
+  "rutas": [
+    {"clave": "matematicas", "numero": 0, "titulo": "Matemáticas", "descripcion": "Álgebra, funciones, cálculo, álgebra lineal, probabilidad y optimización: la base de todo lo demás.", "necesita": [], "curso": null},
+    {"clave": "programacion", "numero": 1, "titulo": "Programación científica", "descripcion": "Python y NumPy, y cómo trabajan por dentro la memoria y la GPU.", "necesita": ["matematicas"], "curso": null},
+    {"clave": "ml-clasico", "numero": 2, "titulo": "Machine learning clásico", "descripcion": "Regresión, árboles, cómo se evalúa un modelo y por qué se equivoca.", "necesita": ["matematicas", "programacion"], "curso": null},
+    {"clave": "deep-learning", "numero": 3, "titulo": "Deep learning", "descripcion": "Redes densas, convolucionales, detección y segmentación, con cada operación a la vista.", "necesita": ["ml-clasico"], "curso": "deep-learning"},
+    {"clave": "lenguaje", "numero": 4, "titulo": "Visión, lenguaje y modelos de lenguaje", "descripcion": "De la atención a construir un modelo de lenguaje propio, paso a paso.", "necesita": ["deep-learning"], "curso": null},
+    {"clave": "refuerzo", "numero": 5, "titulo": "Aprendizaje por refuerzo y modelos de mundo", "descripcion": "Agentes que aprenden actuando, y redes que aprenden a predecir cómo cambia el mundo.", "necesita": ["deep-learning"], "curso": null},
+    {"clave": "robotica", "numero": 6, "titulo": "Robótica", "descripcion": "Cinemática, control, percepción y robots que aprenden.", "necesita": ["refuerzo", "matematicas"], "curso": null},
+    {"clave": "cuantica", "numero": 7, "titulo": "Computación cuántica", "descripcion": "Qubits, compuertas y algoritmos, empezando por |0⟩.", "necesita": ["matematicas", "programacion"], "curso": null}
+  ]
+}
