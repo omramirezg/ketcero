@@ -10,7 +10,7 @@
   "mini-yolo-digitos-en-la-calle": {
    "url": "/ia/deteccion/Animacion_B1_Mini_YOLO_por_dentro",
    "pagina": "/cursos/deep-learning/mini-yolo-digitos-en-la-calle/",
-   "peso_mb": 69.7,
+   "peso_mb": 70.7,
    "miniatura": "/img/mini-yolo.webp",
    "clip": "/img/mini-yolo"
   },
@@ -24,13 +24,13 @@
   "unet-edificios-en-fotos-satelitales": {
    "url": "/ia/segmentacion/Animacion_U1_UNet_por_dentro",
    "pagina": "/cursos/deep-learning/unet-edificios-en-fotos-satelitales/",
-   "peso_mb": 52.2,
+   "peso_mb": 53.0,
    "miniatura": "/img/unet.webp",
    "clip": null
   }
  },
  "versiones": {
-  "/estilo.css": "0bb1b193e9",
+  "/estilo.css": "a30f897713",
   "/favicon.ico": "c52c92cd7f",
   "/favicon.svg": "0dc589a9c0",
   "/robots.txt": "e98cf927f4",
@@ -51,10 +51,10 @@
   "/img/tipos-segmentacion.webp": "c9192f2a44",
   "/img/unet.webp": "1b2e8f5443",
   "/js/cero_datos.js": "12e2dcddf6",
-  "/kc/capa.css": "814f504277",
+  "/kc/capa.css": "e91dc652cd",
   "/kc/capa.js": "60dbd59a28",
   "/kc/fuentes.css": "63f628749e",
-  "/kc/temprano.js": "c82dc1d5a1",
+  "/kc/temprano.js": "e96d2c5927",
   "/practica/indice.json": "0439888a81",
   "/practica/la-derivada-que-usa-una-red/01-derivada-numerica.ipynb": "0e8cf01880",
   "/practica/la-derivada-que-usa-una-red/01-derivada-numerica.json": "bee76c9dc7",
