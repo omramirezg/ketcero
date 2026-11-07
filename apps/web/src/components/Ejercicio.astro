@@ -1,0 +1,33 @@
+---
+// Un ejercicio de práctica: enunciado, editor de Python y «Comprobar». Las pruebas corren en el navegador
+// (Pyodide, en un Web Worker) y no se muestran; la solución de referencia nunca sale del repositorio.
+// Sin JavaScript se ve el código inicial y los enlaces para llevarlo a Colab, a vscode.dev o descargarlo.
+import { join } from "node:path";
+import { ejerciciosDeLeccion } from "@ketcero/practica/cargar";
+import { enunciadoHtml } from "@ketcero/practica";
+
+interface Props { leccion: string; id: string }
+const { leccion, id } = Astro.props;
+const todos = ejerciciosDeLeccion(join(process.cwd(), "..", "..", "contenido", "practica", leccion));
+const n = todos.findIndex((e) => e.id === id);
+if (n < 0) throw new Error(`No existe el ejercicio ${leccion}/${id}`);
+const e = todos[n];
+const REPO = "omramirezg/ketcero";
+const cuaderno = `apps/web/public/practica/${leccion}/${id}.ipynb`;
+const datos = JSON.stringify({ leccion, id, titulo: e.titulo, inicial: e.inicial, pruebas: e.pruebas }).replace(/</g, "\\u003c");
+---
+<section class="ejercicio" id={`ejercicio-${n + 1}`} aria-labelledby={`t-${n + 1}`}>
+<h3 id={`t-${n + 1}`}><span>Ejercicio {n + 1}</span>{e.titulo}</h3>
+{e.enunciado.map((p) => <p set:html={enunciadoHtml(p)} />)}
+<div class="editor"><pre>{e.inicial}</pre></div>
+<div class="botones">
+<button type="button" class="boton" data-comprobar disabled>Comprobar</button>
+<button type="button" class="reiniciar" data-reiniciar disabled>Volver al código inicial</button>
+<span class="estado" aria-live="polite"></span>
+</div>
+<ol class="resultados" aria-label="Resultado de las pruebas"></ol>
+<p class="llevar">También en: <a href={`https://colab.research.google.com/github/${REPO}/blob/main/${cuaderno}`} target="_blank" rel="noopener">Colab</a>
+· <a href={`https://vscode.dev/github/${REPO}/blob/main/${cuaderno}`} target="_blank" rel="noopener">vscode.dev</a>
+· <a href={`/practica/${leccion}/${id}.ipynb`} download>descargar el cuaderno</a></p>
+<script type="application/json" set:html={datos}></script>
+</section>

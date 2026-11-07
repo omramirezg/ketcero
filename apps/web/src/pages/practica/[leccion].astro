@@ -1,0 +1,34 @@
+---
+// Una mini-lección de práctica: explicación + ejercicios con pruebas que corren en el navegador.
+// Mientras esté en «borrador» no aparece en ningún menú ni en el sitemap y lleva noindex.
+import { getCollection, render } from "astro:content";
+import Base from "../../layouts/Base.astro";
+import Ejercicio from "../../components/Ejercicio.astro";
+
+export async function getStaticPaths() {
+  return (await getCollection("practica")).map((p) => ({ params: { leccion: p.data.slug }, props: { p } }));
+}
+const { p } = Astro.props;
+const { Content } = await render(p);
+const ruta = `/practica/${p.data.slug}/`;
+const cabeza = p.data.estado === "borrador" ? '<meta name="robots" content="noindex, nofollow">' : "";
+---
+<Base titulo={`${p.data.titulo} · Práctica · Ket Cero`} descripcion={p.data.descripcion} ruta={ruta} actual={ruta} cabeza={cabeza}>
+<div class="cuerpo solo leccion practica">
+<main id="contenido">
+<section class="cabeza">
+<div class="mono">Práctica · {p.data.ruta}</div>
+<h1>{p.data.titulo}</h1>
+<p>{p.data.descripcion}</p>
+{p.data.estado === "borrador" && <p class="aviso">Borrador: esta página todavía no está enlazada desde ningún lado.</p>}
+</section>
+<article class="ficha practica-texto">
+<Content components={{ Ejercicio }} />
+</article>
+</main>
+</div>
+<script>
+  import { montarTodos } from "@ketcero/practica/cliente";
+  montarTodos();
+</script>
+</Base>

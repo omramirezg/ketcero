@@ -24,6 +24,8 @@ def leer_reglas():
         if not linea[0].isspace():
             actual = (linea.strip(), [])
             reglas.append(actual)
+        elif actual and linea.strip().startswith("!"):  # «! Nombre» quita un encabezado de una regla anterior
+            actual[1].append((linea.strip()[1:].strip(), None))
         elif actual and ":" in linea:
             nombre, valor = linea.strip().split(":", 1)
             actual[1].append((nombre.strip(), valor.strip()))
@@ -53,10 +55,16 @@ class Manejador(http.server.SimpleHTTPRequestHandler):
 
     def end_headers(self):
         camino = self.path.split("?")[0]
+        juntos = []  # como Cloudflare: se suman las reglas que coinciden, y «!» quita lo que puso una anterior
         for patron, encabezados in leer_reglas():
-            if fnmatch.fnmatch(camino, patron.replace("*", "*")):
+            if fnmatch.fnmatch(camino, patron):
                 for nombre, valor in encabezados:
-                    self.send_header(nombre, valor)
+                    if valor is None:
+                        juntos = [(n, v) for n, v in juntos if n.lower() != nombre.lower()]
+                    else:
+                        juntos.append((nombre, valor))
+        for nombre, valor in juntos:
+            self.send_header(nombre, valor)
         super().end_headers()
 
     def log_message(self, *a):

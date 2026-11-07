@@ -1,0 +1,57 @@
+---
+titulo: "La derivada que usa una red"
+slug: "la-derivada-que-usa-una-red"
+ruta: "Ruta 0 · Fundamentos"
+descripcion: "Qué es una derivada, para qué la necesita una red neuronal y cómo se calcula con números, con la regla de la cadena y para un lote entero. Cuatro ejercicios en Python que se comprueban en tu navegador."
+estado: "borrador"
+---
+
+## La idea en una frase
+
+Una red neuronal aprende moviendo sus pesos un poquito en la dirección en que se equivoca menos. Para saber cuál es esa dirección necesita una sola cosa: la derivada de la pérdida con respecto a cada peso. Eso es todo lo que hace el entrenamiento, millones de veces.
+
+## Qué es una derivada, sin fórmulas
+
+Piensen en una montaña de noche. Ustedes están parados en un punto y no ven nada, pero sí sienten el piso con el pie: si el piso sube hacia adelante o baja. La derivada es eso, qué tan inclinado está el piso justo donde están parados. Si es positiva, hacia adelante sube; si es negativa, baja; si es cero, están en un sitio plano.
+
+En una red, la "montaña" es la pérdida: un número que dice qué tan mal predice la red. Cada peso es una dirección en la que uno se puede mover. La derivada de la pérdida con respecto a un peso, que se escribe ∂L/∂w, dice: si muevo este peso un poquito hacia arriba, ¿la pérdida sube o baja, y cuánto?
+
+Dónde se rompe la analogía: en una montaña de verdad hay dos direcciones (norte y este). En una red hay tantas direcciones como pesos, a veces millones. La idea es la misma, solo que no se puede dibujar.
+
+## Calcularla con números
+
+La forma más directa de medir la inclinación es probar: mirar la altura un poquito a la derecha, un poquito a la izquierda, y dividir la diferencia por la distancia entre esos dos puntos. Con un paso pequeño `h`, la distancia es `2h`. A eso se le llama diferencia centrada.
+
+Es lento para una red real (habría que evaluar la red dos veces por cada peso), pero sirve muchísimo para comprobar que una derivada calculada a mano está bien. Los frameworks lo usan justamente para eso.
+
+<Ejercicio leccion="la-derivada-que-usa-una-red" id="01-derivada-numerica" />
+
+## La regla de la cadena: eslabón por eslabón
+
+Una neurona hace tres cosas seguidas: calcula `z = w · x + b`, le aplica la sigmoide `a = σ(z)` y al final se mide la pérdida `L = (a − y)²`. La pérdida no depende de `w` directamente, depende de `a`, que depende de `z`, que depende de `w`.
+
+La regla de la cadena dice que para saber cómo cambia `L` cuando muevo `w`, multiplico cómo cambia cada eslabón con respecto al anterior: `∂L/∂w = ∂L/∂a · ∂a/∂z · ∂z/∂w`. Es como un tren de engranajes: si el primero gira el doble que el segundo y el segundo el triple que el tercero, el primero gira seis veces lo que el tercero.
+
+Eso que acaban de leer es backpropagation, en pequeño. Una red grande es la misma cadena, con muchos más eslabones.
+
+<Ejercicio leccion="la-derivada-que-usa-una-red" id="02-regla-de-la-cadena" />
+
+## Muchos ejemplos a la vez
+
+Una red no aprende de un ejemplo a la vez: toma un lote (un batch) y promedia. Con NumPy eso se escribe sin un solo `for`, operando sobre arreglos completos. El detalle importante es usar el promedio y no la suma: si se suma, el gradiente se hace más grande solo porque el lote es más grande, y el mismo paso de aprendizaje que funcionaba con 32 ejemplos se vuelve enorme con 256.
+
+<Ejercicio leccion="la-derivada-que-usa-una-red" id="03-gradiente-del-lote" />
+
+## Dar el paso
+
+Ya con el gradiente, aprender es moverse en contra: `w ← w − lr · ∂L/∂w`. El `lr` (learning rate) es el tamaño del paso. Muy pequeño y se tarda una eternidad; muy grande y se pasa del fondo del valle y rebota. Esto, repetido, es el descenso de gradiente, y es lo mismo que hace `optimizer.step()` en PyTorch.
+
+<Ejercicio leccion="la-derivada-que-usa-una-red" id="04-un-paso-de-descenso" />
+
+## Lo que se llevan
+
+- La derivada dice hacia dónde sube la pérdida; la red se mueve en contra.
+- Con números se calcula probando a los dos lados (sirve para verificar).
+- La regla de la cadena multiplica los eslabones: eso es backpropagation.
+- En un lote se promedia, no se suma.
+- Un paso de descenso es `w − lr · gradiente`, y entrenar es repetirlo.

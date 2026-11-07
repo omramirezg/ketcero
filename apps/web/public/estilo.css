@@ -232,3 +232,34 @@ a:focus-visible, button:focus-visible { outline:2px solid var(--tinta); outline-
 .grafo .nodo.activo rect { stroke:var(--tinta); }
 .grafo .nodo.activo text { fill:var(--tinta); }
 .grafo a:hover .nodo rect { stroke-width:1.6; }
+
+/* Práctica: ejercicios con editor y pruebas en el navegador */
+.practica-texto h2 { font:600 20px "IBM Plex Sans", sans-serif; margin:34px 0 10px; }
+.practica-texto p { margin:0 0 14px; }
+.practica-texto ul { margin:0 0 14px; }
+.practica-texto code, .ejercicio p code { font:14px "IBM Plex Mono", monospace; background:var(--marca); padding:1px 5px; }
+.ejercicio { margin:28px 0 36px; padding:22px 0 0; border-top:1px solid var(--linea); }
+.ejercicio h3 { font:600 18px "IBM Plex Sans", sans-serif; margin:0 0 12px; }
+.ejercicio h3 span { display:block; font:13px "IBM Plex Mono", monospace; color:var(--gris); font-weight:400; margin-bottom:4px; }
+.ejercicio .editor { margin:16px 0 0; --seleccion:rgba(128,128,128,.35); }
+.ejercicio .editor pre { margin:0; padding:10px 14px; border:1px solid var(--linea); font:13.5px/1.6 "IBM Plex Mono", monospace; overflow-x:auto; color:var(--c-texto); }
+.ejercicio .botones { display:flex; flex-wrap:wrap; align-items:center; gap:12px 20px; margin-top:14px; }
+.ejercicio .boton { background:none; font-family:"IBM Plex Sans", sans-serif; cursor:pointer; }
+.ejercicio .boton:disabled { opacity:.5; cursor:default; }
+.ejercicio .reiniciar { background:none; border:0; padding:0; font:14px "IBM Plex Sans", sans-serif; color:var(--gris); cursor:pointer; border-bottom:1px solid var(--linea); }
+.ejercicio .reiniciar:hover { color:var(--tinta); }
+.ejercicio .estado { font-size:14.5px; color:var(--texto); }
+.ejercicio .resultados { list-style:none; margin:14px 0 0; padding:0; }
+.ejercicio .resultados:empty { display:none; }
+.ejercicio .resultados li { padding:8px 0; border-top:1px solid var(--linea); font-size:15px; }
+.ejercicio .marca-prueba { display:inline-block; min-width:76px; font:13px "IBM Plex Mono", monospace; color:var(--gris); }
+.ejercicio .falla .marca-prueba { color:var(--tinta); font-weight:600; }
+.ejercicio .detalle { margin:6px 0 0 76px; color:var(--texto); font-size:14.5px; }
+.ejercicio dl { display:grid; grid-template-columns:max-content 1fr; gap:2px 14px; margin:6px 0 0; font:13.5px "IBM Plex Mono", monospace; }
+.ejercicio dt { color:var(--gris); } .ejercicio dd { margin:0; overflow-wrap:anywhere; }
+.ejercicio .llevar { margin:14px 0 0 !important; font-size:14px; color:var(--gris) !important; }
+.ejercicio .llevar a { color:var(--gris); border-bottom:1px solid var(--linea); }
+.ejercicio .llevar a:hover { color:var(--tinta); }
+.ejercicio, .practica-texto { --c-clave:#C586C0; --c-funcion:#DCDCAA; --c-modulo:#4EC9B0; --c-var:#9CDCFE; --c-num:#B5CEA8; --c-com:#6A9955; --c-cadena:#CE9178; --c-texto:#D4D4D4; }
+:root[data-tema="claro"] .ejercicio, :root[data-tema="claro"] .practica-texto { --c-clave:#AF00DB; --c-funcion:#795E26; --c-modulo:#267F99; --c-var:#001080; --c-num:#098658; --c-com:#008000; --c-cadena:#A31515; --c-texto:#1F1F1F; }
+@media (max-width: 720px) { .ejercicio .detalle { margin-left:0; } }
