@@ -24,7 +24,7 @@
   "unet-edificios-en-fotos-satelitales": {
    "url": "/ia/segmentacion/Animacion_U1_UNet_por_dentro",
    "pagina": "/cursos/deep-learning/unet-edificios-en-fotos-satelitales/",
-   "peso_mb": 53.1,
+   "peso_mb": 54.0,
    "miniatura": "/img/unet.webp",
    "clip": null
   }
@@ -51,7 +51,7 @@
   "/img/tipos-segmentacion.webp": "c9192f2a44",
   "/img/unet.webp": "1b2e8f5443",
   "/js/cero_datos.js": "12e2dcddf6",
-  "/kc/capa.css": "e91dc652cd",
+  "/kc/capa.css": "8ad1333d8f",
   "/kc/capa.js": "60dbd59a28",
   "/kc/fuentes.css": "63f628749e",
   "/kc/temprano.js": "e96d2c5927",
